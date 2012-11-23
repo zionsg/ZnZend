@@ -11,5 +11,6 @@ echo $this->znZendExcerpt($text, 5, '...read more', 'http://intzone.com');
 ?>
 ```
 _BECOMES_
+
 The quick brown<br /><br />
 The quick brown fox <a href="http://intzone.com">...read more</a>
