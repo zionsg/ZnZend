@@ -7,10 +7,10 @@ $text = 'The quick brown <!--more-->fox jumps over the lazy old dog.';
 echo $this->znZendExcerpt($text) . '<br /><br />';
 
 $text = 'The quick brown fox jumps over the lazy old dog.';
-echo $this->znZendExcerpt($text, 5, '...read more', 'http://intzone.com');
+echo $this->znZendExcerpt($text, 5, '...read more', 'http://intzone.com', '_blank');
 ?>
 ```
 _BECOMES_
 
 The quick brown<br /><br />
-The quick brown fox <a href="http://intzone.com">...read more</a>
+The quick brown fox <a target="_blank" href="http://intzone.com">...read more</a>
