@@ -1,4 +1,4 @@
-### Example for znZendFormatBytes
+### Example for znZendFormatDateRange
 
 ```php
 <!-- In view script -->
