@@ -17,6 +17,7 @@ the helpers and base classes I used for my Zend Framework 1 projects
 
 1. Clone this project into your `./vendor/` directory and enable it in your
    `application.config.php` file under the `modules` key.
+2. Examples can be found in the `examples` directory.
 
 Classes
 -------
