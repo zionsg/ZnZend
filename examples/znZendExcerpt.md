@@ -13,4 +13,4 @@ echo $this->znZendExcerpt($text, 5, '...read more', 'http://intzone.com', '_blan
 _BECOMES_
 
 The quick brown<br />
-The quick brown fox <a target="_blank" href="http://intzone.com">...read more</a>
+The quick brown fox jumps <a target="_blank" href="http://intzone.com">...read more</a>
