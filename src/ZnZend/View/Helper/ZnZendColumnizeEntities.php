@@ -214,7 +214,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     }
 
                     // Insert thumbnail output
-                    $output .= $thumbnailOutput;
+                    $entityOutput .= $thumbnailOutput;
 
                     // Get entity name
                     $name = null;
