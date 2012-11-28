@@ -148,6 +148,21 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     }
                     $entityOutput = $entityCallback($entity) . PHP_EOL;
                 } else {
+                    // Get entity url
+                    $urlOutputBegin = '';
+                    $urlOutputEnd = '';
+                    if ($urlCallback) {
+                        if (!is_callable($urlCallback)) {
+                            throw new InvalidArgumentException('Invalid url callback provided');
+                        }
+                        $url = $urlCallback($entity);
+                        $urlOutputBegin = sprintf(
+                            '<a class="%s" target="%s" href="%s">' . PHP_EOL,
+                            $urlClass, $urlTarget, $url
+                        );
+                        $urlOutputEnd = '</a>' . PHP_EOL;
+                    }
+                    
                     // Get entity thumbnail
                     $thumbnail = null;
                     if ($thumbnailCallback) {
@@ -177,11 +192,13 @@ class ZnZendColumnizeEntities extends AbstractHelper
                             }
 
                             $thumbnailOutput = sprintf(
-                                '<img class="%s" align="center" src="%s" %s %s />' . PHP_EOL,
+                                '%s<img class="%s" align="center" src="%s" %s %s />' . PHP_EOL . '%s',
+                                $urlOutputBegin,
                                 $thumbnailClass,
                                 $thumbnailPath . '/' . $thumbnail,
                                 ($maxThumbnailWidth == 0 ? '' : "width=\"{$width}\""),
-                                ($maxThumbnailHeight == 0 ? '' : "height=\"{$height}\"")
+                                ($maxThumbnailHeight == 0 ? '' : "height=\"{$height}\""),
+                                $urlOutputEnd
                             );
                         } // end if thumbnail file exists
 
@@ -200,19 +217,6 @@ class ZnZendColumnizeEntities extends AbstractHelper
                         }
                     } // end draw thumbnail
 
-                    // Get entity url
-                    $url = null;
-                    if ($urlCallback) {
-                        if (!is_callable($urlCallback)) {
-                            throw new InvalidArgumentException('Invalid url callback provided');
-                        }
-                        $url = $urlCallback($entity);
-                        $entityOutput .= sprintf(
-                            '<a class="%s" target="%s" href="%s">' . PHP_EOL,
-                            $urlClass, $urlTarget, $url
-                        );
-                    }
-
                     // Insert thumbnail output
                     $entityOutput .= $thumbnailOutput;
 
@@ -222,8 +226,14 @@ class ZnZendColumnizeEntities extends AbstractHelper
                         if (!is_callable($nameCallback)) {
                             throw new InvalidArgumentException('Invalid name callback provided');
                         }
-                        $name = $nameCallback($entity);
-                        $entityOutput .= sprintf('<div class="%s">%s</div>' . PHP_EOL, $nameClass, $name);
+                        $name = $nameCallback($entity) . PHP_EOL;
+                        $entityOutput .= sprintf(
+                            '<div class="%s">%s%s%s</div>' . PHP_EOL,
+                            $nameClass,
+                            $urlOutputBegin,
+                            $name,
+                            $urlOutputEnd
+                        );
                     }
 
                     // Close </a> if there is an entity url
