@@ -24,7 +24,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
      * with both hyperlinked to a specified url. If another format is desired,
      * use $entityCallback
      *
-     * @param  array $params Key-value pairs. All paths should NOT have trailing slashes
+     * @param  array $params Key-value pairs as follows:
      *         'cols'           int      DEFAULT=1. No. of columns to split entities in
      *         'drawTable'      boolean  DEFAULT=true. Whether to enclose all entities in a table with
      *                                   1 entity per cell. Sometimes the user may only want to process
@@ -195,7 +195,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     // Draw thumbnail
                     $thumbnailOutput = '';
                     if ($thumbnail !== null) {
-                        $imagePath = $webRoot . $thumbnailPath . '/' . $thumbnail;
+                        $imagePath = $webRoot . rtrim($thumbnailPath, "\\/") . '/' . $thumbnail;
                         if (!file_exists($imagePath)) {
                             $thumbnailOutput .= PHP_EOL;
                         } else {
