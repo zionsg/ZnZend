@@ -29,7 +29,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *         'drawTable'      boolean  DEFAULT=true. Whether to enclose all entities in a table with
      *                                   1 entity per cell. Sometimes the user may only want to process
      *                                   1 entity in which case the outermost table is not needed
-     *         'entities'       object[] Array of entity objects
+     *         'entities'       object[] Array of entity objects. Single object may be passed
      *         'entityCallback' callback Callback function that takes in entity and returns formatted
      *                                   HTML for entity. If this is not defined, the default format
      *                                   of url, thumbnail and name is used
@@ -107,9 +107,13 @@ class ZnZendColumnizeEntities extends AbstractHelper
         extract($params);
 
         // Convert associative array to numerically indexed array
-        $entities = array_values($entities);
+        if (empty($entities)) {
+            return '';
+        }
+        $entities = array_values(
+            is_array($entities) ? $entities : array($entities)
+        );
         $entityCount = count($entities);
-        if ($entityCount == 0) return '';
 
         // Calculate initial rows
         if (!in_array($remainderAlign, array('left', 'center'))) {
