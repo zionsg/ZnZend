@@ -121,7 +121,11 @@ class ZnZendColumnizeEntities extends AbstractHelper
         $entitiesProcessed = 0;
 
         // Process entities and generate output
-        $output = sprintf('<table id="%s" class="%s" width="100%%">' . PHP_EOL, $tableId, $tableClass);
+        $output = sprintf(
+            '<table id="%s" class="%s" cellspacing="0" cellpadding="0" width="100%%">' . PHP_EOL, 
+            $tableId, 
+            $tableClass
+        );
         for ($row = 0; $row < $initialRows; $row++) {
             $output .= sprintf('<tr class="%s">' . PHP_EOL, $trClass);
             for ($col = 0; $col < $cols; $col++) {
@@ -158,7 +162,9 @@ class ZnZendColumnizeEntities extends AbstractHelper
                         $url = $urlCallback($entity);
                         $urlOutputBegin = sprintf(
                             '<a class="%s" target="%s" href="%s">' . PHP_EOL,
-                            $urlClass, $urlTarget, $url
+                            $urlClass, 
+                            $urlTarget, 
+                            $url
                         );
                         $urlOutputEnd = '</a>' . PHP_EOL;
                     }
@@ -217,10 +223,10 @@ class ZnZendColumnizeEntities extends AbstractHelper
                         }
                     } // end draw thumbnail
 
-                    // Insert thumbnail output
+                    // Add thumbnail output to entity output
                     $entityOutput .= $thumbnailOutput;
 
-                    // Get entity name
+                    // Get entity name and add to entity output
                     $name = null;
                     if ($nameCallback) {
                         if (!is_callable($nameCallback)) {
