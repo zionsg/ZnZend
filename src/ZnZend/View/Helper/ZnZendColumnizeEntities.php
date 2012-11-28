@@ -25,47 +25,50 @@ class ZnZendColumnizeEntities extends AbstractHelper
      * use $entityCallback
      *
      * @param  array $params Key-value pairs. All paths should NOT have trailing slashes
-     *         @key int      $cols           DEFAULT=1. No. of columns to split entities in
-     *         @key object[] $entities       Array of entity objects
-     *         @key callback $entityCallback Callback function that takes in entity and returns formatted
-     *                                       HTML for entity. If this is not defined, the default format
-     *                                       of url, thumbnail and name is used
-     *         @key string   $nameClass      CSS class for entity name
-     *         @key callback $nameCallback   Callback function that takes in entity and returns name
-     *         @key boolean  $leftToRight    DEFAULT=true. Whether to list entities from left to right
-     *                                       or top to down. Examples with $remainderAlign set to 'center'
-     *                                           Left to right
-     *                                           1   2   3
-     *                                           4   5   6
-     *                                             7   8
+     *         'cols'           int      DEFAULT=1. No. of columns to split entities in
+     *         'drawTable'      boolean  DEFAULT=true. Whether to enclose all entities in a table with
+     *                                   1 entity per cell. Sometimes the user may only want to process
+     *                                   1 entity in which case the outermost table is not needed
+     *         'entities'       object[] Array of entity objects
+     *         'entityCallback' callback Callback function that takes in entity and returns formatted
+     *                                   HTML for entity. If this is not defined, the default format
+     *                                   of url, thumbnail and name is used
+     *         'nameClass'      string   CSS class for entity name
+     *         'nameCallback'   callback Callback function that takes in entity and returns name
+     *         'leftToRight'    boolean  DEFAULT=true. Whether to list entities from left to right
+     *                                   or top to down. Examples with $remainderAlign set to 'center'
+     *                                       Left to right
+     *                                       1   2   3
+     *                                       4   5   6
+     *                                         7   8
      *
-     *                                           Top to down
-     *                                           1   3   5
-     *                                           2   4   6
-     *                                             7   8
-     *         @key string   $remainderAlign DEFAULT='center'. How to align the remainder entities in
-     *                                       the last row. Possible values: left, center.
-     *         @key string   $tableClass     CSS class for entire table
-     *         @key string   $tableId        'id' attribute for entire table, to facilitate DOM reference
-     *         @key string   $tdClass        CSS class for <td> enclosing entity
-     *         @key string   $trClass        CSS class for <tr> enclosing entity <td>
-     *         @key callback $urlCallback    Callback function that takes in entity and returns entity url
-     *         @key string   $urlClass       CSS class for entity url
-     *         @key string   $urlTarget      Target for entity url. <a target="<$urlTarget>"...
+     *                                       Top to down
+     *                                       1   3   5
+     *                                       2   4   6
+     *                                         7   8
+     *         'remainderAlign' string   DEFAULT='center'. How to align the remainder entities in
+     *                                   the last row. Possible values: left, center.
+     *         'tableClass'     string   CSS class for entire table
+     *         'tableId'        string   'id' attribute for entire table, to facilitate DOM reference
+     *         'tdClass'        string   CSS class for <td> enclosing entity
+     *         'trClass'        string   CSS class for <tr> enclosing entity <td>
+     *         'urlCallback'    callback Callback function that takes in entity and returns entity url
+     *         'urlClass'       string   CSS class for entity url
+     *         'urlTarget'      string   Target for entity url. <a target="urlTarget"...
      *
      *         Keys for drawing thumbnail images:
-     *         @key boolean  $drawThumbnailBox   DEFAULT=true. Whether to enclose thumbnail <img> in <td>.
-     *                                           If true, box will be drawn even if there's no thumbnail
-     *         @key string   $thumbnailBoxClass  CSS class for <td> box enclosing thumbnail image
-     *         @key string   $thumbnailClass     CSS class for thumbnail image
-     *         @key callback $thumbnailCallback  Callback function that takes in entity and returns
-     *                                           thumbnail filename
-     *         @key string   $thumbnailPath      Folder path relative to web root where thumbnail is stored
-     *         @key int      $maxThumbnailHeight Maximum height constraint for thumbnail image
-     *                                           If set to 0, "height" attribute will be skipped in output
-     *         @key int      $maxThumbnailWidth  Maximum width constraint for thumbnail image
-     *                                           If set to 0, "width" attribute will be skipped in output
-     *         @key string   $webRoot            Absolute path for web root. Used for retrieving thumbnail
+     *         'drawThumbnailBox'   boolean  DEFAULT=true. Whether to enclose thumbnail <img> in <td>.
+     *                                       If true, box will be drawn even if there's no thumbnail
+     *         'thumbnailBoxClass'  string   CSS class for <td> box enclosing thumbnail image
+     *         'thumbnailClass'     string   CSS class for thumbnail image
+     *         'thumbnailCallback'  callback Callback function that takes in entity and returns
+     *                                       thumbnail filename
+     *         'thumbnailPath'      string   Folder path relative to web root where thumbnail is stored
+     *         'maxThumbnailHeight' int      Maximum height constraint for thumbnail image
+     *                                       If set to 0, "height" attribute will be skipped in output
+     *         'maxThumbnailWidth'  int      Maximum width constraint for thumbnail image
+     *                                       If set to 0, "width" attribute will be skipped in output
+     *         'webRoot'            string   Absolute path for web root. Used for retrieving thumbnail
      * @return string
      * @throws InvalidArgumentException When any of the callbacks is not callable
      */
@@ -75,6 +78,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
         $params = array_merge(
             array(
                 'cols' => 1,
+                'drawTable' => true,
                 'entities' => array(),
                 'entityCallback' => null,
                 'nameClass' => '',
@@ -121,15 +125,25 @@ class ZnZendColumnizeEntities extends AbstractHelper
         $entitiesProcessed = 0;
 
         // Process entities and generate output
-        $output = sprintf(
-            '<table id="%s" class="%s" cellspacing="0" cellpadding="0" width="100%%">' . PHP_EOL, 
-            $tableId, 
-            $tableClass
-        );
+        if ($drawTable) {
+            $output = sprintf(
+                '<table id="%s" class="%s" cellspacing="0" cellpadding="0" width="100%%">' . PHP_EOL,
+                $tableId,
+                $tableClass
+            );
+        } else {
+            $output = '';
+        }
+
         for ($row = 0; $row < $initialRows; $row++) {
-            $output .= sprintf('<tr class="%s">' . PHP_EOL, $trClass);
+            if ($drawTable) {
+                $output .= sprintf('<tr class="%s">' . PHP_EOL, $trClass);
+            }
+
             for ($col = 0; $col < $cols; $col++) {
-                $output .= sprintf('<td class="%s" width="%d%%">' . PHP_EOL, $tdClass, $tdWidth);
+                if ($drawTable) {
+                    $output .= sprintf('<td class="%s" width="%d%%">' . PHP_EOL, $tdClass, $tdWidth);
+                }
 
                 // Get entity, depending on listing order (left-right or top-down)
                 if ($leftToRight) {
@@ -162,13 +176,13 @@ class ZnZendColumnizeEntities extends AbstractHelper
                         $url = $urlCallback($entity);
                         $urlOutputBegin = sprintf(
                             '<a class="%s" target="%s" href="%s">' . PHP_EOL,
-                            $urlClass, 
-                            $urlTarget, 
+                            $urlClass,
+                            $urlTarget,
                             $url
                         );
                         $urlOutputEnd = '</a>' . PHP_EOL;
                     }
-                    
+
                     // Get entity thumbnail
                     $thumbnail = null;
                     if ($thumbnailCallback) {
@@ -248,12 +262,23 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     }
                 } // end entity output
 
-                $output .= $entityOutput . '</td>' . PHP_EOL;
+                if ($drawTable) {
+                    $output .= $entityOutput . '</td>' . PHP_EOL;
+                } else {
+                    $output .= $entityOutput . PHP_EOL;
+                }
+
                 $entitiesProcessed++;
             } // end for cols
-            $output .= '</tr>' . PHP_EOL;
+
+            if ($drawTable) {
+                $output .= '</tr>' . PHP_EOL;
+            }
         } // end for rows
-        $output .= '</table>' . PHP_EOL;
+
+        if ($drawTable) {
+            $output .= '</table>' . PHP_EOL;
+        }
 
         // Call function again to output remaining entities
         $remainderCount = $entityCount % $cols;
