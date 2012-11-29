@@ -37,9 +37,9 @@ echo $this->znZendColumnizeEntities($params);
 ```
 _BECOMES_
 
-<table id="" class="" cellspacing="0" cellpadding="0" width="100%">
-<tr class="" style="background-color:white;">
-<td style="text-align:center; padding:10px; background-color:white;" width="33%">
+<table id="" class="" cellspacing="0" cellpadding="0" width="100%" style="margin:0;">
+<tr class="" style="background-color:white; border:0; border-top:0;">
+<td style="text-align:center; padding:10px; background-color:white; border:0;" width="33%">
 <table align="center" cellspacing="0" style="border:0;padding:0;background-color:inherit;" cellpadding="0" width="100%">
 <tr style="border:0;"><td class="" width="90" height="60" align="center" valign="middle" style="border:0; padding:0;">
 <a class="" target="" href="http://intzone.com">
@@ -53,7 +53,7 @@ Object1
 </td></tr>
 </table>
 </td>
-<td style="text-align:center; padding:10px; background-color:white;" width="33%">
+<td style="text-align:center; padding:10px; background-color:white; border:0;" width="33%">
 <table align="center" cellspacing="0" style="border:0;padding:0;" cellpadding="0" width="100%">
 <tr style="border:0;"><td class="" width="90" height="60" align="center" valign="middle" style="border:0; padding:0;">
 <a class="" target="" href="http://intzone.com">
@@ -67,7 +67,7 @@ Object2
 </td></tr>
 </table>
 </td>
-<td style="text-align:center; padding:10px; background-color:white;" width="33%">
+<td style="text-align:center; padding:10px; background-color:white; border:0;" width="33%">
 <table align="center" cellspacing="0" style="border:0;padding:0;" cellpadding="0" width="100%">
 <tr style="border:0;"><td class="" width="90" height="60" align="center" valign="middle" style="border:0; padding:0;">
 <a class="" target="" href="http://intzone.com">
@@ -82,8 +82,8 @@ Object3
 </table>
 </td>
 </tr>
-<tr class="">
-<td style="text-align:center; padding:10px; background-color:white;" width="33%">
+<tr class="" style="border:0; border-top:0;">
+<td style="text-align:center; padding:10px; background-color:white; border:0;" width="33%">
 <table align="center" cellspacing="0" style="border:0;padding:0;" cellpadding="0" width="100%">
 <tr style="border:0;"><td class="" width="90" height="60" align="center" valign="middle" style="border:0; padding:0;">
 <a class="" target="" href="http://intzone.com">
@@ -97,7 +97,7 @@ Object4
 </td></tr>
 </table>
 </td>
-<td style="text-align:center; padding:10px; background-color:white;" width="33%">
+<td style="text-align:center; padding:10px; background-color:white; border:0;" width="33%">
 <table align="center" cellspacing="0" style="border:0;padding:0;" cellpadding="0" width="100%">
 <tr style="border:0;"><td class="" width="90" height="60" align="center" valign="middle" style="border:0; padding:0;">
 <a class="" target="" href="http://intzone.com">
@@ -111,7 +111,7 @@ Object5
 </td></tr>
 </table>
 </td>
-<td style="text-align:center; padding:10px; background-color:white;" width="33%">
+<td style="text-align:center; padding:10px; background-color:white; border:0;" width="33%">
 <table align="center" cellspacing="0" style="border:0;padding:0;" cellpadding="0" width="100%">
 <tr style="border:0;"><td class="" width="90" height="60" align="center" valign="middle" style="border:0; padding:0;">
 <a class="" target="" href="http://intzone.com">
@@ -127,9 +127,10 @@ Object6
 </td>
 </tr>
 </table>
-<table id="" class="" cellspacing="0" cellpadding="0" width="100%">
-<tr class="">
-<td style="text-align:center; padding:10px; background-color:white;" width="50%">
+
+<table id="" class="" cellspacing="0" cellpadding="0" width="100%" style="margin:0;">
+<tr class="" style="border:0; border-top:0;">
+<td style="text-align:center; padding:10px; background-color:white; border:0;" width="50%">
 <table align="center" cellspacing="0" style="border:0;padding:0;" cellpadding="0" width="100%">
 <tr style="border:0;"><td class="" width="90" height="60" align="center" valign="middle" style="border:0; padding:0;">
 <a class="" target="" href="http://intzone.com">
@@ -143,7 +144,7 @@ Object7
 </td></tr>
 </table>
 </td>
-<td style="text-align:center; padding:10px; background-color:white;" width="50%">
+<td style="text-align:center; padding:10px; background-color:white; border:0;" width="50%">
 <table align="center" cellspacing="0" style="border:0;padding:0;" cellpadding="0" width="100%">
 <tr style="border:0;"><td class="" width="90" height="60" align="center" valign="middle" style="border:0; padding:0;">
 <a class="" target="" href="http://intzone.com">
