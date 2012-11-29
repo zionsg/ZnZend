@@ -18,11 +18,25 @@ class ZnZendColumnizeEntities extends AbstractHelper
     /**
      * __invoke
      *
+     * This is used as a proxy as columnize() has other arguments meant for
+     * its internal use only
+     *
+     * @params array @see columnize() for docblock on $params
+     * @return string
+     */
+    public function __invoke(array $params = array())
+    {
+        return $this->columnize($params);
+    }
+
+    /**
+     * Iterative function to columnize entities
+     *
      * Result can be formatted using CSS classes
      *
-     * By default, for each entity, its thumbnail image and name are shown
-     * with both hyperlinked to a specified url. If another format is desired,
-     * use $entityCallback
+     * By default, for each entity, the output is as follows:
+     *   <a href="$url">$thumbnail</a><div><a href="$url">$name</a></div>
+     * If another format is desired, use $entityCallback
      *
      * @param  array $params Key-value pairs as follows:
      *         'cols'           int      DEFAULT=1. No. of columns to split entities in
@@ -48,10 +62,11 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *                                         7   8
      *         'remainderAlign' string   DEFAULT='center'. How to align the remainder entities in
      *                                   the last row. Possible values: left, center.
-     *         'tableClass'     string   CSS class for entire table
-     *         'tableId'        string   'id' attribute for entire table, to facilitate DOM reference
-     *         'tdClass'        string   CSS class for <td> enclosing entity
-     *         'trClass'        string   CSS class for <tr> enclosing entity <td>
+     *         'tableClass'     string   CSS class for entire table enclosing all entities
+     *         'tableId'        string   'id' attribute for entire table enclosing all entities,
+     *                                   to facilitate DOM reference
+     *         'tdClass'        string   CSS class for <td> enclosing individual entity
+     *         'trClass'        string   CSS class for <tr> enclosing individual entity <td>
      *         'urlCallback'    callback Callback function that takes in entity and returns entity url
      *         'urlClass'       string   CSS class for entity url
      *         'urlTarget'      string   Target for entity url. <a target="urlTarget"...
@@ -64,17 +79,18 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *         'thumbnailCallback'  callback Callback function that takes in entity and returns
      *                                       thumbnail filename
      *         'thumbnailPath'      string   Folder path relative to web root where thumbnail is stored
-     *         'maxThumbnailHeight' int      Maximum height constraint for thumbnail image
+     *         'maxThumbnailHeight' int      DEFAULT=0. Maximum height constraint for thumbnail image
      *                                       If set to 0, "height" attribute will be skipped in output
-     *         'maxThumbnailWidth'  int      Maximum width constraint for thumbnail image
+     *         'maxThumbnailWidth'  int      DEFAULT=0. Maximum width constraint for thumbnail image
      *                                       If set to 0, "width" attribute will be skipped in output
      *         'webRoot'            string   Absolute path for web root. Used for retrieving thumbnail.
      *                                       If thumbnail is a remote image, eg. http://test.com/test.png,
      *                                       set webRoot to '' and thumbnailPath to 'http://test.com'
+     * @param  string $output For internal use during iteration. Stores final output
      * @return string
      * @throws InvalidArgumentException When any of the callbacks is not callable
      */
-    public function __invoke(array $params = array())
+    public function columnize(array $params = array(), $output = '')
     {
         // Ensure all keys are set before extracting to prevent notices
         $params = array_merge(
@@ -108,9 +124,13 @@ class ZnZendColumnizeEntities extends AbstractHelper
         );
         extract($params);
 
+        // Add trailing slash if not empty - simplifies joining of paths later
+        $webRoot = $this->addSlash($webRoot);
+        $thumbnailPath = $this->addSlash($thumbnailPath);
+
         // Convert associative array to numerically indexed array
         if (empty($entities)) {
-            return '';
+            return $output;
         }
         $entities = array_values(
             is_array($entities) ? $entities : array($entities)
@@ -132,13 +152,11 @@ class ZnZendColumnizeEntities extends AbstractHelper
 
         // Process entities and generate output
         if ($drawTable) {
-            $output = sprintf(
+            $output .= sprintf(
                 '<table id="%s" class="%s" cellspacing="0" cellpadding="0" width="100%%">' . PHP_EOL,
                 $tableId,
                 $tableClass
             );
-        } else {
-            $output = '';
         }
 
         for ($row = 0; $row < $initialRows; $row++) {
@@ -201,7 +219,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     // Draw thumbnail
                     $thumbnailOutput = '';
                     if ($thumbnail !== null) {
-                        $imagePath = $webRoot . rtrim($thumbnailPath, "\\/") . '/' . $thumbnail;
+                        $imagePath = $webRoot . $thumbnailPath . $thumbnail;
                         $imageInfo = getimagesize($imagePath);
                         if (false === $imageInfo) {
                             $thumbnailOutput .= PHP_EOL;
@@ -222,7 +240,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                                 '%s<img class="%s" align="center" src="%s" %s %s />' . PHP_EOL . '%s',
                                 $urlOutputBegin,
                                 $thumbnailClass,
-                                $thumbnailPath . '/' . $thumbnail,
+                                $thumbnailPath . $thumbnail,
                                 ($maxThumbnailWidth == 0 ? '' : "width=\"{$width}\""),
                                 ($maxThumbnailHeight == 0 ? '' : "height=\"{$height}\""),
                                 $urlOutputEnd
@@ -293,9 +311,24 @@ class ZnZendColumnizeEntities extends AbstractHelper
             }
             $params['cols'] = $remainderCount;
             $params['entities'] = $remainderEntities;
-            return $output . $this->__invoke($params);
+
+            // No need to change code here if method name is changed
+            $function = __FUNCTION__;
+            return $this->$function($params, $output);
         }
+    } // end function columnize
 
-    } // end function __invoke
-
-} // end class
+    /**
+     * Adds trailing slash to path if not empty
+     *
+     * If path is empty, '' is returned
+     * Simplifies joining of paths
+     *
+     * @param  string $path
+     * @return string
+     */
+    protected function addSlash($path)
+    {
+        return (empty($path) ? '' : rtrim($path, "\\/") . '/');
+    }
+}
