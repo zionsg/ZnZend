@@ -32,7 +32,7 @@ $params = array(
     'maxThumbnailWidth' => 90,
     'webRoot' => '',
 );
-echo $this->nZendColumnizeEntities($params);
+echo $this->znZendColumnizeEntities($params);
 ?>
 ```
 _BECOMES_
