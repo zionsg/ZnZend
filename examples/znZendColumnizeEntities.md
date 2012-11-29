@@ -32,8 +32,7 @@ $params = array(
     'maxThumbnailWidth' => 90,
     'webRoot' => '',
 );
-$instance = new ZnZendColumnizeEntities();
-echo $instance($params);
+echo $this->nZendColumnizeEntities($params);
 ?>
 ```
 _BECOMES_
