@@ -217,13 +217,10 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     }
 
                     // Draw thumbnail
-                    $thumbnailOutput = '';
                     if ($thumbnail !== null) {
                         $imagePath = $webRoot . $thumbnailPath . $thumbnail;
                         $imageInfo = getimagesize($imagePath);
-                        if (false === $imageInfo) {
-                            $thumbnailOutput .= PHP_EOL;
-                        } else {
+                        if (false !== $imageInfo) {
                             list($width, $height, $type, $attr) = $imageInfo;
 
                             if ($maxThumbnailWidth != 0 && $width > $maxThumbnailWidth) {
@@ -260,10 +257,10 @@ class ZnZendColumnizeEntities extends AbstractHelper
                                 $thumbnailOutput
                             );
                         }
-                    } // end draw thumbnail
 
-                    // Add thumbnail output to entity output
-                    $entityOutput .= $thumbnailOutput;
+                        // Add thumbnail output to entity output
+                        $entityOutput .= $thumbnailOutput;
+                    } // end draw thumbnail
 
                     // Get entity name and add to entity output
                     if ($nameCallback) {
