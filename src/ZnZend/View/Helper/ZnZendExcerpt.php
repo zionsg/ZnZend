@@ -73,4 +73,4 @@ class ZnZendExcerpt extends AbstractHelper
         );
     } // end function __invoke
 
-} // end class
+}

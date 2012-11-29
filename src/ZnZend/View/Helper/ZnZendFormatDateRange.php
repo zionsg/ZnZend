@@ -62,4 +62,4 @@ class ZnZendFormatDateRange extends AbstractHelper
         return $output;
     } // end function __invoke
 
-} // end class
+}

@@ -60,4 +60,4 @@ class ZnZendFormatBytes extends AbstractHelper
         );
     } // end function __invoke
 
-} // end class
+}

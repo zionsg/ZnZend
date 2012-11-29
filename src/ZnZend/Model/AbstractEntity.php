@@ -169,4 +169,4 @@ abstract class AbstractEntity
         return $this->data;
     }
 
-} // end class
+}
