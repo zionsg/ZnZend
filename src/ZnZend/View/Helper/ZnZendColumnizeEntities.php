@@ -245,7 +245,6 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     $entityOutput .= $thumbnailOutput;
 
                     // Get entity name and add to entity output
-                    $name = null;
                     if ($nameCallback) {
                         if (!is_callable($nameCallback)) {
                             throw new InvalidArgumentException('Invalid name callback provided');
@@ -260,10 +259,6 @@ class ZnZendColumnizeEntities extends AbstractHelper
                         );
                     }
 
-                    // Close </a> if there is an entity url
-                    if ($url !== null) {
-                        $entityOutput .= '</a>' . PHP_EOL;
-                    }
                 } // end entity output
 
                 if ($drawTable) {
