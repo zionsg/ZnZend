@@ -218,6 +218,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
 
                     // Draw thumbnail
                     if ($thumbnail !== null) {
+                        $thumbnailOutput = '';
                         $imagePath = $webRoot . $thumbnailPath . $thumbnail;
                         $imageInfo = getimagesize($imagePath);
                         if (false !== $imageInfo) {
@@ -244,6 +245,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                             );
                         } // end if thumbnail file exists
 
+                        // If true, box will be drawn even if there is no thumbnail
                         if ($drawThumbnailBox) {
                             $thumbnailOutput = sprintf(
                                 '<table align="center" cellspacing="0" cellpadding="0">' . PHP_EOL
