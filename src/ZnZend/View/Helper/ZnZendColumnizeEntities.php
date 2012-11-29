@@ -68,7 +68,9 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *                                       If set to 0, "height" attribute will be skipped in output
      *         'maxThumbnailWidth'  int      Maximum width constraint for thumbnail image
      *                                       If set to 0, "width" attribute will be skipped in output
-     *         'webRoot'            string   Absolute path for web root. Used for retrieving thumbnail
+     *         'webRoot'            string   Absolute path for web root. Used for retrieving thumbnail.
+     *                                       If thumbnail is a remote image, eg. http://test.com/test.png,
+     *                                       set webRoot to '' and thumbnailPath to 'http://test.com'
      * @return string
      * @throws InvalidArgumentException When any of the callbacks is not callable
      */
@@ -200,10 +202,11 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     $thumbnailOutput = '';
                     if ($thumbnail !== null) {
                         $imagePath = $webRoot . rtrim($thumbnailPath, "\\/") . '/' . $thumbnail;
-                        if (!file_exists($imagePath)) {
+                        $imageInfo = getimagesize($imagePath);
+                        if (false === $imageInfo) {
                             $thumbnailOutput .= PHP_EOL;
                         } else {
-                            list($width, $height, $type, $attr) = getimagesize($imagePath);
+                            list($width, $height, $type, $attr) = $imageInfo;
 
                             if ($maxThumbnailWidth != 0 && $width > $maxThumbnailWidth) {
                                 $height = ($height / $width) * $maxThumbnailWidth;
