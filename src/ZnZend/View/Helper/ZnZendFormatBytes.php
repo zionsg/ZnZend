@@ -21,42 +21,34 @@ class ZnZendFormatBytes extends AbstractHelper
      * @see http://en.wikipedia.org/wiki/Binary_prefix
      * @var array
      */
-    protected $prefix = array('', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi');
+    protected $prefixes = array('', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi');
 
     /**
      * __invoke
      *
-     * The final numeric value should be less than 1024 and more than 0
-     * when shown with the final unit and up to 2 decimal places
+     * 0 <= final numeric value shown with unit < 1024
+     * Precision is set to 2 decimal places
      *
-     * @param int         $bytes            Value in bytes
-     * @param null|string $byteString       DEFAULT='B'. String to use to denote "bytes"
-     * @param boolean     $returnMultiplier DEFAULT=false. Whether to return multiplier only
+     * @param int|float $bytes            Value in bytes
+     * @param boolean   $returnMultiplier DEFAULT=false. Whether to return multiplier only.
+     *                                    $multiplier x $finalValue = $bytes
+     *                                    This is provided for use in calculations if need be
      */
-    public function __invoke($bytes, $byteString = 'B', $returnMultiplier = false)
+    public function __invoke($bytes, $returnMultiplier = false)
     {
-        $bytes = (int) $bytes;
-        if ($byteString === null) {
-            $byteString = 'B';
+        if (!is_numeric($bytes)) {
+            $bytes = 0;
         }
 
-        $multiplier = 1;
-        foreach ($this->prefix as $key => $value) {
-            if ($bytes < 1024) {
-                return (
-                    $returnMultiplier
-                    ? $multiplier
-                    : sprintf('%.2f %s%s', $bytes, $value, $byteString)
-                );
-            }
-            $bytes /= 1024;
-            $multiplier *= 1024;
-        }
+        $base  = 1024;
+        $power = (int) floor(log($bytes, $base));
+        $power = min($power, count($this->prefixes) - 1); // to ensure power corresponds to a prefix
 
+        $multiplier = pow($base, $power);
         return (
             $returnMultiplier
             ? $multiplier
-            : sprintf('%.2f %s%s', $bytes * 1024, end($this->_prefix), $byteString)
+            : sprintf('%.2f %s%s', $bytes / $multiplier, $this->prefixes[$power], 'B')
         );
     } // end function __invoke
 
