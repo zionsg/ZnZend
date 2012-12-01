@@ -5,7 +5,7 @@
 <?php
 $value = 20000000;
 echo $this->znZendFormatBytes($value) . '<br />';
-echo $this->znZendFormatBytes($value, null, true);
+echo $this->znZendFormatBytes($value, true);
 ?>
 ```
 _BECOMES_
