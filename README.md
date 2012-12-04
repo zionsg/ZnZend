@@ -16,8 +16,9 @@ the helpers and base classes I used for my Zend Framework 1 projects
 ## Installation
 
 1. Clone this project into your `./vendor/` directory and enable it in your
-   `application.config.php` file under the `modules` key.
-2. Examples can be found in the `examples` directory.
+   `application.config.php` file under the `modules` key
+2. Examples can be found in the `examples` directory
+3. Tests can be run in browser using test/phpunit_cmd_browser.php (see inline docblock)
 
 Classes
 -------
