@@ -36,7 +36,8 @@ class ZnZendExcerpt extends AbstractHelper
      */
     public function __invoke($text, $maxWords = 0, $moreText = '', $moreLink = '', $moreTarget = '')
     {
-        if (empty($text)) {
+        if (empty($text))
+        {
             return $text;
         }
 
