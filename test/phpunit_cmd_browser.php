@@ -11,12 +11,6 @@
  * @link   [Source] http://github.com/zionsg/ZnZend
  * @since  2012-12-04T13:00+08:00
  */
-$zf2Path = getenv('ZF2_PATH');
-if (empty($zf2Path)) {
-    $zf2Path = 'Zend2'; // replace $zf2Path with path to the ZF2 library
-    putenv("ZF2_PATH=$zf2Path");
-}
-
 require_once 'PHPUnit/vendor/autoload.php'; // assumes PHPUnit library is in include path
 $command = new PHPUnit_TextUI_Command;
 ?>
