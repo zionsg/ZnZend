@@ -44,7 +44,7 @@ class ZnZendFormatBytesTest extends TestCase
     {
         $helper = $this->helper;
         $value = 1024;
-        $expected = '1.00 KiB';
+        $expected = '1.02 KiB';
         $actual = $helper($value);
         $this->assertEquals($expected, $actual);
     }
