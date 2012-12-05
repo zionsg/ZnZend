@@ -1,9 +1,11 @@
 {
     "name": "zionsg/znzend",
-    "description": "Commonly used classes and helpers for ZF2",
+    "description": "ZF2 Module containing commonly used classes and helpers for Zn projects",
     "type": "library",
     "keywords": [
-        "zf2"
+        "zf2",
+        "zend",
+        "module"
     ],
     "homepage": "https://github.com/zionsg/ZnZend",
     "authors": [
@@ -11,11 +13,11 @@
             "name": "Zion Ng",
             "email": "zion@intzone.com",
             "homepage": "http://zion.sg/"
-        },
+        }
     ],
     "require": {
         "php": ">=5.3.3",
-        "zendframework/zendframework": "2.*",
+        "zendframework/zendframework": "2.*"
     },
     "autoload": {
         "psr-0": {
