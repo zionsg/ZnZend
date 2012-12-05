@@ -1,6 +1,8 @@
 ZnZend
 ======
 
+[![Build Status](https://secure.travis-ci.org/zionsg/ZnZend.png?branch=master)](https://travis-ci.org/zionsg/ZnZend)
+
 Zend Framework 2 module containing helpers and base classes for my projects.
 
 ## Introduction
