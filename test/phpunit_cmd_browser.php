@@ -11,7 +11,9 @@
  * @link   [Source] http://github.com/zionsg/ZnZend
  * @since  2012-12-04T13:00+08:00
  */
-require_once 'PHPUnit/vendor/autoload.php'; // assumes PHPUnit library is in include path
+ 
+// Assumes PHPUnit has been installed via Composer and is in include path 
+require_once 'PHPUnit/vendor/autoload.php'; 
 $command = new PHPUnit_TextUI_Command;
 ?>
 <pre>
