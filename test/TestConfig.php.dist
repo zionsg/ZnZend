@@ -3,7 +3,7 @@
 
 return array(
     'modules' => array(
-        'ZnZend',
+        'ZnZend', // Change this to your module
     ),
     'module_listener_options' => array(
         'config_glob_paths'    => array(
