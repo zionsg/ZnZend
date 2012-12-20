@@ -28,6 +28,7 @@ Classes
 
 Controller Plugins
 ------------------
+* `ZnZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `ZnZendPageStore` - Persist data for current page across page reloads
 
 View Helpers
