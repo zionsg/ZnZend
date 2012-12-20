@@ -26,6 +26,10 @@ Classes
 -------
 * `ZnZend\Model\AbstractEntity` - An abstract entity class
 
+Controller Plugins
+------------------
+* `ZnZendPageStore` - Persist data for current page across page reloads
+
 View Helpers
 ------------
 * `znZendColumnizeEntities` - Output entities in columns

@@ -1,5 +1,11 @@
 <?php
 return array(
+    'controller_plugins' => array(
+        'invokables' => array(
+            'ZnZendPageStore' => 'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore',
+        ),
+    ),
+
     'view_helpers' => array(
         'invokables' => array(
             'znZendColumnizeEntities' => 'ZnZend\View\Helper\ZnZendColumnizeEntities',
