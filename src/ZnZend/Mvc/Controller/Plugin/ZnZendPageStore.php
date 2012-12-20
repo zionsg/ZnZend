@@ -9,7 +9,6 @@
 namespace ZnZend\Mvc\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Zend\Mvc\ModuleRouteListener;
 use Zend\Session\Container;
 use Zend\Session\ManagerInterface as Manager;
 use Zend\Session\SessionManager;
