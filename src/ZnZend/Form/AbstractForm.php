@@ -20,7 +20,7 @@ use Zend\InputFilter\InputFilter;
  * Additions to Zend_Form:
  *   - Params for dynamic elements can be injected via the constructor
  *     and retrieved with getParam()
- *   - init() method created for adding of elements
+ *   - init() method created for adding of elements in extending classes
  *   - CSRF element is added by default
  *   - Validated data is trimmed upon retrieval
  */
