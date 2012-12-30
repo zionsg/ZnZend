@@ -11,6 +11,7 @@ return array(
         'invokables' => array(
             'znZendColumnizeEntities' => 'ZnZend\View\Helper\ZnZendColumnizeEntities',
             'znZendExcerpt'           => 'ZnZend\View\Helper\ZnZendExcerpt',
+            'znZendFlashMessages'     => 'ZnZend\View\Helper\ZnZendFlashMessages',
             'znZendFormatBytes'       => 'ZnZend\View\Helper\ZnZendFormatBytes',
             'znZendFormatDateRange'   => 'ZnZend\View\Helper\ZnZendFormatDateRange',
             'znZendFormatTimeRange'   => 'ZnZend\View\Helper\ZnZendFormatTimeRange',

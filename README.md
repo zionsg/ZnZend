@@ -41,6 +41,7 @@ View Helpers
 ------------
 * `znZendColumnizeEntities` - Output entities in columns
 * `znZendExcerpt` - Extract excerpt from text
+* `znZendFlashMessages` - Retrieve messages from FlashMessenger
 * `znZendFormatBytes` - Format bytes to human-readable form
 * `znZendFormatDateRange` - Format a date range
 * `znZendFormatTimeRange` - Format a time range
