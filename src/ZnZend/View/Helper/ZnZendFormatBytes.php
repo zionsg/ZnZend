@@ -29,10 +29,11 @@ class ZnZendFormatBytes extends AbstractHelper
      * 0 <= final numeric value shown with unit < 1024
      * Precision is set to 2 decimal places
      *
-     * @param int|float $bytes            Value in bytes
-     * @param boolean   $returnMultiplier DEFAULT=false. Whether to return multiplier only.
-     *                                    $multiplier x $finalValue = $bytes
-     *                                    This is provided for use in calculations if need be
+     * @param  int|float $bytes            Value in bytes
+     * @param  boolean   $returnMultiplier DEFAULT=false. Whether to return multiplier only.
+     *                                     $multiplier x $finalValue = $bytes
+     *                                     This is provided for use in calculations if need be
+     * @return string
      */
     public function __invoke($bytes, $returnMultiplier = false)
     {
@@ -51,5 +52,4 @@ class ZnZendFormatBytes extends AbstractHelper
             : sprintf('%.2f %s%s', $bytes / $multiplier, $this->prefixes[$power], 'B')
         );
     } // end function __invoke
-
 }

@@ -33,6 +33,7 @@ class ZnZendExcerpt extends AbstractHelper
      * @param  string $moreText   DEFAULT=''. Text to append to excerpt, eg. '...Read more'
      * @param  string $moreLink   DEFAULT=''. Url for $moreText. If empty, there will be no link
      * @param  string $moreTarget DEFAULT=''. Target for $moreLink, eg. '_blank'
+     * @return string
      */
     public function __invoke($text, $maxWords = 0, $moreText = '', $moreLink = '', $moreTarget = '')
     {
