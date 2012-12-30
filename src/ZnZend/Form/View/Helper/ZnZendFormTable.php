@@ -8,6 +8,7 @@
  */
 namespace ZnZend\Form\View\Helper;
 
+use Zend\Form\ElementInterface;
 use Zend\Form\View\Helper\Form;
 use Zend\Form\View\Helper\FormCollection;
 use ZnZend\Form\View\Helper\ZnZendFormRow;
