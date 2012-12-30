@@ -30,7 +30,12 @@ Classes
 Controller Plugins
 ------------------
 * `ZnZendMvcParams` - Get name of module, controller and action as like in ZF1
-* `ZnZendPageStore` - Persist data for current page across page reloads
+* `ZnZendPageStore` - Persist data for current page across reloads of the same page
+
+Form View Helpers
+-----------------
+* `znZendFormRow` - Extension to FormRow view helper to allow rendering format to be customized
+* `znZendFormTable` - Render form as 2-column table
 
 View Helpers
 ------------
