@@ -14,6 +14,9 @@ return array(
             'znZendFormatBytes'       => 'ZnZend\View\Helper\ZnZendFormatBytes',
             'znZendFormatDateRange'   => 'ZnZend\View\Helper\ZnZendFormatDateRange',
             'znZendFormatTimeRange'   => 'ZnZend\View\Helper\ZnZendFormatTimeRange',
+            // Form view helpers
+            'znZendFormRow'           => 'ZnZend\Form\View\Helper\ZnZendFormRow',
+            'znZendFormTable'         => 'ZnZend\Form\View\Helper\ZnZendFormTable',
         ),
     ),
 );
