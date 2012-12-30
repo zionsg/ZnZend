@@ -24,6 +24,7 @@ class Login extends Form
         $this->add($element);
     }
 }
+```
 
 ```php
 <!-- In view script -->
