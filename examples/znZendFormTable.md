@@ -2,6 +2,8 @@
 
 ```php
 // Sample login form
+namespace Web\Form;
+
 use Zend\Form\Element;
 use Zend\Form\Form;
 
