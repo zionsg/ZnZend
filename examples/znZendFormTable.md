@@ -33,7 +33,7 @@ class Login extends Form
 </style>
 <?php
 // Instance of login form passed in from controller as $form
-echo $this->znZendFormTable()->setTdElementClass('test')->render($form);
+echo $this->znZendFormTable()->setTdElementClass('element')->render($form);
 ?>
 ```
 _BECOMES_
