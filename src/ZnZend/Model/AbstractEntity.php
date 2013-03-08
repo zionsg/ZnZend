@@ -12,36 +12,23 @@ use BadMethodCallException;
 use InvalidArgumentException;
 
 /**
- * Base class for entities
+ * Base class for entities corresponding to rows in database tables
+ *
+ * Methods from EntityInterface are implemented as examples and should
+ * be overwritten by concrete classes.
  */
-abstract class AbstractEntity
+abstract class AbstractEntity implements EntityInterface
 {
     /**
      * Array of property-value pairs for entity
      *
-     * Properties MUST include $prefix as they may be mapping to columns
-     * in a database table and it would be too cumbersome to remove any prefix
-     *
-     * Use array_key_exists() instead of isset() to check if a key exists
-     * If a key exists and its value is NULL, isset() will return false
+     * Properties map exactly to columns.
+     * Use array_key_exists() instead of isset() to check if a key exists.
+     * If a key exists and its value is NULL, isset() will return false.
      *
      * @var array
      */
     protected $data = array();
-
-    /**
-     * Common prefix for properties (used internally)
-     *
-     * Entities may model rows in a database table where columns are prefixed
-     * with the table name for unique naming. The prefix should not be shown
-     * in public properties, methods, errors or exceptions.
-     *
-     * Eg: $entity->id and NOT $entity->adm_id,
-     *     $entity->getId() and NOT $entity->getAdm_Id()
-     *
-     * @var string
-     */
-    protected $prefix = '';
 
     /**
      * Constructor
@@ -50,59 +37,50 @@ abstract class AbstractEntity
      *
      * @param array $data
      */
-    public function __construct(array $data = null)
+    public function __construct(array $data = array())
     {
         $this->setFromArray($data);
     }
 
     /**
-     * Magic method to get or set properties
+     * Set entity properties from array
      *
-     * This is only for convenience and fallback. Explicit getters and setters
-     * should be coded for each property for reflection and performance reasons
+     * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::hydrate()
+     * to populate an object.
      *
-     * Assuming $prefix is 'adm_', calling $entity->getDisplayName() will return
-     * the property 'adm_displayName' while $entity->setDisplayName() will set its value
-     *
-     * @param  string $methodName       'getProperty' or 'setProperty'. Property
-     *                                  must NOT have $prefix added
-     * @param  array  $arguments        Exactly 1 argument for 'set' methods.
-     *                                  Ignored for 'get' methods
-     * @throws InvalidArgumentException Thrown if setProperty() is not called with
-     *                                  exactly one argument, which is the value to set
-     * @throws BadMethodCallException   Thrown if method name does not start with 'get' or 'set'
+     * @param  array $data
+     * @return void
      */
-    public function __call($methodName, $arguments)
+    public function exchangeArray(array $data)
     {
-        $type = substr($methodName, 0, 3);
-        $property = strtolower(substr($methodName, 3, 1)) . substr($methodName, 4);
-
-        if ($type == 'get') {
-            return $this->get($property);
-        } elseif ($type == 'set') {
-            if (!is_array($arguments) || count($arguments) != 1) {
-                throw new InvalidArgumentException(
-                    "Method {$methodName} must be called with exactly one argument"
-                );
-            }
-            return $this->set($property, $arguments[0]);
-        } else {
-            throw new BadMethodCallException("Method {$methodName} does not exist");
-        }
+        $this->data = $data;
     }
 
     /**
-     * Generic internal getter for properties
+     * Get entity properties as an array
      *
-     * @internal E_USER_NOTICE is triggered if the property does not exist
-     * @param    string $property Name of property WITHOUT $prefix
-     * @return   mixed|null NULL is returned if property does not exist
+     * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::extract()
+     * to extract values from an object.
+     *
+     * @return array
      */
-    protected function get($property)
+    public function getArrayCopy()
     {
-        $actualProperty = $this->prefix . $property;
-        if (array_key_exists($actualProperty, $this->data)) {
-            return $this->data[$actualProperty];
+        return $this->data;
+    }
+
+    /**
+     * Generic internal getter for entity properties
+     *
+     * @param  string     $property Property to retrieve
+     * @param  null|mixed $default  Optional default value if key or property does not exist
+     * @return mixed
+     * @internal E_USER_NOTICE is triggered if property does not exist
+     */
+    protected function get($property, $default = null)
+    {
+        if (array_key_exists($property, $this->data)) {
+            return $this->data[$property];
         }
 
         $trace = debug_backtrace();
@@ -115,58 +93,151 @@ abstract class AbstractEntity
             ),
             E_USER_NOTICE
         );
-        return null;
+
+        return $default;
     }
 
     /**
-     * Generic internal setter for properties
+     * Generic internal setter for entity properties
      *
-     * @param  string $property Name of property WITHOUT $prefix
+     * @param  string $property Property to set
      * @param  mixed  $value    Value to set
-     * @return AbstractEntity For fluent interface
-     * @throws InvalidArgumentException Thrown if property does not exist
+     * @return AbstractEntity   For fluent interface
+     * @throws Exception\InvalidArgumentException Property does not exist
      */
     protected function set($property, $value)
     {
-        $actualProperty = $this->prefix . $property;
-        if (!array_key_exists($actualProperty, $this->data)) {
-            throw new InvalidArgumentException("Property {$property} does not exist");
-        } else {
-            $this->data[$actualProperty] = $value;
-            return $this;
-        }
-    }
-
-    /**
-     * Populate entity from array
-     *
-     * Only values whose keys exist in the entity are stored
-     *
-     * @param  array   $data
-     * @param  boolean $usePrefix DEFAULT=false. Whether to add prefix to keys
-     *                            in $data for checking and setting
-     * @return AbstractEntity For fluent interface
-     */
-    public function setFromArray(array $data = null, $usePrefix = false)
-    {
-        $prefix = $usePrefix ? $this->prefix : '';
-        foreach (($data ?: array()) as $key => $value) {
-            if (array_key_exists($prefix . $key, $this->data)) {
-                $this->data[$prefix. $key] = $value;
-            }
+        if (!array_key_exists($property, $this->data)) {
+            throw new Exception\InvalidArgumentException("Property \"{$property}\" does not exist.");
         }
 
+        $this->data[$property] = $value;
         return $this;
     }
 
     /**
-     * Return entity properties as an array
+     * Retrieve record id of entity
      *
-     * @return array
+     * @return null|int
      */
-    public function toArray()
+    public function getId()
     {
-        return $this->data;
+        return (int) $this->get('id');
+    }
+
+    /**
+     * Retrieve name of entity
+     *
+     * @return null|string
+     */
+    public function getName()
+    {
+        return $this->get('name');
+    }
+
+    /**
+     * Retrieve description of entity
+     *
+     * @return null|string
+     */
+    public function getDescription()
+    {
+        return $this->get('description');
+    }
+
+    /**
+     * Retrieve filename of thumbnail image for entity
+     *
+     * Typical thumbnail size is about 150 x 100 pixels, usually used when
+     * listing entities. Can refer to the logo of an establishment.
+     *
+     * @return null|string
+     */
+    public function getThumbnail()
+    {
+        return $this->get('thumbnail');
+    }
+
+    /**
+     * Retrieve filename of photo for entity
+     *
+     * Typical photo size is about 600 x 400 pixels or larger, usually shown
+     * on the entity details page.
+     *
+     * @return null|string
+     */
+    public function getPhoto()
+    {
+        return $this->get('photo');
+    }
+
+    /**
+     * Retrieve timestamp when entity was created
+     *
+     * @return null|DateTime
+     */
+    public function getCreated()
+    {
+        return new DateTime($this->get('created'));
+    }
+
+    /**
+     * Retrieve user who created the entity
+     *
+     * A simple string can be returned (eg. userid) or preferrably, an object
+     * which implements EntityInterface.
+     *
+     * @return null|string|EntityInterface
+     */
+    public function getCreator()
+    {
+        return $this->get('creator');
+    }
+
+    /**
+     * Retrieve timestamp when entity was last updated
+     *
+     * @return null|DateTime
+     */
+    public function getUpdated()
+    {
+        return new DateTime($this->get('updated'));
+    }
+
+    /**
+     * Retrieve user who last updated the entity
+     *
+     * A simple string can be returned (eg. userid) or preferrably, an object
+     * which implements EntityInterface.
+     *
+     * @return null|string|EntityInterface
+     */
+    public function getUpdator()
+    {
+        return $this->get('updator');
+    }
+
+    /**
+     * Check whether entity is marked as hidden
+     *
+     * @return boolean
+     */
+    public function isHidden()
+    {
+        return (bool) $this->get('ishidden');
+    }
+
+    /**
+     * Check whether entity is marked as deleted
+     *
+     * Ideally, no records should ever be deleted from the database and
+     * should have a field to mark it as deleted instead.
+     *
+     * @return boolean
+     */
+    public function isDeleted()
+    {
+        return (bool) $this->get('isdeleted');
     }
 
 }
