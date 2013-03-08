@@ -50,7 +50,7 @@ class ZnZendFormatTimeRange extends AbstractHelper
         if ($startTimestamp === false) {
             return '';
         }
-        if ($ignoreMidnight && (int)date('H:i:s', $startTimestamp) == 0) {
+        if ($ignoreMidnight && (int)date('His', $startTimestamp) == 0) {
             return '';
         }
 
@@ -62,7 +62,7 @@ class ZnZendFormatTimeRange extends AbstractHelper
         if ($endTimestamp === false) {
             $endTimestamp = $startTimestamp;
         }
-        if ($ignoreMidnight && (int)date('H:i:s', $endTimestamp) == 0) {
+        if ($ignoreMidnight && (int)date('His', $endTimestamp) == 0) {
             $endTimestamp = $startTimestamp;
         }
 
