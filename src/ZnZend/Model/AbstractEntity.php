@@ -148,7 +148,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Retrieve filename of thumbnail image for entity
      *
-     * Typical thumbnail size is about 150 x 100 pixels, usually used when
+     * Typical thumbnail fits in a box of 160 x 160 pixels, usually used when
      * listing entities. Can refer to the logo of an establishment.
      *
      * @return null|string
@@ -159,18 +159,17 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve filename of photo for entity
+     * Retrieve priority of entity
      *
-     * Typical photo size is about 600 x 400 pixels or larger, usually shown
-     * on the entity details page.
-     *
-     * @return null|string
+     * When listing entities, smaller numbers typically come first.
+     * 
+     * @return null|int
      */
-    public function getPhoto()
+    public function getPriority()
     {
-        return $this->get('photo');
+        return $this->get('priority');
     }
-
+    
     /**
      * Retrieve timestamp when entity was created
      *
