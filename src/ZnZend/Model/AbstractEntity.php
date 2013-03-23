@@ -8,9 +8,6 @@
  */
 namespace ZnZend\Model;
 
-use BadMethodCallException;
-use InvalidArgumentException;
-
 /**
  * Base class for entities corresponding to rows in database tables
  *
