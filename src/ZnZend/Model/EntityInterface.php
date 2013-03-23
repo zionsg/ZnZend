@@ -69,7 +69,7 @@ interface EntityInterface
      * Retrieve priority of entity
      *
      * When listing entities, smaller numbers typically come first.
-     * 
+     *
      * @return null|int
      */
     public function getPriority();
