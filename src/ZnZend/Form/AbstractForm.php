@@ -13,6 +13,7 @@ use Zend\Form\Element;
 use Zend\Form\Form;
 use Zend\Form\FormInterface;
 use Zend\InputFilter\InputFilter;
+use Zend\Permissions\Acl\Resource\ResourceInterface;
 
 /**
  * Base form class
@@ -23,8 +24,9 @@ use Zend\InputFilter\InputFilter;
  *   - init() method created for adding of elements in extending classes
  *   - CSRF element is added by default
  *   - Validated data is trimmed upon retrieval
+ *   - implements ResourceInterface allowing it to return resource id for itself or its elements
  */
-abstract class AbstractForm extends Form
+abstract class AbstractForm extends Form implements ResourceInterface
 {
     /**
      * Params for use with dynamic elements
@@ -32,6 +34,13 @@ abstract class AbstractForm extends Form
      * @var array
      */
     protected $params = array();
+
+    /**
+     * Unique id of Resource
+     *
+     * @var string
+     */
+    protected $resourceId;
 
     /**
      * Constructor
@@ -150,4 +159,28 @@ abstract class AbstractForm extends Form
 
         return $default;
     }
+
+    /**
+     * Defined by ResourceInterface; returns the string identifier of the Resource
+     *
+     * Method signature modified to get resource ids for form elements as it is
+     * not feasible to create a custom class for each form element just to implement
+     * ResourceInterface. Also, a form element is tied to the form, hence better to put here.
+     *
+     * @param  string $elementOrFieldset Optional name of form element or fieldset to get resource id for
+     * @return string Defaults to class name in lowercase
+     */
+    public function getResourceId($elementOrFieldset = '')
+    {
+        if (null === $this->resourceId) {
+            $this->resourceId = strtolower(get_class($this));
+        }
+
+        if (empty($elementOrFieldset) || !$this->has($elementOrFieldset)) {
+            return $this->resourceId;
+        }
+
+        return $this->resourceId . '.' . strtolower($elementOrFieldset);
+    }
+
 }
