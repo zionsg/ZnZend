@@ -159,14 +159,14 @@ abstract class AbstractEntity implements EntityInterface
      * Retrieve priority of entity
      *
      * When listing entities, smaller numbers typically come first.
-     * 
+     *
      * @return null|int
      */
     public function getPriority()
     {
         return (int) $this->get('priority');
     }
-    
+
     /**
      * Retrieve timestamp when entity was created
      *
