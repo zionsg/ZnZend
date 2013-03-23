@@ -164,7 +164,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getPriority()
     {
-        return $this->get('priority');
+        return (int) $this->get('priority');
     }
     
     /**
