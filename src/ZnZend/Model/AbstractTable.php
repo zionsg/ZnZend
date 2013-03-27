@@ -151,7 +151,7 @@ abstract class AbstractTable extends AbstractTableGateway
     protected function getResultSet(Select $select, $fetchAll = true)
     {
         if (!$fetchAll) {
-            return $this->select->current();
+            return $select->current();
         }
 
         return new Paginator(
@@ -168,7 +168,7 @@ abstract class AbstractTable extends AbstractTableGateway
      */
     public function fetchAll()
     {
-        $select = $this->getBaseSelect();
+        $select = $this->select();
         return $this->getResultSet($select);
     }
 
@@ -180,7 +180,7 @@ abstract class AbstractTable extends AbstractTableGateway
      */
     public function find($key)
     {
-        $select = $this->getBaseSelect();
+        $select = $this->select();
         $select->where(array($this->primaryKey => $key));
         return $this->getResultSet($select, false);
     }
