@@ -13,6 +13,7 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Where;
 use Zend\Db\TableGateway\AbstractTableGateway;
 use Zend\Paginator\Adapter\DbSelect;
@@ -111,22 +112,21 @@ abstract class AbstractTable extends AbstractTableGateway
         $this->rowState = $rowState;
     }
 
-    /**
-     * Select
+    /*
+     * Get base Select with from, joins, columns added
      *
-     * Modified to take row state into consideration when querying.
+     * All other queries should build upon this so that the columns selected and joins are standardised
+     * Extending classes may override this with their own implementation as this only
+     * provides the most basic 'SELECT * FROM table'.
+     *
      * By default, only active records are selected.
      * Use setRowState() to change behaviour before calling query function.
      *
-     * As this gives the base select, any joins or expression columns should be put in here
-     * so that all query functions will return the same columns.
-     *
-     * @param Where|\Closure|string|array $where
-     * @return ResultSet
+     * @return Select
      */
-    public function select($where = null)
+    public function getBaseSelect()
     {
-        $select = parent::select($where);
+        $select = $this->sql->select();
 
         // Any other value besides ACTIVE_ROWS and DELETED_ROWS will default to ALL_ROWS
         if (self::ACTIVE_ROWS == $this->rowState && !empty($this->activeRowState)) {
@@ -151,7 +151,7 @@ abstract class AbstractTable extends AbstractTableGateway
     protected function getResultSet(Select $select, $fetchAll = true)
     {
         if (!$fetchAll) {
-            return $select->current();
+            return $this->select($select)->current();
         }
 
         return new Paginator(
@@ -168,7 +168,7 @@ abstract class AbstractTable extends AbstractTableGateway
      */
     public function fetchAll()
     {
-        $select = $this->select();
+        $select = $this->getBaseSelect();
         return $this->getResultSet($select);
     }
 
@@ -180,7 +180,7 @@ abstract class AbstractTable extends AbstractTableGateway
      */
     public function find($key)
     {
-        $select = $this->select();
+        $select = $this->getBaseSelect();
         $select->where(array($this->primaryKey => $key));
         return $this->getResultSet($select, false);
     }
