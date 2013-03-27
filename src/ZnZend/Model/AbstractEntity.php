@@ -36,7 +36,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function __construct(array $data = array())
     {
-        $this->setFromArray($data);
+        $this->exchangeArray($data);
     }
 
     /**
