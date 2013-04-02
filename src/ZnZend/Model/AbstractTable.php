@@ -125,6 +125,7 @@ abstract class AbstractTable extends AbstractTableGateway implements AdapterAwar
     public function setRowState($rowState)
     {
         $this->rowState = $rowState;
+        return $this;
     }
 
     /*
