@@ -4,12 +4,12 @@
  *
  * @author Zion Ng <zion@intzone.com>
  * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2013-03-27T16:00+08:00
  */
 namespace ZnZend\Model;
 
 use SplObjectStorage;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Adapter\AdapterAwareInterface;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Expression;
@@ -24,6 +24,7 @@ use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
  * Base class for table gateways
  *
  * Modifications to AbstractTableGateway:
+ *   - Implements AdapterAwareInterface
  *   - Custom class for result set objects set via property $resultSetClass
  *   - Paginator is returned for result sets
  *   - Row state (active, deleted, all) is taken into consideration when querying
@@ -31,7 +32,7 @@ use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
  *   - undelete() added
  *   - insert() and update() modified to filter out keys in user data that do not map to columns in table
  */
-abstract class AbstractTable extends AbstractTableGateway
+abstract class AbstractTable extends AbstractTableGateway implements AdapterAwareInterface
 {
     /**
      * Constants for referring to row state
@@ -80,11 +81,25 @@ abstract class AbstractTable extends AbstractTableGateway
     /**
      * Constructor
      *
-     * Sets up result set prototype using custom entity class
-     *
      * @param Adapter $adapter
      */
     public function __construct(Adapter $adapter)
+    {
+        $this->setDbAdapter($adapter);
+    }
+
+    /**
+     * Defined by AdapterAwareInterface; Set db adapter
+     *
+     * Allows Module.php or module config to set default db adapter via
+     * 'initializer' key.
+     *
+     * Sets up result set prototype using custom entity class
+     *
+     * @param  Adapter $adapter
+     * @return AdapterAwareInterface
+     */
+    public function setDbAdapter(Adapter $adapter)
     {
         $this->adapter = $adapter;
 
