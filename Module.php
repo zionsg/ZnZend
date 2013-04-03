@@ -7,8 +7,21 @@
  */
 namespace ZnZend;
 
+use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
+use Zend\Mvc\MvcEvent;
+
 class Module
 {
+    /**
+     * Set global/static db adapter for feature-enabled TableGateways such as ZnZend\Model\AbstractTable
+     */
+    public function onBootstrap(MvcEvent $e)
+    {
+        $sm = $e->getApplication()->getServiceManager();
+        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+        GlobalAdapterFeature::setStaticAdapter($dbAdapter);
+    }
+
     public function getAutoloaderConfig()
     {
         return array(
@@ -23,23 +36,5 @@ class Module
     public function getConfig($env = null)
     {
         return include __DIR__ . '/config/module.config.php';
-    }
-
-    public function getServiceConfig()
-    {
-        return array(
-            // Any object pulled from a service manager is ran through the registered initializers
-            'initializers' => array(
-                function ($instance, $sm) {
-                    // Sets default db adapter
-                    // Instance needs to implement the interface and be pulled from a service manager for this to work
-                    // Example in controller action:
-                    //     $userTable = $this->getServiceLocator()->get('Application\Model\UserTable');
-                    if ($instance instanceof \Zend\Db\Adapter\AdapterAwareInterface) {
-                        $instance->setDbAdapter($sm->get('Zend\Db\Adapter\Adapter'));
-                    }
-                }
-            ),
-        );
     }
 }
