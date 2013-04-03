@@ -4,7 +4,6 @@
  *
  * @author Zion Ng <zion@intzone.com>
  * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2012-12-29T01:00+08:00
  */
 namespace ZnZend\Form;
 
@@ -24,7 +23,8 @@ use Zend\Permissions\Acl\Resource\ResourceInterface;
  *   - init() method created for adding of elements in extending classes
  *   - CSRF element is added by default
  *   - Validated data is trimmed upon retrieval
- *   - implements ResourceInterface allowing it to return resource id for itself or its elements
+ *   - Implements ResourceInterface allowing it to return resource id for itself or its elements
+ *   - Allows setting of parent resource id which will be prefixed to its own resource id
  */
 abstract class AbstractForm extends Form implements ResourceInterface
 {
@@ -36,11 +36,22 @@ abstract class AbstractForm extends Form implements ResourceInterface
     protected $params = array();
 
     /**
-     * Unique id of Resource
+     * Resource id of form
+     *
+     * Defaults to class name of form with slashes replaced by underscores.
      *
      * @var string
      */
     protected $resourceId;
+
+    /**
+     * Resource id of form's parent
+     *
+     * A form's parent is usually the page where it is rendered - module.controller.action
+     *
+     * @var string
+     */
+    protected $parentResourceId;
 
     /**
      * Constructor
@@ -173,14 +184,28 @@ abstract class AbstractForm extends Form implements ResourceInterface
     public function getResourceId($elementOrFieldset = '')
     {
         if (null === $this->resourceId) {
-            $this->resourceId = strtolower(get_class($this));
+            $this->resourceId = strtolower(str_replace("\\", '_', get_class($this)));
         }
+
+        $resourceId = (empty($this->parentResourceId) ? '' : $this->parentResourceId . '.')
+                    . $this->resourceId;
 
         if (empty($elementOrFieldset) || !$this->has($elementOrFieldset)) {
-            return $this->resourceId;
+            return $resourceId;
         }
 
-        return $this->resourceId . '.' . strtolower($elementOrFieldset);
+        return $resourceId . '.' . strtolower($elementOrFieldset);
     }
 
+    /**
+     * Set parent resource id of form
+     *
+     * @param  string $parentResourceId Resource id of form's parent
+     * @return AbstractForm For fluent interface
+     */
+    public function setParentResourceId($parentResourceId)
+    {
+        $this->parentResourceId = strtolower($parentResourceId);
+        return $this;
+    }
 }
