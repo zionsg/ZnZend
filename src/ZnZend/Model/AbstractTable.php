@@ -48,8 +48,9 @@ abstract class AbstractTable extends AbstractTableGateway
     protected $primaryKey;
 
     /**
-     * Name of class used for result set objects - set by user
+     * Fully qualified name of class used for result set objects - set by user
      *
+     * @example \Application\Model\User
      * @var string
      */
     protected $resultSetClass;
