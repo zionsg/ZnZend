@@ -7,15 +7,10 @@
  */
 namespace ZnZend\Model;
 
-use SplObjectStorage;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Adapter\AdapterAwareInterface;
 use Zend\Db\ResultSet\HydratingResultSet;
-use Zend\Db\ResultSet\ResultSet;
-use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
-use Zend\Db\Sql\Where;
 use Zend\Db\TableGateway\AbstractTableGateway;
+use Zend\Db\TableGateway\Feature;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
@@ -23,8 +18,12 @@ use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
 /**
  * Base class for table gateways
  *
+ * Properties that must be set: $table, $resultSetClass
+ * Properties that should be set if applicable: $activeRowState, $deletedRowState
+ *
  * Modifications to AbstractTableGateway:
- *   - Implements AdapterAwareInterface
+ *   - Ability to use global/static db adapter
+ *   - Column and primary key information populated during instantiation
  *   - Custom class for result set objects set via property $resultSetClass
  *   - Paginator is returned for result sets
  *   - Row state (active, deleted, all) is taken into consideration when querying
@@ -32,7 +31,7 @@ use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
  *   - undelete() added
  *   - insert() and update() modified to filter out keys in user data that do not map to columns in table
  */
-abstract class AbstractTable extends AbstractTableGateway implements AdapterAwareInterface
+abstract class AbstractTable extends AbstractTableGateway
 {
     /**
      * Constants for referring to row state
@@ -42,21 +41,21 @@ abstract class AbstractTable extends AbstractTableGateway implements AdapterAwar
     const ALL_ROWS     = 'all';
 
     /**
-     * Name of primary key column(s)
+     * Name of primary key column(s) - set by constructor not user
      *
      * @var string|array
      */
     protected $primaryKey;
 
     /**
-     * Name of class used for result set objects
+     * Name of class used for result set objects - set by user
      *
      * @var string
      */
     protected $resultSetClass;
 
     /**
-     * Column-value pair used to determine active row state
+     * Column-value pair used to determine active row state - set by user
      *
      * @example array('usr_isdeleted' => 0)
      * @var     array
@@ -64,7 +63,7 @@ abstract class AbstractTable extends AbstractTableGateway implements AdapterAwar
     protected $activeRowState = array();
 
     /**
-     * Column-value pair used to determine deleted row state
+     * Column-value pair used to determine deleted row state - set by user
      *
      * @example array('usr_isdeleted' => 1)
      * @var     array
@@ -81,35 +80,45 @@ abstract class AbstractTable extends AbstractTableGateway implements AdapterAwar
     /**
      * Constructor
      *
-     * @param Adapter $adapter
+     * Add ability to use a global/static adapter without having to inject it into a TableGateway instance.
+     *   Just add the following line to a bootstrap, eg. onBootstrap() in Module.php:
+     *       Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter($adapter);
+     *   The adapter is statically loaded when instantiating in a controller/model, eg: $table = new MyTableGateway();
+     *
+     * Populate TableGateway with column and primary key information.
+     *   Without this, $this->columns will be empty and cannot be used for filterColumns().
+     *   Feature\MetadataFeature is not used as it is very slow.
      */
-    public function __construct(Adapter $adapter)
+    public function __construct()
     {
-        $this->setDbAdapter($adapter);
-    }
+        // Add ability to use global/static adapter
+        $this->featureSet = new Feature\FeatureSet();
+        $this->featureSet->addFeature(new Feature\GlobalAdapterFeature());
 
-    /**
-     * Defined by AdapterAwareInterface; Set db adapter
-     *
-     * Allows Module.php or module config to set default db adapter via
-     * 'initializer' key.
-     *
-     * Sets up result set prototype using custom entity class
-     *
-     * @param  Adapter $adapter
-     * @return AdapterAwareInterface
-     */
-    public function setDbAdapter(Adapter $adapter)
-    {
-        $this->adapter = $adapter;
-
+        // Set result set prototype
         $resultSetClass = $this->resultSetClass;
         $this->resultSetPrototype = new HydratingResultSet(
             new ArraySerializableHydrator(),
             new $resultSetClass()
         );
         $this->resultSetPrototype->buffer();
+
+        // Initialize
         $this->initialize();
+
+        // Populate $columns - adapter is only available after initialize()
+        $columns = $this->adapter->query(
+            'SELECT COLUMN_NAME, COLUMN_KEY FROM information_schema.columns WHERE table_schema = ? and table_name = ?',
+            array($this->adapter->getCurrentSchema(), $this->table)
+        );
+        $keys = array();
+        foreach ($columns as $column) {
+            $this->columns[] = $column->COLUMN_NAME;
+            if ('PRI' == $column->COLUMN_KEY) {
+                $keys[] = $column->COLUMN_NAME;
+            }
+        }
+        $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
     }
 
     /*** IMPORTANT FUNCTIONS ***/
@@ -169,7 +178,7 @@ abstract class AbstractTable extends AbstractTableGateway implements AdapterAwar
     protected function getResultSet(Select $select, $fetchAll = true)
     {
         if (!$fetchAll) {
-            return $this->select($select)->current();
+            return $this->executeSelect($select)->current();
         }
 
         $paginator = new Paginator(
