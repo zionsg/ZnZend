@@ -8,6 +8,7 @@
 
 namespace ZnZend\Model;
 
+use ReflectionClass;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\ResultSet\ResultSetInterface;
 use Zend\Db\Sql\Select;
@@ -244,6 +245,17 @@ abstract class AbstractTable extends AbstractTableGateway
         $this->resultSetPrototype = $resultSetPrototype;
 
         return $this->resultSetPrototype;
+    }
+
+    /**
+     * Get list of class constants which can be used to populate a dropdown list
+     *
+     * @return array
+     */
+    public function getConstants()
+    {
+        $reflection = new ReflectionClass(__CLASS__);
+        return $reflection->getConstants();
     }
 
     /*** QUERY FUNCTIONS ***/
