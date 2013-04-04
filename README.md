@@ -25,7 +25,9 @@ the helpers and base classes I used for my Zend Framework 1 projects
 Classes
 -------
 * `ZnZend\Form\AbstractForm` - Base form class with additional features
+* `ZnZend\Model\EntityInterface` - An entity interface
 * `ZnZend\Model\AbstractEntity` - An abstract entity class
+* `ZnZend\Model\AbstractTable` - An abstract table gateway
 
 Controller Plugins
 ------------------

@@ -3,8 +3,9 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZend\Model;
 
 use Zend\Db\ResultSet\HydratingResultSet;
@@ -14,6 +15,7 @@ use Zend\Db\TableGateway\Feature;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
+use ZnZend\Model\Exception;
 
 /**
  * Base class for table gateways

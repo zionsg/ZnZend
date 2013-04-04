@@ -3,9 +3,9 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2012-11-23T23:00+08:00
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZendTest\View\Helper;
 
 use PHPUnit_Framework_TestCase as TestCase;
@@ -48,5 +48,4 @@ class ZnZendFormatBytesTest extends TestCase
         $actual = $helper($value);
         $this->assertEquals($expected, $actual);
     }
-
 }

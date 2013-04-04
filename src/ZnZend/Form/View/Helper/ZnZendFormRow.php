@@ -3,13 +3,14 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2012-12-29T15:00+08:00
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZend\Form\View\Helper;
 
 use Zend\Form\ElementInterface;
 use Zend\Form\View\Helper\FormRow;
+use ZnZend\Form\Exception;
 
 /**
  * Extension of FormRow view helper to allow rendering format to be customized
@@ -55,9 +56,9 @@ class ZnZendFormRow extends FormRow
      * Bulk of the code is from FormRow. The rendering format is applied at the end
      * If the label, element and errors are empty, the format is ignored and an empty string is returned
      *
-     * @param ElementInterface $element
+     * @param  ElementInterface $element
      * @return string
-     * @throws \Zend\Form\Exception\DomainException
+     * @throws Exception\DomainException
      */
     public function render(ElementInterface $element)
     {

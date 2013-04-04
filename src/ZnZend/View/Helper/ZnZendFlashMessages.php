@@ -3,9 +3,9 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2012-12-30T17:30+08:00
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZend\View\Helper;
 
 use Zend\Mvc\Controller\Plugin\FlashMessenger;

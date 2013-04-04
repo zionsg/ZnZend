@@ -3,9 +3,9 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2012-11-23T23:00+08:00
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZend\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;

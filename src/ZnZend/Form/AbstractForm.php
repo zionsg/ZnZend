@@ -3,8 +3,9 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZend\Form;
 
 use Zend\Filter\StringTrim;
@@ -13,13 +14,13 @@ use Zend\Form\Form;
 use Zend\Form\FormInterface;
 use Zend\InputFilter\InputFilter;
 use Zend\Permissions\Acl\Resource\ResourceInterface;
+use ZnZend\Form\Exception;
 
 /**
  * Base form class
  *
  * Additions to Zend_Form:
- *   - Params for dynamic elements can be injected via the constructor
- *     and retrieved with getParam()
+ *   - Params for dynamic elements can be injected via the constructor and retrieved with getParam()
  *   - init() method created for adding of elements in extending classes
  *   - CSRF element is added by default
  *   - Validated data is trimmed upon retrieval
@@ -105,12 +106,12 @@ abstract class AbstractForm extends Form implements ResourceInterface
      * @param   callback $callback Callback function to map on array elements
      * @param   array    $array
      * @return  array
-     * @throws  InvalidArgumentException If $callback is not callable
+     * @throws  Exception\InvalidArgumentException If $callback is not callable
      */
     protected function array_map_recursive($callback, array $array)
     {
         if (!is_callable($callback)) {
-            throw new InvalidArgumentException('Invalid map callback provided');
+            throw new Exception\InvalidArgumentException('Invalid map callback provided');
         }
 
         $result   = array();

@@ -3,10 +3,12 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2012-11-09T23:00+08:00
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZend\Model;
+
+use ZnZend\Model\Exception;
 
 /**
  * Base class for entities corresponding to rows in database tables
@@ -235,5 +237,4 @@ abstract class AbstractEntity implements EntityInterface
     {
         return (bool) $this->get('isdeleted');
     }
-
 }

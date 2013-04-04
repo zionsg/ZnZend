@@ -7,9 +7,8 @@
  *     http://localhost/test/phpunit_browser.php
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [PHPUnit] https://github.com/sebastianbergmann/phpunit/
- * @link   [Source] https://github.com/zionsg/standalone-php-scripts/tree/master/phpunit_browser
- * @since  2012-12-06T19:00+08:00
+ * @link   https://github.com/zionsg/standalone-php-scripts/tree/master/phpunit_browser for canonical source repository
+ * @link   https://github.com/sebastianbergmann/phpunit/ for PHPUnit source repository
  */
 
 // Assumes PHPUnit has been installed via Composer and is in current folder or include path

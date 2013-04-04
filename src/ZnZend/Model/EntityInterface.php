@@ -3,9 +3,9 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2013-03-08T16:00+08:00
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZend\Model;
 
 /**
@@ -124,5 +124,4 @@ interface EntityInterface
      * @return boolean
      */
     public function isDeleted();
-
 }

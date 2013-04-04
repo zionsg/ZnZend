@@ -3,12 +3,13 @@
  * ZnZend
  *
  * @author Zion Ng <zion@intzone.com>
- * @link   [Source] http://github.com/zionsg/ZnZend
- * @since  2012-11-23T23:00+08:00
+ * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
+
 namespace ZnZend\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
+use ZnZend\View\Exception;
 
 /**
  * Output entities in columns
@@ -88,7 +89,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *                                       set webRoot to '' and thumbnailPath to 'http://test.com'
      * @param  string $output For internal use during iteration. Stores final output
      * @return string
-     * @throws InvalidArgumentException When any of the callbacks is not callable
+     * @throws Exception\InvalidArgumentException When any of the callbacks is not callable
      */
     public function columnize(array $params = array(), $output = '')
     {
@@ -186,7 +187,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
 
                 if ($entityCallback) {
                     if (!is_callable($entityCallback)) {
-                        throw new InvalidArgumentException('Invalid entity callback provided');
+                        throw new Exception\InvalidArgumentException('Invalid entity callback provided');
                     }
                     $entityOutput = $entityCallback($entity) . PHP_EOL;
                 } else {
@@ -195,7 +196,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     $urlOutputEnd = '';
                     if ($urlCallback) {
                         if (!is_callable($urlCallback)) {
-                            throw new InvalidArgumentException('Invalid url callback provided');
+                            throw new Exception\InvalidArgumentException('Invalid url callback provided');
                         }
                         $url = $urlCallback($entity);
                         $urlOutputBegin = sprintf(
@@ -211,7 +212,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     $thumbnail = null;
                     if ($thumbnailCallback) {
                         if (!is_callable($thumbnailCallback)) {
-                            throw new InvalidArgumentException('Invalid thumbnail callback provided');
+                            throw new Exception\InvalidArgumentException('Invalid thumbnail callback provided');
                         }
                         $thumbnail = $thumbnailCallback($entity);
                     }
@@ -267,7 +268,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     // Get entity name and add to entity output
                     if ($nameCallback) {
                         if (!is_callable($nameCallback)) {
-                            throw new InvalidArgumentException('Invalid name callback provided');
+                            throw new Exception\InvalidArgumentException('Invalid name callback provided');
                         }
                         $name = $nameCallback($entity) . PHP_EOL;
                         $entityOutput .= sprintf(
