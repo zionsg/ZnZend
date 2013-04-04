@@ -8,13 +8,16 @@
 
 namespace ZnZend\Model;
 
+use ReflectionClass;
 use Zend\Db\ResultSet\HydratingResultSet;
+use Zend\Db\ResultSet\ResultSetInterface;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\AbstractTableGateway;
 use Zend\Db\TableGateway\Feature;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
+use ZnZend\Model\EntityInterface;
 use ZnZend\Model\Exception;
 
 /**
@@ -51,6 +54,8 @@ abstract class AbstractTable extends AbstractTableGateway
 
     /**
      * Fully qualified name of class used for result set objects - set by user
+     *
+     * Class must implement EntityInterface.
      *
      * @example \Application\Model\User
      * @var string
@@ -99,29 +104,27 @@ abstract class AbstractTable extends AbstractTableGateway
         $this->featureSet->addFeature(new Feature\GlobalAdapterFeature());
 
         // Set result set prototype
-        $resultSetClass = $this->resultSetClass;
-        $this->resultSetPrototype = new HydratingResultSet(
-            new ArraySerializableHydrator(),
-            new $resultSetClass()
-        );
+        $this->resultSetPrototype = $this->getResultSetPrototype();
         $this->resultSetPrototype->buffer();
 
         // Initialize
         $this->initialize();
 
         // Populate $columns - adapter is only available after initialize()
-        $columns = $this->adapter->query(
-            'SELECT COLUMN_NAME, COLUMN_KEY FROM information_schema.columns WHERE table_schema = ? and table_name = ?',
-            array($this->adapter->getCurrentSchema(), $this->table)
-        );
-        $keys = array();
-        foreach ($columns as $column) {
-            $this->columns[] = $column->COLUMN_NAME;
-            if ('PRI' == $column->COLUMN_KEY) {
-                $keys[] = $column->COLUMN_NAME;
+        if (empty($this->columns) || empty($this->primaryKey)) {
+            $columns = $this->adapter->query(
+                'SELECT COLUMN_NAME, COLUMN_KEY FROM information_schema.columns WHERE table_schema = ? and table_name = ?',
+                array($this->adapter->getCurrentSchema(), $this->table)
+            );
+            $keys = array();
+            foreach ($columns as $column) {
+                $this->columns[] = $column->COLUMN_NAME;
+                if ('PRI' == $column->COLUMN_KEY) {
+                    $keys[] = $column->COLUMN_NAME;
+                }
             }
+            $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
         }
-        $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
     }
 
     /*** IMPORTANT FUNCTIONS ***/
@@ -176,19 +179,83 @@ abstract class AbstractTable extends AbstractTableGateway
      * @param  Select $select
      * @param  bool   $fetchAll Default = true. Whether to return all rows (as Paginator)
      *                          or only the 1st row (as result set protoype).
+     * @param  ResultSetInterface $resultSetPrototype Optional alternate result set prototype to use.
      * @return Paginator|object
      */
-    protected function getResultSet(Select $select, $fetchAll = true)
+    protected function getResultSet(Select $select, $fetchAll = true, ResultSetInterface $resultSetPrototype = null)
     {
-        if (!$fetchAll) {
+        if (false === $fetchAll) { // $fetchAll defaults to true if null, hence ===
             return $this->executeSelect($select)->current();
         }
 
+        if (null === $resultSetPrototype) {
+            $resultSetPrototype = $this->getResultSetPrototype();
+        }
         $paginator = new Paginator(
-            new DbSelect($select, $this->adapter, $this->resultSetPrototype)
+            new DbSelect($select, $this->adapter, $resultSetPrototype)
         );
         $paginator->setItemCountPerPage(PHP_INT_MAX)->setCurrentPageNumber(1);
         return $paginator;
+    }
+
+    /**
+     * Defined in AbstractTableGateway; Get select result prototype
+     *
+     * Method signature modified to create ad hoc result set prototype different from $resultSetClass.
+     * Useful when returning result sets from junction tables which fall under composite entities.
+     *
+     * Example: A CompanyTable returns result sets of Company entities. findMapCompanyEmployee()
+     * which returns records mapping all companies to all employees should return CompanyEmployee entities,
+     * which in turn should have getCompany() and getEmployee() methods. As such, findMapCompanyEmployee()
+     * should call $this->getResultSet($select, null, $this->getResultSetPrototype('CompanyEmployee')).
+     *
+     * @used-by AbstractTable::getResultSet()
+     * @param  string $resultSetClass Fully qualified name of class to be used for result set prototype.
+     *                                Class must implement EntityInterface.
+     * @return ResultSet
+     * @throws Exception\InvalidArgumentException If class does not implement EntityInterface.
+     */
+    public function getResultSetPrototype($resultSetClass = '')
+    {
+        if (empty($resultSetClass)) {
+            $resultSetClass = $this->resultSetClass;
+        }
+
+        if (   $resultSetClass == $this->resultSetClass
+            && $this->resultSetPrototype instanceof ResultSetInterface
+        ) {
+            return $this->resultSetPrototype;
+        }
+
+        // Create prototype
+        $resultSetInstance = new $resultSetClass();
+        if (!$resultSetInstance instanceof EntityInterface) {
+            throw new Exception\InvalidArgumentException('Result set class does not implement EntityInterface');
+        }
+        $resultSetPrototype = new HydratingResultSet(
+            new ArraySerializableHydrator(),
+            $resultSetInstance
+        );
+
+        // Ad hoc prototype
+        if ($resultSetClass != $this->resultSetClass) {
+            return $resultSetPrototype;
+        }
+
+        $this->resultSetPrototype = $resultSetPrototype;
+
+        return $this->resultSetPrototype;
+    }
+
+    /**
+     * Get list of class constants which can be used to populate a dropdown list
+     *
+     * @return array
+     */
+    public function getConstants()
+    {
+        $reflection = new ReflectionClass(__CLASS__);
+        return $reflection->getConstants();
     }
 
     /*** QUERY FUNCTIONS ***/
