@@ -111,7 +111,7 @@ class Privilege
      *
      * @return array
      */
-    public function getConstants()
+    public static function getConstants()
     {
         $reflection = new ReflectionClass(__CLASS__);
         return $reflection->getConstants();
