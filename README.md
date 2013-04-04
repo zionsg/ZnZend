@@ -28,11 +28,12 @@ Classes
 * `ZnZend\Model\EntityInterface` - An entity interface
 * `ZnZend\Model\AbstractEntity` - An abstract entity class
 * `ZnZend\Model\AbstractTable` - An abstract table gateway
+* `ZnZend\Permissions\Acl\Privilege` - A standardized set of constants for Acl privileges
 
 Controller Plugins
 ------------------
-* `ZnZendMvcParams` - Get name of module, controller and action as like in ZF1
-* `ZnZendPageStore` - Persist data for current page across reloads of the same page
+* `znZendMvcParams` - Get name of module, controller and action as like in ZF1
+* `znZendPageStore` - Persist data for current page across reloads of the same page
 
 Form View Helpers
 -----------------
