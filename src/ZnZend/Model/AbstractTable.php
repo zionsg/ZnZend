@@ -212,8 +212,8 @@ abstract class AbstractTable extends AbstractTableGateway
      * @used-by AbstractTable::getResultSet()
      * @param  string $resultSetClass Fully qualified name of class to be used for result set prototype.
      *                                Class must implement EntityInterface.
-     * @return ResultSet
      * @throws Exception\InvalidArgumentException If class does not implement EntityInterface.
+     * @return ResultSet
      */
     public function getResultSetPrototype($resultSetClass = '')
     {

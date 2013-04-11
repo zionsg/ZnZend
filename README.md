@@ -28,6 +28,7 @@ Classes
 * `ZnZend\Model\EntityInterface` - An entity interface
 * `ZnZend\Model\AbstractEntity` - An abstract entity class
 * `ZnZend\Model\AbstractTable` - An abstract table gateway
+* `ZnZend\Permissions\Acl\Acl` - Additional method to add a resource and its parents recursively
 * `ZnZend\Permissions\Acl\Privilege` - A standardized set of constants for Acl privileges
 
 Controller Plugins

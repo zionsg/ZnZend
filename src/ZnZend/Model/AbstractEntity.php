@@ -101,8 +101,8 @@ abstract class AbstractEntity implements EntityInterface
      *
      * @param  string $property Property to set
      * @param  mixed  $value    Value to set
-     * @return AbstractEntity   For fluent interface
      * @throws Exception\InvalidArgumentException Property does not exist
+     * @return AbstractEntity   For fluent interface
      */
     protected function set($property, $value)
     {

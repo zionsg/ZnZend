@@ -57,8 +57,8 @@ class ZnZendFormRow extends FormRow
      * If the label, element and errors are empty, the format is ignored and an empty string is returned
      *
      * @param  ElementInterface $element
-     * @return string
      * @throws Exception\DomainException
+     * @return string
      */
     public function render(ElementInterface $element)
     {

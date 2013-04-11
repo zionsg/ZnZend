@@ -87,9 +87,9 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *         'webRoot'            string   Absolute path for web root. Used for retrieving thumbnail.
      *                                       If thumbnail is a remote image, eg. http://test.com/test.png,
      *                                       set webRoot to '' and thumbnailPath to 'http://test.com'
-     * @param  string $output For internal use during iteration. Stores final output
+     * @param  string $output For internal use during iteration. Stores final output.
+     * @throws Exception\InvalidArgumentException When any of the callbacks is not callable.
      * @return string
-     * @throws Exception\InvalidArgumentException When any of the callbacks is not callable
      */
     public function columnize(array $params = array(), $output = '')
     {

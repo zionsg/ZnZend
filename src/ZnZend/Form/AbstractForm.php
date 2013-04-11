@@ -105,8 +105,8 @@ abstract class AbstractForm extends Form implements ResourceInterface
      *
      * @param   callback $callback Callback function to map on array elements
      * @param   array    $array
-     * @return  array
      * @throws  Exception\InvalidArgumentException If $callback is not callable
+     * @return  array
      */
     protected function array_map_recursive($callback, array $array)
     {
@@ -139,8 +139,8 @@ abstract class AbstractForm extends Form implements ResourceInterface
      *
      * @see    Form::getData()
      * @param  int $flag
-     * @return array|object
      * @throws Exception\DomainException
+     * @return array|object
      */
     public function getData($flag = FormInterface::VALUES_NORMALIZED)
     {
