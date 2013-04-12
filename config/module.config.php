@@ -2,8 +2,9 @@
 return array(
     'controller_plugins' => array(
         'invokables' => array(
-            'znZendMvcParams' => 'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams',
-            'znZendPageStore' => 'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore',
+            'znZendDataTables' => 'ZnZend\Mvc\Controller\Plugin\ZnZendDataTables',
+            'znZendMvcParams'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams',
+            'znZendPageStore'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore',
         ),
     ),
 

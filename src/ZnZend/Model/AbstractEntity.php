@@ -19,7 +19,7 @@ use ZnZend\Model\Exception;
 abstract class AbstractEntity implements EntityInterface
 {
     /**
-     * Array of property-value pairs for entity
+     * Array of property-value pairs for entity - set by constructor and exchangeArray(), not extending class
      *
      * Properties map exactly to columns.
      * Use array_key_exists() instead of isset() to check if a key exists.
@@ -28,6 +28,14 @@ abstract class AbstractEntity implements EntityInterface
      * @var array
      */
     protected $data = array();
+
+    /**
+     * Array mapping getters to columns - set by extending class
+     *
+     * @example array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
+     * @var array
+     */
+    protected $mapGettersColumns = array();
 
     /**
      * Constructor
@@ -66,6 +74,23 @@ abstract class AbstractEntity implements EntityInterface
     public function getArrayCopy()
     {
         return $this->data;
+    }
+
+    /**
+     * Map getters to column names in table
+     *
+     * Getters should be used in view scripts to retrieve information instead of properties
+     * which in this case would be named after database columns, which the view should not know about.
+     * This method can be used by a controller plugin (eg. \ZnZend\Controller\Plugin\DataTables) to
+     * work with pagination filtering/sorting params submitted from the view script together with
+     * the names of the getters used for each <table> column in the view script and update the Select
+     * object accordingly.
+     *
+     * @return array Example: array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
+     */
+    public function mapGettersColumns()
+    {
+        return $this->mapGettersColumns;
     }
 
     /**

@@ -12,13 +12,14 @@ use ReflectionClass;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\ResultSet\ResultSetInterface;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 use Zend\Db\TableGateway\AbstractTableGateway;
 use Zend\Db\TableGateway\Feature;
-use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
 use ZnZend\Model\EntityInterface;
 use ZnZend\Model\Exception;
+use ZnZend\Paginator\Adapter\DbSelect;
 
 /**
  * Base class for table gateways

@@ -35,6 +35,20 @@ interface EntityInterface
     public function getArrayCopy();
 
     /**
+     * Map getters to column names in table
+     *
+     * Getters should be used in view scripts to retrieve information instead of properties
+     * which in this case would be named after the database columns, which the view should not know about.
+     * This method can be used by a controller plugin (eg. \ZnZend\Controller\Plugin\DataTables) to
+     * work with pagination filtering/sorting params submitted from the view script together with
+     * the names of the getters used for each <table> column in the view script and update the Select
+     * object accordingly.
+     *
+     * @return array Example: array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
+     */
+    public function mapGettersColumns();
+
+    /**
      * Retrieve record id of entity
      *
      * @return null|int

@@ -33,6 +33,7 @@ Classes
 
 Controller Plugins
 ------------------
+* `znZendDataTable` - Update Paginator (DbSelect) with params sent from jQuery DataTables plugin
 * `znZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `znZendPageStore` - Persist data for current page across reloads of the same page
 
