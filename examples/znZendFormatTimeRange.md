@@ -1,4 +1,4 @@
-### Example for znZendTimeRange
+### Example for `znZendTimeRange` View Helper
 
 ```php
 <!-- In view script -->
