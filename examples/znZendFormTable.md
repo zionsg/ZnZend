@@ -1,4 +1,4 @@
-### Example for `znZendFormTable` View Helper
+### Example for `znZendFormTable` Form View Helper
 
 ```php
 // Sample login form
