@@ -1,4 +1,4 @@
-### Example for znZendFormatDateRange
+### Example for `znZendFormatDateRange` View Helper
 
 ```php
 <!-- In view script -->
