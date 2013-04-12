@@ -1,4 +1,4 @@
-### Example for znZendExcerpt
+### Example for `znZendExcerpt` View Helper
 
 ```php
 <!-- In view script -->
