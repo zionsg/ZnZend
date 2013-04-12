@@ -1,4 +1,4 @@
-### Example for znZendFlashMessages
+### Example for `znZendFlashMessages` View Helper
 
 ```php
 // In controller
