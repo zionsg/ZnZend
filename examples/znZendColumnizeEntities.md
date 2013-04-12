@@ -1,4 +1,4 @@
-### Example for znZendColumnizeEntities
+### Example for znZendColumnizeEntities View Helper
 
 ```php
 <!-- In view script -->
