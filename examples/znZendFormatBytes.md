@@ -1,4 +1,4 @@
-### Example for znZendFormatBytes
+### Example for `znZendFormatBytes` View Helper
 
 ```php
 <!-- In view script -->
