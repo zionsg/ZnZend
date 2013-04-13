@@ -33,19 +33,16 @@ class ZnZendDataTables extends AbstractPlugin
      *                                     a getSelect() method to return the Select object.
      * @param array     $dataTablesParams  Params passed to server by jQuery DataTables plugin
      *                                     (@link http://www.datatables.net/usage/server-side)
-     *                                     'mDataProp_0', 'mDataProp_1', etc. must be set to the getters used
-     *                                     to retrieve info for that particular column. This can be set
-     *                                     via the 'aoColumns' key. Example as follows:
+     *                                     The getters (for the result set prototype in $paginator) used for each
+     *                                     column MUST BE SET via 'aoColumns' using 'sName'. Example as follows:
      *                                     $('#example').dataTable( {
      *                                         'bProcessing': true,
      *                                         'bServerSide': true,
      *                                         'sServerMethod': 'POST',
      *                                         'sAjaxSource': 'process.php',
-     *                                         'aoColumns": [
-     *                                             { 'mData': 'getId' },
-     *                                             { 'mData': 'getName' },
-     *                                             { 'mData': 'getDescription' },
-     *                                             { 'mData': 'getTimestamp' }
+     *                                         'aoColumns': [
+     *                                             { 'sName': 'getFirstName' },
+     *                                             { 'sName': 'getLastName' }
      *                                         ]
      *                                     });
      * @param array     $mapGettersColumns Key-value pairs mapping the getters for the result set prototype
@@ -53,15 +50,21 @@ class ZnZendDataTables extends AbstractPlugin
      *                                     via a method in the result set prototype or entity class.
      *                                     Eg: array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
      * @throws Exception\InvalidArgumentException
-     * @return Paginator
+     * @return array Contains all parameters for returning to DataTables plugin
      */
     public function __invoke(Paginator $paginator, array $dataTablesParams, array $mapGettersColumns)
     {
         $adapter = $paginator->getAdapter();
         if (!$adapter instanceof DbSelect) {
-            throw new Exception\InvalidArgumentException('Paginator must use \ZnZend\Paginator\Adapter\DbSelect');
+            throw new Exception\InvalidArgumentException(
+                'Paginator must use \ZnZend\Paginator\Adapter\DbSelect or an adapter that implements getSelect()'
+                . ' method to to get Select object'
+            );
         }
         $select = $adapter->getSelect();
+
+        // 'sColumns' is used to pass in the names of the getters used for each column
+        $columnGetters = explode(',', $dataTablesParams['sColumns']);
 
         // Column sorting
         for ($i = 0; $i < (int) $dataTablesParams['iSortingCols']; $i++) {
@@ -70,7 +73,7 @@ class ZnZendDataTables extends AbstractPlugin
                 continue;
             }
 
-            $getter = $dataTablesParams['mDataProp_' . $dataColumn];
+            $getter = $columnGetters[$dataColumn];
             if (empty($mapGettersColumns[$getter])) {
                 continue;
             }
@@ -87,7 +90,7 @@ class ZnZendDataTables extends AbstractPlugin
                 continue;
             }
 
-            $getter = $dataTablesParams['mDataProp_' . $i];
+            $getter = $columnGetters[$dataColumn];
             if (empty($mapGettersColumns[$getter])) {
                 continue;
             }
@@ -104,6 +107,30 @@ class ZnZendDataTables extends AbstractPlugin
         $select->where($where);
 
         $adapter->updateSelect($select);
-        return new Paginator($adapter);
+        $filteredPaginator = new Paginator($adapter);
+
+        $itemCountPerPage = (int) $dataTablesParams['iDisplayLength'];
+        $itemStart = (int) $dataTablesParams['iDisplayStart'];
+        $page = (int) ceil(($itemStart + 1) / $itemCountPerPage);
+        $filteredPaginator->setItemCountPerPage($itemCountPerPage)
+                          ->setCurrentPageNumber($page);
+
+        $aaData = array();
+        foreach ($filteredPaginator as $row) {
+            $rowRender = array();
+            for ($i = 0; $i < $dataTablesParams['iColumns']; $i++) {
+                $rowRender[] = $row->{$columnGetters[$i]}();
+            }
+            $aaData[] = $rowRender;
+        }
+
+        // Return expected parameters for DataTables plugin
+        return array(
+            'sEcho' => (int) $dataTablesParams['sEcho'],
+            'iTotalRecords' => $paginator->getTotalItemCount(),
+            'iTotalDisplayRecords' => $filteredPaginator->getTotalItemCount(),
+            'aaData' => $aaData,
+        );
+
     } // end function __invoke
 }
