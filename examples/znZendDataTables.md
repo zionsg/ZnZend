@@ -3,6 +3,31 @@
 Note: The return from processAction() has not been tested to work yet.
 
 ```php
+<!-- In result set prototype used in Paginator -->
+namespace Web\Model;
+
+use ZnZend\Model\AbstractEntity;
+
+class Person extends AbstractEntity
+{
+    protected static $mapGettersColumns = array(
+        'getFirstName' => 'per_firstname',
+        'getLastName' => 'per_lastname',
+    );
+
+    public function getFirstName()
+    {
+        return $this->get('per_firstname');
+    }
+
+    public function getLastName()
+    {
+        return $this->get('per_lastname');
+    }
+}
+```
+
+```php
 <!-- In controller -->
 namespace Web\Controller;
 
@@ -21,7 +46,7 @@ class IndexController extends AbstractActionController
         }
 
         $personTable = new PersonTable();
-        $persons = $personTable->fetchAll();
+        $persons = $personTable->fetchAll(); // returns Paginator
 
         $postData = $this->params()->fromPost();
         $result = $this->znZendDataTables(
@@ -84,7 +109,7 @@ class IndexController extends AbstractActionController
               aoData.push({'submit': 'DataTables'});
           },
           'aoColumns': [
-               { 'sName': 'getFirstName' },
+               { 'sName': 'getFirstName' }, // Getter used on Person to get value for first column
                { 'sName': 'getLastName' }
           ]
       });
