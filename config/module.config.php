@@ -21,4 +21,10 @@ return array(
             'znZendFormTable'         => 'ZnZend\Form\View\Helper\ZnZendFormTable',
         ),
     ),
+
+    'view_manager' => array(
+        'strategies' => array(
+            'ViewJsonStrategy', // required for returning of JsonModel to work
+        ),
+    ),
 );
