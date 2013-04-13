@@ -35,7 +35,7 @@ abstract class AbstractEntity implements EntityInterface
      * @example array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
      * @var array
      */
-    protected $mapGettersColumns = array();
+    protected static $mapGettersColumns = array();
 
     /**
      * Constructor
@@ -88,9 +88,10 @@ abstract class AbstractEntity implements EntityInterface
      *
      * @return array Example: array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
      */
-    public function mapGettersColumns()
+    public static function mapGettersColumns()
     {
-        return $this->mapGettersColumns;
+        $caller = get_called_class();
+        return $caller::$mapGettersColumns;
     }
 
     /**
