@@ -46,7 +46,7 @@ interface EntityInterface
      *
      * @return array Example: array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
      */
-    public function mapGettersColumns();
+    public static function mapGettersColumns();
 
     /**
      * Retrieve record id of entity
