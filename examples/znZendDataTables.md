@@ -6,35 +6,32 @@ Note: The return from processAction() has not been tested to work yet.
 <!-- In controller -->
 namespace Web\Controller;
 
+use Web\Model\Person;
+use Web\Model\PersonTable;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 
 class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        // ...
-    }
+        if (!$this->getRequest()->isPost()) {
+            return new ViewModel();
+        }
 
-    public function processAction()
-    {
-        // Assume $rows is a Paginator result set with Person objects
-        $postParams = $this->params()->fromPost();
-        $paginator = $this->znZendDataTables(
-            $postParams,
-            $rows,
-            array(
-                'getFirstName' => 'per_firstname',
-                'getLastName' => 'per_lastname',
-            )
+        $personTable = new PersonTable();
+        $persons = $personTable->fetchAll();
+
+        $postData = $this->params()->fromPost();
+        $result = $this->znZendDataTables(
+            $persons,
+            $postData,
+            Person::mapGettersColumns()
         );
 
-        return new JsonModel(array(
-            'iTotalRecords' => 0,
-            'iTotalDisplayRecords' => 0,
-            'sEcho' => 0,
-            'aaData' => $paginator,
-        ));
+        // ViewJsonStrategy must be added in module.config.php for JsonModel to work
+        return new JsonModel($result);
     }
 }
 ```
@@ -43,6 +40,7 @@ class IndexController extends AbstractActionController
 <!-- In view script for indexAction() -->
 <link href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" media="screen" rel="stylesheet" type="text/css">
 <style>
+  /* Hide global search field for 'example' table */
   #example_filter { display: none; }
 </style>
 
@@ -56,20 +54,6 @@ class IndexController extends AbstractActionController
     </thead>
 
     <tbody>
-      <tr align="center">
-        <td>Alpha</td>
-        <td>Delta</th>
-      </tr>
-
-      <tr align="center">
-        <td>Alpha</td>
-        <td>Omega</th>
-      </tr>
-
-      <tr align="center">
-        <td>Beta</td>
-        <td>Psi</td>
-      </tr>
     </tbody>
 
     <tfoot>
@@ -88,17 +72,21 @@ class IndexController extends AbstractActionController
       var searchInitVals = new Array();
 
       var oTable = $('#example').dataTable({
-          "bProcessing": false,
-          "bServerSide": true,
-          "sServerMethod": 'POST',
-          "sAjaxSource": '<?php echo $this->url('web/wildcard', array('action' => 'process')); ?>',
-          "aoColumns": [
-            { "mData": 'getFirstName' },
-            { "mData": 'getLastName' },
-          ],
           'iDisplayLength': 25,
           'aLengthMenu': [[25, 50, 100, -1], [25, 50, 100, 'All']],
-          "sPaginationType": 'full_numbers'
+          'sPaginationType': 'full_numbers',
+          'bProcessing': false,
+          'bDeferRender': true,
+          'bServerSide': true,
+          'sServerMethod': 'POST',
+          'sAjaxSource': '<?php echo $this->url('web/wildcard', array('action' => 'index')); ?>',
+          'fnServerParams': function (aoData) {
+              aoData.push({'submit': 'DataTables'});
+          },
+          'aoColumns': [
+               { 'sName': 'getFirstName' },
+               { 'sName': 'getLastName' }
+          ]
       });
 
       $('tfoot input').keyup(function () {
@@ -127,6 +115,7 @@ class IndexController extends AbstractActionController
   });
 </script>
 ```
+
 _BECOMES_
 
 ![Screenshot of result](https://raw.github.com/zionsg/ZnZend/master/examples/znZendDataTables_screenshot.png)
