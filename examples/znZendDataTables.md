@@ -1,7 +1,5 @@
 ### Example for `znZendDataTables` Controller Plugin
 
-Note: The return from processAction() has not been tested to work yet.
-
 ```php
 <!-- In result set prototype used in Paginator -->
 namespace Web\Model;
