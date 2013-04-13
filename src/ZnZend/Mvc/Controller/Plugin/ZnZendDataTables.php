@@ -29,6 +29,8 @@ class ZnZendDataTables extends AbstractPlugin
      *
      * Note that the global search filter is not processed, only those for the individual columns.
      *
+     * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect or an adapter that implements
+     *                                     a getSelect() method to return the Select object.
      * @param array     $dataTablesParams  Params passed to server by jQuery DataTables plugin
      *                                     (@link http://www.datatables.net/usage/server-side)
      *                                     'mDataProp_0', 'mDataProp_1', etc. must be set to the getters used
@@ -46,7 +48,6 @@ class ZnZendDataTables extends AbstractPlugin
      *                                             { 'mData': 'getTimestamp' }
      *                                         ]
      *                                     });
-     * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect.
      * @param array     $mapGettersColumns Key-value pairs mapping the getters for the result set prototype
      *                                     in $paginator to the database column names, which can be provided
      *                                     via a method in the result set prototype or entity class.
@@ -54,7 +55,7 @@ class ZnZendDataTables extends AbstractPlugin
      * @throws Exception\InvalidArgumentException
      * @return Paginator
      */
-    public function __invoke(array $dataTablesParams, Paginator $paginator, array $mapGettersColumns)
+    public function __invoke(Paginator $paginator, array $dataTablesParams, array $mapGettersColumns)
     {
         $adapter = $paginator->getAdapter();
         if (!$adapter instanceof DbSelect) {
