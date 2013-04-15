@@ -13,7 +13,7 @@ use Zend\Db\Sql\Where;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Paginator\Paginator;
 use ZnZend\Paginator\Adapter\DbSelect;
-use ZnZend\Mvc\Controller\Exception;
+use ZnZend\Mvc\Exception;
 
 /**
  * Controller plugin to update Paginator (DbSelect) with params from jQuery DataTables
@@ -30,7 +30,7 @@ class ZnZendDataTables extends AbstractPlugin
      * Note that the global search filter is not processed, only those for the individual columns.
      *
      * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect or an adapter that implements
-     *                                     a getSelect() method to return the Select object.
+     *                                     a getSelect() method to retreive the Select object.
      * @param array     $dataTablesParams  Params passed to server by jQuery DataTables plugin
      *                                     (@link http://www.datatables.net/usage/server-side)
      *                                     The getters (for the result set prototype in $paginator) used for each
@@ -55,13 +55,12 @@ class ZnZendDataTables extends AbstractPlugin
     public function __invoke(Paginator $paginator, array $dataTablesParams, array $mapGettersColumns)
     {
         $adapter = $paginator->getAdapter();
-        if (!$adapter instanceof DbSelect) {
+
+        if (!method_exists($adapter, 'getSelect') || !(($select = $adapter->getSelect()) instanceof Select)) {
             throw new Exception\InvalidArgumentException(
-                'Paginator must use \ZnZend\Paginator\Adapter\DbSelect or an adapter that implements getSelect()'
-                . ' method to to get Select object'
+                get_class($adapter) . ' does not implement getSelect() method to retrieve \Zend\Db\Sql\Select object'
             );
         }
-        $select = $adapter->getSelect();
 
         // 'sColumns' is used to pass in the names of the getters used for each column
         $columnGetters = explode(',', $dataTablesParams['sColumns']);
