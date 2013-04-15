@@ -89,7 +89,7 @@ class ZnZendDataTables extends AbstractPlugin
                 continue;
             }
 
-            $getter = $columnGetters[$dataColumn];
+            $getter = $columnGetters[$i];
             if (empty($mapGettersColumns[$getter])) {
                 continue;
             }
@@ -114,15 +114,18 @@ class ZnZendDataTables extends AbstractPlugin
         $filteredPaginator->setItemCountPerPage($itemCountPerPage)
                           ->setCurrentPageNumber($page);
 
-        $aaData = array();
+        $aaData = array(); $flag = 0;
         foreach ($filteredPaginator as $row) {
+            if (false === $row) {
+                break;
+            }
             $rowRender = array();
             for ($i = 0; $i < $dataTablesParams['iColumns']; $i++) {
                 $rowRender[] = $row->{$columnGetters[$i]}();
             }
             $aaData[] = $rowRender;
         }
-
+        file_put_contents('D:\Base\zion.ng\Desktop\log.txt', $flag);
         // Return expected parameters for DataTables plugin
         return array(
             'sEcho' => (int) $dataTablesParams['sEcho'],
