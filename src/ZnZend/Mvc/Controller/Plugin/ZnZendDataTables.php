@@ -125,7 +125,7 @@ class ZnZendDataTables extends AbstractPlugin
             }
             $aaData[] = $rowRender;
         }
-        file_put_contents('D:\Base\zion.ng\Desktop\log.txt', $flag);
+
         // Return expected parameters for DataTables plugin
         return array(
             'sEcho' => (int) $dataTablesParams['sEcho'],
