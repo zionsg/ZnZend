@@ -81,8 +81,11 @@ class IndexController extends AbstractActionController
 
     <tfoot>
       <tr>
-        <th><input type="text" name="search_firstname" value="Search first name" class="search_init"></th>
-        <th><input type="text" name="search_lastname" value="Search last name" class="search_init"></th>
+        <td align="center" colspan="2"><small><em>Press ENTER to filter after keying in search text</em></small></td>
+      </tr>
+      <tr>
+        <th><input type="text" name="search_firstname" placeholder="Search first name" /></th>
+        <th><input type="text" name="search_lastname" placeholder="Search last name" /></th>
       </tr>
     </tfoot>
   </table>
@@ -91,51 +94,39 @@ class IndexController extends AbstractActionController
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 <script>
-  $(document).ready(function() {
-      var searchInitVals = new Array();
+  var dataTablesScript = function() {
+      $(document).ready(function() {
+          var oTable = $('#example').dataTable({
+              'iDisplayLength': 25,
+              'aLengthMenu': [[25, 50, 100, -1], [25, 50, 100, 'All']],
+              'sPaginationType': 'full_numbers',
+              'bProcessing': false,
+              'bDeferRender': true,
+              'bServerSide': true,
+              'sServerMethod': 'POST',
+              'sAjaxSource': '<?php echo $this->url('web/wildcard', array('action' => 'index')); ?>',
+              'fnServerParams': function (aoData) {
+                  aoData.push({'submit': 'DataTables'});
+              },
+              'aoColumns': [
+                   { 'sName': 'getFirstName' }, // Getter used on Person to get value for first column
+                   { 'sName': 'getLastName' }
+              ]
+          });
 
-      var oTable = $('#example').dataTable({
-          'iDisplayLength': 25,
-          'aLengthMenu': [[25, 50, 100, -1], [25, 50, 100, 'All']],
-          'sPaginationType': 'full_numbers',
-          'bProcessing': false,
-          'bDeferRender': true,
-          'bServerSide': true,
-          'sServerMethod': 'POST',
-          'sAjaxSource': '<?php echo $this->url('web/wildcard', array('action' => 'index')); ?>',
-          'fnServerParams': function (aoData) {
-              aoData.push({'submit': 'DataTables'});
-          },
-          'aoColumns': [
-               { 'sName': 'getFirstName' }, // Getter used on Person to get value for first column
-               { 'sName': 'getLastName' }
-          ]
-      });
+          $('tfoot input').keyup(function (event) {
+              // Filter only when ENTER is pressed, not for every keystroke
+              if (event.which != 13) {
+                  return;
+              }
 
-      $('tfoot input').keyup(function () {
-          // Filter on the column (the index) of this element
-          oTable.fnFilter(this.value, $('tfoot input').index(this));
+              // Filter on all columns where text is entered
+              $('tfoot input').each(function (index) {
+                  oTable.fnFilter(this.value, index);
+              });
+          });
       });
-
-      // Support functions to provide a little bit of 'user friendlyness' to the textboxes in the footer
-      $('tfoot input').each(function (i) {
-          searchInitVals[i] = this.value;
-      });
-
-      $('tfoot input').focus(function () {
-          if ('search_init' == this.className) {
-              this.className = '';
-              this.value = '';
-          }
-      });
-
-      $('tfoot input').blur(function (i) {
-          if ('' == this.value) {
-              this.className = 'search_init';
-              this.value = searchInitVals[$('tfoot input').index(this)];
-          }
-      });
-  });
+  }();
 </script>
 ```
 
