@@ -17,8 +17,9 @@ return array(
             'znZendFormatDateRange'   => 'ZnZend\View\Helper\ZnZendFormatDateRange',
             'znZendFormatTimeRange'   => 'ZnZend\View\Helper\ZnZendFormatTimeRange',
             // Form view helpers
-            'znZendFormRow'           => 'ZnZend\Form\View\Helper\ZnZendFormRow',
-            'znZendFormTable'         => 'ZnZend\Form\View\Helper\ZnZendFormTable',
+            'znZendFormRow'             => 'ZnZend\Form\View\Helper\ZnZendFormRow',
+            'znZendFormTable'           => 'ZnZend\Form\View\Helper\ZnZendFormTable',
+            'znZendFormCaptchaQuestion' => 'ZnZend\Form\View\Helper\Captcha\Question',
         ),
     ),
 
