@@ -37,8 +37,13 @@ Controller Plugins
 * `znZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `znZendPageStore` - Persist data for current page across reloads of the same page
 
+Captcha Adapters
+----------------
+* `ZnZend\Captcha\Question` - Captcha adapter for custom questions and answers
+
 Form View Helpers
 -----------------
+* `znZendFormCaptchaQuestion` - Render captcha element using ZnZend\Captcha\Question adapter
 * `znZendFormRow` - Extension to FormRow view helper to allow rendering format to be customized
 * `znZendFormTable` - Render form as 2-column table
 
