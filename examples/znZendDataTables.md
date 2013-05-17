@@ -1,7 +1,7 @@
 ### Example for `znZendDataTables` Controller Plugin
 
 ```php
-<!-- In result set prototype used in Paginator -->
+// In result set prototype used in Paginator
 namespace Web\Model;
 
 use ZnZend\Model\AbstractEntity;
@@ -9,24 +9,24 @@ use ZnZend\Model\AbstractEntity;
 class Person extends AbstractEntity
 {
     protected static $mapGettersColumns = array(
-        'getFirstName' => 'per_firstname',
-        'getLastName' => 'per_lastname',
+        'getId' => 'person_id',
+        'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)",
     );
 
-    public function getFirstName()
+    public function getId()
     {
-        return $this->get('per_firstname');
+        return $this->get('person_id');
     }
 
-    public function getLastName()
+    public function getFullName()
     {
-        return $this->get('per_lastname');
+        return $this->get('person_firstname') . ' ' . $this->get('person_lastname');
     }
 }
 ```
 
 ```php
-<!-- In controller -->
+// In controller
 namespace Web\Controller;
 
 use Web\Model\Person;
@@ -61,7 +61,7 @@ class IndexController extends AbstractActionController
 
 ```php
 <!-- In view script for indexAction() -->
-<link href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" media="screen" rel="stylesheet" type="text/css">
+<link href="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" media="screen" rel="stylesheet" type="text/css">
 <style>
   /* Hide global search field for 'example' table */
   #example_filter { display: none; }
@@ -71,8 +71,9 @@ class IndexController extends AbstractActionController
   <table id="example" border="0" cellpadding="0" cellspacing="0" width="100%">
     <thead>
       <tr>
-        <th>First Name</th>
-        <th>Last Name</th>
+        <th>ID</th>
+        <th>Full Name</th>
+        <th>Actions</th>
       </tr>
     </thead>
 
@@ -84,15 +85,16 @@ class IndexController extends AbstractActionController
         <td align="center" colspan="2"><small><em>Press ENTER to filter after keying in search text</em></small></td>
       </tr>
       <tr>
-        <th><input type="text" name="search_firstname" placeholder="Search first name" /></th>
-        <th><input type="text" name="search_lastname" placeholder="Search last name" /></th>
+        <th><input type="text" name="search_id" placeholder="Search ID" /></th>
+        <th><input type="text" name="search_fullname" placeholder="Search full name" /></th>
+        <th></th>
       </tr>
     </tfoot>
   </table>
 </div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+<script src="//ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 <script>
   var dataTablesScript = function() {
       $(document).ready(function() {
@@ -108,9 +110,10 @@ class IndexController extends AbstractActionController
               'fnServerParams': function (aoData) {
                   aoData.push({'submit': 'DataTables'});
               },
-              'aoColumns': [
-                   { 'sName': 'getFirstName' }, // Getter used on Person to get value for first column
-                   { 'sName': 'getLastName' }
+              'aoColumnDefs': [
+                  { 'aTargets': [0], 'sName': 'getId' }, // getter for Person to get value for 1st column
+                  { 'aTargets': [1], 'sName': 'getFullName' },
+                  { 'aTargets': [2], 'sName': null, 'sDefaultContent': '<a href="" class="editrec">Edit</a>' },
               ]
           });
 
