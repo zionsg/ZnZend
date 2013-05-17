@@ -16,7 +16,7 @@ use ZnZend\Paginator\Adapter\DbSelect;
 use ZnZend\Mvc\Exception;
 
 /**
- * Controller plugin to update Paginator (DbSelect) with params from jQuery DataTables
+ * Controller plugin to update Paginator (DbSelect adapter) with params from jQuery DataTables
  *
  * Params is based on version 1.9.4 (23 Sep 2012) of the DataTables plugin.
  *
@@ -30,25 +30,41 @@ class ZnZendDataTables extends AbstractPlugin
      * Note that the global search filter is not processed, only those for the individual columns.
      *
      * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect or an adapter that implements
-     *                                     a getSelect() method to retreive the Select object.
+     *                                     a getSelect() method to retrieve the Select object.
      * @param array     $dataTablesParams  Params passed to server by jQuery DataTables plugin
      *                                     (@link http://www.datatables.net/usage/server-side)
      *                                     The getters (for the result set prototype in $paginator) used for each
-     *                                     column MUST BE SET via 'aoColumns' using 'sName'. Example as follows:
-     *                                     $('#example').dataTable( {
-     *                                         'bProcessing': true,
-     *                                         'bServerSide': true,
-     *                                         'sServerMethod': 'POST',
-     *                                         'sAjaxSource': 'process.php',
-     *                                         'aoColumns': [
-     *                                             { 'sName': 'getFirstName' },
-     *                                             { 'sName': 'getLastName' }
-     *                                         ]
-     *                                     });
-     * @param array     $mapGettersColumns Key-value pairs mapping the getters for the result set prototype
-     *                                     in $paginator to the database column names, which can be provided
-     *                                     via a method in the result set prototype or entity class.
-     *                                     Eg: array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
+     *                                     column MUST BE SET via 'aoColumns' or 'aoColumnDefs' using 'sName'.
+     *                                     'sName' can be set to null for non-data columns (eg. 'Edit Record').
+     *                                     Example as follows:
+     *                                         $('#example').dataTable({
+     *                                             'bProcessing': true,
+     *                                             'bServerSide': true,
+     *                                             'sServerMethod': 'POST',
+     *                                             'sAjaxSource': 'process.php',
+     *                                             'aoColumnDefs': [
+     *                                                 { 'aTargets': [0], 'sName': 'getId' },
+     *                                                 { 'aTargets': [1], 'sName': 'getFullName' },
+     *                                                 {
+     *                                                   'aTargets': [2],
+     *                                                   'sName': null,
+     *                                                   'sDefaultContent': '<a href="" class="editrec">Edit</a>'
+     *                                                 }
+     *                                             ]
+     *                                         });
+     * @param array     $mapGettersColumns Key-value pairs mapping the getters (for the result set prototype
+     *                                     in $paginator) to the database column names, to be used to modify Select.
+     *                                     The array should ideally be provided via a method in the entity rather
+     *                                     than being exposed/hardcoded in the controller action.
+     *                                     Example as follows:
+     *                                     array(
+     *                                         // property $p->person_id => `person_id` column in database table
+     *                                         'person_id' => 'person_id',
+     *                                         // method $p->getId() => `person_id` column in database table
+     *                                         'getId' => 'person_id',
+     *                                         // method $p->getFullName() => SQL expression
+     *                                         'getFullName' => "CONCAT('person_firstname, ' ', person_lastname)",
+     *                                     )
      * @throws Exception\InvalidArgumentException
      * @return array Contains all parameters for returning to DataTables plugin
      */
@@ -97,7 +113,8 @@ class ZnZendDataTables extends AbstractPlugin
 
             if ('false' == $dataTablesParams['bRegex_' . $i]) {
                 // Use LIKE
-                $where->like($column, '%' . $searchText . '%');
+                // like() not used in case $column is an expression and everything gets quoted
+                $where->expression("{$column} LIKE ?", "%{$searchText}%");
             } else {
                 // Use REGEXP
                 $where->expression("{$column} REGEXP ?", $searchText);
@@ -114,14 +131,29 @@ class ZnZendDataTables extends AbstractPlugin
         $filteredPaginator->setItemCountPerPage($itemCountPerPage)
                           ->setCurrentPageNumber($page);
 
-        $aaData = array(); $flag = 0;
+        // Construct data for each row and column
+        $aaData = array();
         foreach ($filteredPaginator as $row) {
             if (false === $row) {
                 break;
             }
             $rowRender = array();
             for ($i = 0; $i < $dataTablesParams['iColumns']; $i++) {
-                $rowRender[] = $row->{$columnGetters[$i]}();
+                // Getter may be null, empty, a method of $row or property of $row
+                $getter = $columnGetters[$i];
+                if ('null' == $getter || empty($getter)){
+                    $value = null;
+                } elseif (is_callable(array($row, $getter))) {
+                    // method_exists() not used as it returns true for private methods which are not callable
+                    $value = $row->$getter();
+                } elseif (isset($row->$getter)) {
+                    // Property
+                    $value = $row->$getter;
+                } else {
+                    $value = null;
+                }
+
+                $rowRender[] = $value;
             }
             $aaData[] = $rowRender;
         }
