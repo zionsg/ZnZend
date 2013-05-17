@@ -113,7 +113,12 @@ class IndexController extends AbstractActionController
               'aoColumnDefs': [
                   { 'aTargets': [0], 'sName': 'getId' }, // getter for Person to get value for 1st column
                   { 'aTargets': [1], 'sName': 'getFullName' },
-                  { 'aTargets': [2], 'sName': null, 'sDefaultContent': '<a href="" class="editrec">Edit</a>' },
+                  {
+                    'aTargets': [2],
+                    'sName': null,
+                    'sDefaultContent': '<a href="" class="editrec">Edit</a>',
+                    'bSortable': false
+                  },
               ],
               'fnRowCallback': function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                   // Add "_record" attribute to td with Edit link
@@ -125,7 +130,7 @@ class IndexController extends AbstractActionController
                       event.preventDefault();
                       window.location = 'edit.php?id=' + $(this).parent().attr('_record');
                   });
-              }              
+              }
           });
 
           $('tfoot input').keyup(function (event) {
