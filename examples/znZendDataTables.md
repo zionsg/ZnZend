@@ -114,7 +114,18 @@ class IndexController extends AbstractActionController
                   { 'aTargets': [0], 'sName': 'getId' }, // getter for Person to get value for 1st column
                   { 'aTargets': [1], 'sName': 'getFullName' },
                   { 'aTargets': [2], 'sName': null, 'sDefaultContent': '<a href="" class="editrec">Edit</a>' },
-              ]
+              ],
+              'fnRowCallback': function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                  // Add "_record" attribute to td with Edit link
+                  $('td:eq(2)', nRow).attr('_record', $('td:eq(0)', nRow).text());
+              },
+              'fnDrawCallback': function (oSettings) {
+                  // Add click event handler on action links for each record
+                  $('a.editrec').click(function (event) {
+                      event.preventDefault();
+                      window.location = 'edit.php?id=' + $(this).parent().attr('_record');
+                  });
+              }              
           });
 
           $('tfoot input').keyup(function (event) {
