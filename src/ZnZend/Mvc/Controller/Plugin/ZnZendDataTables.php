@@ -35,23 +35,30 @@ class ZnZendDataTables extends AbstractPlugin
      *                                     (@link http://www.datatables.net/usage/server-side)
      *                                     The getters (for the result set prototype in $paginator) used for each
      *                                     column MUST BE SET via 'aoColumns' or 'aoColumnDefs' using 'sName'.
-     *                                     'sName' can be set to null for non-data columns (eg. 'Edit Record').
+     *                                     'sName' can be set to null if no data is to be fetched for that column.
      *                                     Example as follows:
-     *                                         $('#example').dataTable({
-     *                                             'bProcessing': true,
-     *                                             'bServerSide': true,
-     *                                             'sServerMethod': 'POST',
-     *                                             'sAjaxSource': 'process.php',
-     *                                             'aoColumnDefs': [
-     *                                                 { 'aTargets': [0], 'sName': 'getId' },
-     *                                                 { 'aTargets': [1], 'sName': 'getFullName' },
-     *                                                 {
-     *                                                   'aTargets': [2],
-     *                                                   'sName': null,
-     *                                                   'sDefaultContent': '<a href="" class="editrec">Edit</a>'
+     *                                       $('#example').dataTable({
+     *                                           'bProcessing': true,
+     *                                           'bServerSide': true,
+     *                                           'sServerMethod': 'POST',
+     *                                           'sAjaxSource': 'process.php',
+     *                                           'aoColumnDefs': [
+     *                                               { 'aTargets': [0], 'sName': 'getId' },
+     *                                               { 'aTargets': [1], 'sName': 'getFullName' },
+     *                                               {
+     *                                                 'aTargets': [2],
+     *                                                 'sName': null, // no data to be fetched
+     *                                                 'bSortable': false,
+     *                                                 'mRender': function (data, type, full) {
+     *                                                     // use data from other columns to create link
+     *                                                     url = 'edit.php?id=' + full[0];
+     *                                                     title = 'Edit person named: ' + full[1];
+     *                                                     return '<a href="' + url
+     *                                                          + '" title="' + title + '">Edit</a>';
      *                                                 }
-     *                                             ]
-     *                                         });
+     *                                               }
+     *                                           ]
+     *                                       });
      * @param array     $mapGettersColumns Key-value pairs mapping the getters (for the result set prototype
      *                                     in $paginator) to the database column names, to be used to modify Select.
      *                                     The array should ideally be provided via a method in the entity rather
