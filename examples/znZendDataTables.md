@@ -115,10 +115,14 @@ class IndexController extends AbstractActionController
                   { 'aTargets': [1], 'sName': 'getFullName' },
                   {
                     'aTargets': [2],
-                    'sName': null,
-                    'sDefaultContent': '<a href="" class="editrec">Edit</a>',
-                    'bSortable': false
-                  },
+                    'sName': 'getId',
+                    'bSortable': false,                    
+                    'mRender': function (data, type, full) {
+                        url = 'edit.php?id=' + data; // value from getId() used in link
+                        title = 'Edit person named: ' + full[1]; // full[1] refers to value of 2nd column
+                        return '<a href="' + url + '" title="' + title + '">Edit</a>';
+                    }
+                  }
               ],
               'fnRowCallback': function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                   // Add "_record" attribute to td with Edit link
