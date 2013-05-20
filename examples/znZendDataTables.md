@@ -115,26 +115,16 @@ class IndexController extends AbstractActionController
                   { 'aTargets': [1], 'sName': 'getFullName' },
                   {
                     'aTargets': [2],
-                    'sName': 'getId',
-                    'bSortable': false,                    
+                    'sName': null, // no data to be fetched
+                    'bSortable': false,
                     'mRender': function (data, type, full) {
-                        url = 'edit.php?id=' + data; // value from getId() used in link
-                        title = 'Edit person named: ' + full[1]; // full[1] refers to value of 2nd column
+                        // use data from other columns to create link
+                        url = 'edit.php?id=' + full[0]; // from aTarget[0], getId
+                        title = 'Edit person named: ' + full[1]; // from aTarget[1], getFullName
                         return '<a href="' + url + '" title="' + title + '">Edit</a>';
                     }
                   }
-              ],
-              'fnRowCallback': function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                  // Add "_record" attribute to td with Edit link
-                  $('td:eq(2)', nRow).attr('_record', $('td:eq(0)', nRow).text());
-              },
-              'fnDrawCallback': function (oSettings) {
-                  // Add click event handler on action links for each record
-                  $('a.editrec').click(function (event) {
-                      event.preventDefault();
-                      window.location = 'edit.php?id=' + $(this).parent().attr('_record');
-                  });
-              }
+              ]
           });
 
           $('tfoot input').keyup(function (event) {
