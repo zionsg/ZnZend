@@ -32,7 +32,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Array mapping getters to columns - set by extending class
      *
-     * @example array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
+     * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
      * @var array
      */
     protected static $mapGettersColumns = array();
@@ -86,7 +86,8 @@ abstract class AbstractEntity implements EntityInterface
      * the names of the getters used for each <table> column in the view script and update the Select
      * object accordingly.
      *
-     * @return array Example: array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
+     * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
+     * @return  array
      */
     public static function mapGettersColumns()
     {
