@@ -93,7 +93,7 @@ class ZnZendFormTable extends FormCollection
             return $this->formHelper;
         }
 
-        if (method_exists($this->view, 'plugin')) {
+        if (is_callable(array($this->view, 'plugin'))) {
             $this->formHelper = $this->view->plugin('form');
         }
 
