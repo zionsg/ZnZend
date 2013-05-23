@@ -114,7 +114,8 @@ abstract class AbstractTable extends AbstractTableGateway
         // Populate $columns - adapter is only available after initialize()
         if (empty($this->columns) || empty($this->primaryKey)) {
             $columns = $this->adapter->query(
-                'SELECT COLUMN_NAME, COLUMN_KEY FROM information_schema.columns WHERE table_schema = ? and table_name = ?',
+                'SELECT COLUMN_NAME, COLUMN_KEY FROM information_schema.columns '
+                . 'WHERE table_schema = ? and table_name = ?',
                 array($this->adapter->getCurrentSchema(), $this->table)
             );
             $keys = array();
@@ -135,7 +136,8 @@ abstract class AbstractTable extends AbstractTableGateway
      *
      * Rows returned from query results will conform to the current specified row state
      *
-     * @param  string $rowState Options: AbstractTable::ACTIVE_ROWS, AbstractTable::DELETED_ROWS, AbstractTable::ALL_ROWS
+     * @param  string $rowState Options: AbstractTable::ACTIVE_ROWS, AbstractTable::DELETED_ROWS, 
+     *                          AbstractTable::ALL_ROWS
      * @return AbstractTable For fluent interface
      */
     public function setRowState($rowState)
