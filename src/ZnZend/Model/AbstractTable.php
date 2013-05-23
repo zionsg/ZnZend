@@ -136,7 +136,7 @@ abstract class AbstractTable extends AbstractTableGateway
      *
      * Rows returned from query results will conform to the current specified row state
      *
-     * @param  string $rowState Options: AbstractTable::ACTIVE_ROWS, AbstractTable::DELETED_ROWS, 
+     * @param  string $rowState Options: AbstractTable::ACTIVE_ROWS, AbstractTable::DELETED_ROWS,
      *                          AbstractTable::ALL_ROWS
      * @return AbstractTable For fluent interface
      */
