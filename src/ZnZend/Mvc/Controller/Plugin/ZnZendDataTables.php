@@ -79,7 +79,9 @@ class ZnZendDataTables extends AbstractPlugin
     {
         $adapter = $paginator->getAdapter();
 
-        if (!method_exists($adapter, 'getSelect') || !(($select = $adapter->getSelect()) instanceof Select)) {
+        // method_exists() not used as it returns true for private methods which are not callable
+        if (   !is_callable(array($adapter, 'getSelect'))
+            || !(($select = $adapter->getSelect()) instanceof Select)) {
             throw new Exception\InvalidArgumentException(
                 get_class($adapter) . ' does not implement getSelect() method to retrieve \Zend\Db\Sql\Select object'
             );
@@ -151,7 +153,6 @@ class ZnZendDataTables extends AbstractPlugin
                 if ('null' == $getter || empty($getter)){
                     $value = null;
                 } elseif (is_callable(array($row, $getter))) {
-                    // method_exists() not used as it returns true for private methods which are not callable
                     $value = $row->$getter();
                 } elseif (isset($row->$getter)) {
                     // Property
