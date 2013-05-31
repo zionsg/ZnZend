@@ -114,15 +114,15 @@ abstract class AbstractTable extends AbstractTableGateway
         // Populate $columns - adapter is only available after initialize()
         if (empty($this->columns) || empty($this->primaryKey)) {
             $columns = $this->adapter->query(
-                'SELECT COLUMN_NAME, COLUMN_KEY FROM information_schema.columns '
-                . 'WHERE table_schema = ? and table_name = ?',
+                'SELECT column_name, column_key FROM information_schema.columns '
+                . 'WHERE table_schema = ? AND table_name = ?',
                 array($this->adapter->getCurrentSchema(), $this->table)
             );
             $keys = array();
             foreach ($columns as $column) {
-                $this->columns[] = $column->COLUMN_NAME;
-                if ('PRI' == $column->COLUMN_KEY) {
-                    $keys[] = $column->COLUMN_NAME;
+                $this->columns[] = $column->column_name;
+                if ('PRI' == $column->column_key) {
+                    $keys[] = $column->column_name;
                 }
             }
             $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
