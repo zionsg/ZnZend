@@ -263,11 +263,15 @@ abstract class AbstractTable extends AbstractTableGateway
     {
         // Get primary key column
         if (empty($this->primaryKey)) {
-            $keys = $this->adapter->query(
+            $columns = $this->adapter->query(
                 'SELECT column_name FROM information_schema.columns '
                 . "WHERE table_schema = ? AND table_name = ? AND column_key = 'PRI'",
                 array($this->adapter->getCurrentSchema(), $this->table)
             );
+            $keys = array();
+            foreach ($columns as $column) {
+                $keys[] = $column->column_name;
+            }
             $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
         }
 
@@ -297,11 +301,15 @@ abstract class AbstractTable extends AbstractTableGateway
         // Get columns only when needed
         // Feature\MetadataFeature is not used as it is very slow
         if (empty($this->columns)) {
-            $this->columns = $this->adapter->query(
+            $columns = $this->adapter->query(
                 'SELECT column_name FROM information_schema.columns '
                 . 'WHERE table_schema = ? AND table_name = ?',
                 array($this->adapter->getCurrentSchema(), $this->table)
             );
+            $this->columns = array();
+            foreach ($columns as $column) {
+                $this->columns[] = $column->column_name;
+            }
         }
 
         // remove invalid keys from $data
