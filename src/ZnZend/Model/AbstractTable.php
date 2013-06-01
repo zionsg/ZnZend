@@ -47,13 +47,6 @@ abstract class AbstractTable extends AbstractTableGateway
     const ALL_ROWS     = 'all';
 
     /**
-     * Name of primary key column(s) - set by constructor not user
-     *
-     * @var string|array
-     */
-    protected $primaryKey;
-
-    /**
      * Fully qualified name of class used for result set objects - set by user
      *
      * Class must implement EntityInterface.
@@ -80,6 +73,13 @@ abstract class AbstractTable extends AbstractTableGateway
     protected $deletedRowState = array();
 
     /**
+     * Name of primary key column(s) - set by find() not user
+     *
+     * @var string|array
+     */
+    protected $primaryKey;
+
+    /**
      * Current row state
      *
      * @var string Options: AbstractTable::ACTIVE_ROWS (default), AbstractTable::DELETED_ROWS, AbstractTable::ALL_ROWS
@@ -93,10 +93,6 @@ abstract class AbstractTable extends AbstractTableGateway
      *   Just add the following line to a bootstrap, eg. onBootstrap() in Module.php:
      *       Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter($adapter);
      *   The adapter is statically loaded when instantiating in a controller/model, eg: $table = new MyTableGateway();
-     *
-     * Populate TableGateway with column and primary key information.
-     *   Without this, $this->columns will be empty and cannot be used for filterColumns().
-     *   Feature\MetadataFeature is not used as it is very slow.
      */
     public function __construct()
     {
@@ -110,23 +106,6 @@ abstract class AbstractTable extends AbstractTableGateway
 
         // Initialize
         $this->initialize();
-
-        // Populate $columns - adapter is only available after initialize()
-        if (empty($this->columns) || empty($this->primaryKey)) {
-            $columns = $this->adapter->query(
-                'SELECT column_name, column_key FROM information_schema.columns '
-                . 'WHERE table_schema = ? AND table_name = ?',
-                array($this->adapter->getCurrentSchema(), $this->table)
-            );
-            $keys = array();
-            foreach ($columns as $column) {
-                $this->columns[] = $column->column_name;
-                if ('PRI' == $column->column_key) {
-                    $keys[] = $column->column_name;
-                }
-            }
-            $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
-        }
     }
 
     /*** IMPORTANT FUNCTIONS ***/
@@ -282,6 +261,16 @@ abstract class AbstractTable extends AbstractTableGateway
      */
     public function find($key)
     {
+        // Get primary key column
+        if (empty($this->primaryKey)) {
+            $keys = $this->adapter->query(
+                'SELECT column_name FROM information_schema.columns '
+                . "WHERE table_schema = ? AND table_name = ? AND column_key = 'PRI'",
+                array($this->adapter->getCurrentSchema(), $this->table)
+            );
+            $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
+        }
+
         $select = $this->getBaseSelect();
         $select->where(array($this->primaryKey => $key));
         return $this->getResultSet($select, false);
@@ -301,6 +290,20 @@ abstract class AbstractTable extends AbstractTableGateway
      */
     public function filterColumns(array $data)
     {
+        if (empty($data)) {
+            return $data;
+        }
+
+        // Get columns only when needed
+        // Feature\MetadataFeature is not used as it is very slow
+        if (empty($this->columns)) {
+            $this->columns = $this->adapter->query(
+                'SELECT column_name FROM information_schema.columns '
+                . 'WHERE table_schema = ? AND table_name = ?',
+                array($this->adapter->getCurrentSchema(), $this->table)
+            );
+        }
+
         // remove invalid keys from $data
         // array_intersect() not used as keys with empty strings or boolean false are removed
         $tableCols = array_flip($this->columns);  // need to flip
