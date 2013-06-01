@@ -3,12 +3,12 @@ ZnZend
 
 [![Build Status](https://secure.travis-ci.org/zionsg/ZnZend.png?branch=master)](https://travis-ci.org/zionsg/ZnZend)
 
-Zend Framework 2 module containing helpers and base classes for my projects.
+Zend Framework 2 module containing helpers and base classes for my projects at intzone.com.
 
 ## Introduction
 
-This is an attempt to build up a Zend Framework 2 module containing revamps of
-the helpers and base classes I used for my Zend Framework 1 projects
+This is a Zend Framework 2 module containing revamps of
+the helpers and base classes I used for my Zend Framework 1 projects.
 
 ## Requirements
 
