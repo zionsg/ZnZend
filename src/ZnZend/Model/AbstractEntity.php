@@ -108,8 +108,8 @@ abstract class AbstractEntity implements EntityInterface
     protected function get($property = null, $default = null)
     {
         if (null === $property) {
-            $callers = debug_backtrace();
-            $callerFunction = $callers[1]['function'];
+            $trace = debug_backtrace();
+            $callerFunction = $trace[1]['function'];
             $callerClass = get_called_class(); // 'self::' will point to AbstractEntity, hence this
             if (array_key_exists($callerFunction, $callerClass::$mapGettersColumns)) {
                 $property = $callerClass::$mapGettersColumns[$callerFunction];
@@ -120,7 +120,9 @@ abstract class AbstractEntity implements EntityInterface
             return $this->data[$property];
         }
 
-        $trace = debug_backtrace();
+        if (empty($trace)) {
+            $trace = debug_backtrace();
+        }
         trigger_error(
             sprintf(
                 'Undefined property via get(): %s in %s on line %s',
