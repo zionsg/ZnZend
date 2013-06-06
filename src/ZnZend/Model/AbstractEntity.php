@@ -98,13 +98,24 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Generic internal getter for entity properties
      *
-     * @param  string     $property Property to retrieve
+     * @param  null|string $property Optional property to retrieve. If not specified,
+     *                               $mapGettersColumns is checked for the name of the calling
+     *                               function.
      * @param  null|mixed $default  Optional default value if key or property does not exist
      * @return mixed
      * @internal E_USER_NOTICE is triggered if property does not exist
      */
-    protected function get($property, $default = null)
+    protected function get($property = null, $default = null)
     {
+        if (null === $property) {
+            $callers = debug_backtrace();
+            $callerFunction = $callers[1]['function'];
+            $callerClass = get_called_class(); // 'self::' will point to AbstractEntity, hence this
+            if (array_key_exists($callerFunction, $callerClass::$mapGettersColumns)) {
+                $property = $callerClass::$mapGettersColumns[$callerFunction];
+            }
+        }
+        
         if (array_key_exists($property, $this->data)) {
             return $this->data[$property];
         }
