@@ -115,7 +115,7 @@ abstract class AbstractEntity implements EntityInterface
                 $property = $callerClass::$mapGettersColumns[$callerFunction];
             }
         }
-        
+
         if (array_key_exists($property, $this->data)) {
             return $this->data[$property];
         }
