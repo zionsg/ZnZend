@@ -9,7 +9,8 @@ before_install:
  - wget http://cs.sensiolabs.org/get/php-cs-fixer.phar
 
 before_script:
- - composer install --dev
+ - composer self-update
+ - composer updated --dev
 
 script:
  - (cd test; phpunit -c phpunit.xml.dist)
