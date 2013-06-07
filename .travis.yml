@@ -10,7 +10,7 @@ before_install:
 
 before_script:
  - composer self-update
- - composer updated --dev
+ - composer install --dev
 
 script:
  - (cd test; phpunit -c phpunit.xml.dist)
