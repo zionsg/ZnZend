@@ -1,6 +1,6 @@
 {
     "name": "zionsg/znzend",
-    "description": "ZF2 Module containing commonly used classes and helpers for Zn projects",
+    "description": "Zend Framework 2 module containing helpers and base classes for projects at intzone.com",
     "type": "library",
     "keywords": [
         "zf2",
