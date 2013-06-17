@@ -154,9 +154,9 @@ abstract class AbstractTable extends AbstractTableGateway
     /**
      * Return result set as Paginator for select query
      *
-     * Common return point for query functions
-     * The returned Paginator is set to page 1 with item count set to PHP_INT_MAX
-     * so that the full result set is returned when iterated over.
+     * All query functions should use this as a common return point, even extending classes.
+     * The returned Paginator is set to page 1 with item count set to -1 so that the full result
+     * is returned by default when iterated over without use of pagination.
      *
      * @param  Select $select
      * @param  bool   $fetchAll Default = true. Whether to return all rows (as Paginator)
@@ -176,7 +176,7 @@ abstract class AbstractTable extends AbstractTableGateway
         $paginator = new Paginator(
             new DbSelect($select, $this->adapter, $resultSetPrototype)
         );
-        $paginator->setItemCountPerPage(PHP_INT_MAX)->setCurrentPageNumber(1);
+        $paginator->setItemCountPerPage(-1)->setCurrentPageNumber(1);
         return $paginator;
     }
 
