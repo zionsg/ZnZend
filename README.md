@@ -56,3 +56,4 @@ View Helpers
 * `znZendFormatBytes` - Format bytes to human-readable form
 * `znZendFormatDateRange` - Format a date range
 * `znZendFormatTimeRange` - Format a time range
+* `znZendResizeImage` - Make resized copy of image and return path for use in HTML <img>
