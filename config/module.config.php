@@ -5,6 +5,7 @@ return array(
             'znZendDataTables' => 'ZnZend\Mvc\Controller\Plugin\ZnZendDataTables',
             'znZendMvcParams'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams',
             'znZendPageStore'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore',
+            'znZendTimestamp'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendTimestamp',
         ),
     ),
 
