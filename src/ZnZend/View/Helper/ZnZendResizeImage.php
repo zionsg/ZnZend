@@ -20,6 +20,10 @@ class ZnZendResizeImage extends AbstractHelper
      *
      * Creates resized copy of image if it does not exist and returns path
      *
+     * Example: __invoke('/public/images/test.jpg', 150, 100)
+     * Result for centered image: '/public/images/150x100/test_150x100c.jpg'
+     * Result for non-centered image: '/public/images/150x100/test_150x100.jpg'
+     *
      * @param  string $imagePath Path to image file, relative to $_SERVER['DOCUMENT_ROOT']
      * @param  int    $width     Maximum width for resized image
      * @param  int    $height    Maximum height for resized image
@@ -27,19 +31,20 @@ class ZnZendResizeImage extends AbstractHelper
      *                           in box defined by $width x $height
      * @param  int    $quality   Default = 100. Optional quality for resized image from 0 to 100
      * @param  bool   $overwrite Default = false. Optional flag to overwrite existing resized image
-     * @return string Path to resized copy of image for use in HTML <img>, relative to $_SERVER['DOCUMENT_ROOT']
+     * @return string Path to resized copy of image for use in HTML <img>, relative to $_SERVER['DOCUMENT_ROOT'].
+     *                An empty string is returned upon any failure such as write permissions as returning
+     *                the original path will likely break the layout expecting a different size.
      */
     public function __invoke($imagePath, $width, $height, $center = true, $quality = 100, $overwrite = false)
     {
         $webRoot = $_SERVER['DOCUMENT_ROOT'];
+        $failure = '';
 
-        if (!extension_loaded('gd')) {
-            return $imagePath;
-        }
-        if (!file_exists($webRoot . $imagePath)) {
-            return $imagePath;
+        if (!extension_loaded('gd') || !file_exists($webRoot . $imagePath)) {
+            return $failure;
         }
 
+        // Compute subfolder and new filename
         $pathParts = pathinfo($imagePath);
         $resizedFolder = sprintf(
             '%s/%dx%d',
@@ -48,11 +53,12 @@ class ZnZendResizeImage extends AbstractHelper
             $height
         );
         $resizedPath = sprintf(
-            '%s/%s_%dx%d.%s',
+            '%s/%s_%dx%d%s.%s',
             $resizedFolder,
             $pathParts['filename'],
             $width,
             $height,
+            ($center ? 'c' : ''),
             $pathParts['extension']
         );
         if (!$overwrite && file_exists($webRoot . $resizedPath)) {
@@ -62,7 +68,7 @@ class ZnZendResizeImage extends AbstractHelper
         // Detect type of image
         $imageInfo = getimagesize($webRoot . $imagePath);
         if (false === $imageInfo) {
-            return $imagePath;
+            return $failure;
         }
         switch ($imageInfo[2]) {
             case IMAGETYPE_GIF:
@@ -75,18 +81,26 @@ class ZnZendResizeImage extends AbstractHelper
                 $type = 'jpeg';
                 break;
             default:
-                return $imagePath;
+                return $failure;
         }
 
-        // Create canvas for resized copy of image
-        $origWidth  = $imageInfo[0];
-        $origHeight = $imageInfo[1];
-        if ($origWidth >= $origHeight) {
+        // Create canvas for resized copy of image to fit box $width x $height
+        $currWidth  = $imageInfo[0];
+        $currHeight = $imageInfo[1];
+        if ($currWidth >= $currHeight) {
             $newWidth  = $width;
-            $newHeight = ($origHeight / $origWidth) * $newWidth;
+            $newHeight = ($currHeight / $currWidth) * $newWidth;
+            if ($newHeight > $height) {
+                $newHeight = $height;
+                $newWidth = ($currWidth / $currHeight) * $newHeight;
+            }
         } else {
             $newHeight = $height;
-            $newWidth  = ($origWidth / $origHeight) * $newHeight;
+            $newWidth  = ($currWidth / $currHeight) * $newHeight;
+            if ($newWidth > $width) {
+                $newWidth = $width;
+                $newHeight = ($currHeight / $currWidth) * $newWidth;
+            }
         }
         $image = imagecreatefromstring(file_get_contents($webRoot . $imagePath));
         $resizedImage = empty($center)
@@ -101,14 +115,22 @@ class ZnZendResizeImage extends AbstractHelper
         // Position of resized image in canvas
         $destX = empty($center) ? 0 : (int) (($width - $newWidth) / 2);
         $destY = empty($center) ? 0 : (int) (($height - $newHeight) / 2);
-        imagecopyresampled($resizedImage, $image, $destX, $destY, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
+        imagecopyresampled(
+            $resizedImage, $image,
+            $destX, $destY,
+            0, 0,
+            $newWidth, $newHeight,
+            $currWidth, $currHeight
+        );
 
+        // Create subfolder
         if (!file_exists($webRoot . $resizedFolder)) {
             if (!mkdir($webRoot . $resizedFolder, 0755)) {
-                return $imagePath;
+                return $failure;
             }
         }
 
+        // Create file
         $imageFunc = 'image' . $type;
         if('jpeg' == $type) {
             $success = $imageFunc($resizedImage, $webRoot . $resizedPath, $quality);
@@ -117,6 +139,6 @@ class ZnZendResizeImage extends AbstractHelper
         }
         imagedestroy($resizedImage);
 
-        return ($success ? $resizedPath : $imagePath);
+        return ($success ? $resizedPath : $failure);
     }
 }
