@@ -30,12 +30,14 @@ abstract class AbstractEntity implements EntityInterface
     protected $data = array();
 
     /**
-     * Array mapping getters to columns - set by extending class
+     * Array mapping getters to columns - to be set by extending class
      *
      * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
      * @var array
      */
-    protected static $mapGettersColumns = array();
+    protected static $mapGettersColumns = array(
+        'getId' => 'id', // example to show use of get() without params - see getId()
+    );
 
     /**
      * Constructor
@@ -161,7 +163,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getId()
     {
-        return (int) $this->get('id');
+        return (int) $this->get(); // example of calling get() without params
     }
 
     /**
