@@ -101,7 +101,7 @@ abstract class AbstractEntity implements EntityInterface
      * @param  null|string $property Optional property to retrieve. If not specified,
      *                               $mapGettersColumns is checked for the name of the calling
      *                               function.
-     * @param  null|mixed $default  Optional default value if key or property does not exist
+     * @param  null|mixed  $default  Optional default value if key or property does not exist
      * @return mixed
      * @internal E_USER_NOTICE is triggered if property does not exist
      */
