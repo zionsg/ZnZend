@@ -1,7 +1,7 @@
 ### Example for `znZendDataTables` Controller Plugin
 
 ```php
-// In result set prototype used in Paginator
+// Result set prototype used in Paginator
 namespace Web\Model;
 
 use ZnZend\Model\AbstractEntity;
@@ -22,6 +22,21 @@ class Person extends AbstractEntity
     {
         return $this->get('person_firstname') . ' ' . $this->get('person_lastname');
     }
+}
+```
+
+```php
+// Table gateway for retrieving Persons
+namespace Web\Model;
+
+use ZnZend\Model\AbstractTable;
+
+class PersonTable extends AbstractTable
+{
+    protected $table = 'person';
+    protected $resultSetClass = '\Application\Model\Person';
+    protected $activeRowState = array('per_isdeleted' => 0);
+    protected $deletedRowState = array('per_isdeleted' => 1);
 }
 ```
 
