@@ -8,6 +8,7 @@
 
 namespace ZnZend\Model;
 
+use Zend\Stdlib\ArraySerializableInterface;
 use ZnZend\Model\Exception;
 
 /**
@@ -16,7 +17,7 @@ use ZnZend\Model\Exception;
  * Methods from EntityInterface are implemented as examples and should
  * be overwritten by concrete classes.
  */
-abstract class AbstractEntity implements EntityInterface
+abstract class AbstractEntity implements ArraySerializableInterface, EntityInterface
 {
     /**
      * Array of property-value pairs for entity - set by constructor and exchangeArray(), not extending class
@@ -52,7 +53,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Set entity properties from array
+     * Defined by ArraySerializableInterface; Set entity properties from array
      *
      * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::hydrate()
      * to populate an object.
@@ -66,7 +67,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Get entity properties as an array
+     * Defined by ArraySerializableInterface; Get entity properties as an array
      *
      * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::extract()
      * to extract values from an object.
@@ -79,7 +80,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Map getters to column names in table
+     * Defined by EntityInterface; Map getters to column names in table
      *
      * Getters should be used in view scripts to retrieve information instead of properties
      * which in this case would be named after database columns, which the view should not know about.
@@ -157,7 +158,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve record id of entity
+     * Defined by EntityInterface; Retrieve record id of entity
      *
      * @return null|int
      */
@@ -167,7 +168,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve name of entity
+     * Defined by EntityInterface; Retrieve name of entity
      *
      * @return null|string
      */
@@ -177,7 +178,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve description of entity
+     * Defined by EntityInterface; Retrieve description of entity
      *
      * @return null|string
      */
@@ -187,7 +188,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve filename of thumbnail image for entity
+     * Defined by EntityInterface; Retrieve filename of thumbnail image for entity
      *
      * Typical thumbnail fits in a box of 160 x 160 pixels, usually used when
      * listing entities. Can refer to the logo of an establishment.
@@ -200,7 +201,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve priority of entity
+     * Defined by EntityInterface; Retrieve priority of entity
      *
      * When listing entities, smaller numbers typically come first.
      *
@@ -212,7 +213,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve timestamp when entity was created
+     * Defined by EntityInterface; Retrieve timestamp when entity was created
      *
      * @return null|DateTime
      */
@@ -222,7 +223,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve user who created the entity
+     * Defined by EntityInterface; Retrieve user who created the entity
      *
      * A simple string can be returned (eg. userid) or preferrably, an object
      * which implements EntityInterface.
@@ -235,7 +236,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve timestamp when entity was last updated
+     * Defined by EntityInterface; Retrieve timestamp when entity was last updated
      *
      * @return null|DateTime
      */
@@ -245,7 +246,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Retrieve user who last updated the entity
+     * Defined by EntityInterface; Retrieve user who last updated the entity
      *
      * A simple string can be returned (eg. userid) or preferrably, an object
      * which implements EntityInterface.
@@ -258,7 +259,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Check whether entity is marked as hidden
+     * Defined by EntityInterface; Check whether entity is marked as hidden
      *
      * @return boolean
      */
@@ -268,7 +269,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Check whether entity is marked as deleted
+     * Defined by EntityInterface; Check whether entity is marked as deleted
      *
      * Ideally, no records should ever be deleted from the database and
      * should have a field to mark it as deleted instead.
