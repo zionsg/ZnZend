@@ -14,27 +14,6 @@ namespace ZnZend\Model;
 interface EntityInterface
 {
     /**
-     * Set entity properties from array
-     *
-     * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::hydrate()
-     * to populate an object.
-     *
-     * @param  array $data
-     * @return void
-     */
-    public function exchangeArray(array $data);
-
-    /**
-     * Get entity properties as an array
-     *
-     * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::extract()
-     * to extract values from an object.
-     *
-     * @return array
-     */
-    public function getArrayCopy();
-
-    /**
      * Map getters to column names in table
      *
      * Getters should be used in view scripts to retrieve information instead of properties
