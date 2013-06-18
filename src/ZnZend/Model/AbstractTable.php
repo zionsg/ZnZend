@@ -16,6 +16,7 @@ use Zend\Db\Sql\Where;
 use Zend\Db\TableGateway\AbstractTableGateway;
 use Zend\Db\TableGateway\Feature;
 use Zend\Paginator\Paginator;
+use Zend\Stdlib\ArraySerializableInterface;
 use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
 use ZnZend\Model\EntityInterface;
 use ZnZend\Model\Exception;
@@ -289,11 +290,22 @@ abstract class AbstractTable extends AbstractTableGateway
      * Care needs to be taken for columns already prefixed with the table name
      * (so as to prevent ambiguity error when table is self-joined in select())
      *
-     * @param  array $data Column-value pairs
+     * @param  array|ArraySerializableInterface $data Column-value pairs
+     * @throws Exception\InvalidArgumentException
      * @return array
      */
-    public function filterColumns(array $data)
+    public function filterColumns($data)
     {
+        if ($data instanceof ArraySerializableInterface) {
+            $data = $data->getArrayCopy();
+        }
+
+        if (!is_array($data)) {
+            throw new Exception\InvalidArgumentException(
+                'Array or object implementing Zend\Stdlib\ArraySerializableInterface expected'
+            );
+        }
+
         if (empty($data)) {
             return $data;
         }
