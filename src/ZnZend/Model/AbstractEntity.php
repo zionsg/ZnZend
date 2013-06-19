@@ -39,17 +39,17 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     protected static $mapGettersColumns = array(
         // The mappings below are for the getters defined in EntityInterface
         // and are provided for easy copying for extending classes
-        getId          => 'id',
-        getName        => 'name',
-        getDescription => 'description',
-        getThumbnail   => 'thumbnail',
-        getPriority    => 'priority',
-        getCreated     => 'created',
-        getCreator     => 'creator',
-        getUpdated     => 'updated',
-        getUpdator     => 'updator',
-        getIshidden    => 'ishidden',
-        getIsdeleted   => 'isdeleted',
+        'getId'          => 'id',
+        'getName'        => 'name',
+        'getDescription' => 'description',
+        'getThumbnail'   => 'thumbnail',
+        'getPriority'    => 'priority',
+        'getCreated'     => 'created',
+        'getCreator'     => 'creator',
+        'getUpdated'     => 'updated',
+        'getUpdator'     => 'updator',
+        'isHidden'       => 'ishidden',
+        'isDeleted'      => 'isdeleted',
     );
 
     /**
