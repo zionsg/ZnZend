@@ -84,9 +84,14 @@ class ZnZendResizeImage extends AbstractHelper
                 return $failure;
         }
 
-        // Create canvas for resized copy of image to fit box $width x $height
+        // Do not create resized copy if current image dimensions are the same
         $currWidth  = $imageInfo[0];
         $currHeight = $imageInfo[1];
+        if ($currWidth == $width && $currHeight == $height) {
+            return $imagePath;
+        }
+
+        // Create canvas for resized copy of image to fit box $width x $height
         if ($currWidth >= $currHeight) {
             $newWidth  = $width;
             $newHeight = ($currHeight / $currWidth) * $newWidth;
