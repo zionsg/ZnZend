@@ -8,6 +8,7 @@
 
 namespace ZnZend\Model;
 
+use DateTime;
 use Zend\Stdlib\ArraySerializableInterface;
 use ZnZend\Model\Exception;
 
@@ -228,11 +229,18 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     /**
      * Defined by EntityInterface; Retrieve timestamp when entity was created
      *
+     * Need to handle default DATETIME value of '0000-00-00 00:00:00' in SQL
+     *
      * @return null|DateTime
      */
     public function getCreated()
     {
-        return new DateTime($this->get());
+        $timestamp = $this->get();
+        if (false === strtotime($timestamp)) {
+            return null;
+        }
+
+        return new DateTime($timestamp);
     }
 
     /**
@@ -251,11 +259,18 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     /**
      * Defined by EntityInterface; Retrieve timestamp when entity was last updated
      *
+     * Need to handle default DATETIME value of '0000-00-00 00:00:00' in SQL
+     *
      * @return null|DateTime
      */
     public function getUpdated()
     {
-        return new DateTime($this->get());
+        $timestamp = $this->get();
+        if (false === strtotime($timestamp)) {
+            return null;
+        }
+
+        return new DateTime($timestamp);
     }
 
     /**

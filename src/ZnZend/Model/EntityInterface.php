@@ -70,6 +70,8 @@ interface EntityInterface
     /**
      * Retrieve timestamp when entity was created
      *
+     * Need to handle default DATETIME value of '0000-00-00 00:00:00' in SQL
+     *
      * @return null|DateTime
      */
     public function getCreated();
@@ -86,6 +88,8 @@ interface EntityInterface
 
     /**
      * Retrieve timestamp when entity was last updated
+     *
+     * Need to handle default DATETIME value of '0000-00-00 00:00:00' in SQL
      *
      * @return null|DateTime
      */
