@@ -37,7 +37,19 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      * @var array
      */
     protected static $mapGettersColumns = array(
-        'getId' => 'id', // example to show use of get() without params - see getId()
+        // The mappings below are for the getters defined in EntityInterface
+        // and are provided for easy copying for extending classes
+        getId          => 'id',
+        getName        => 'name',
+        getDescription => 'description',
+        getThumbnail   => 'thumbnail',
+        getPriority    => 'priority',
+        getCreated     => 'created',
+        getCreator     => 'creator',
+        getUpdated     => 'updated',
+        getUpdator     => 'updator',
+        getIshidden    => 'ishidden',
+        getIsdeleted   => 'isdeleted',
     );
 
     /**
@@ -164,7 +176,8 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getId()
     {
-        return (int) $this->get(); // example of calling get() without params
+        // Alternative: $this->get('id') where 'id' is the column name
+        return (int) $this->get();
     }
 
     /**
@@ -174,7 +187,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getName()
     {
-        return $this->get('name');
+        return $this->get();
     }
 
     /**
@@ -184,7 +197,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getDescription()
     {
-        return $this->get('description');
+        return $this->get();
     }
 
     /**
@@ -197,7 +210,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getThumbnail()
     {
-        return $this->get('thumbnail');
+        return $this->get();
     }
 
     /**
@@ -209,7 +222,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getPriority()
     {
-        return (int) $this->get('priority');
+        return (int) $this->get();
     }
 
     /**
@@ -219,7 +232,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getCreated()
     {
-        return new DateTime($this->get('created'));
+        return new DateTime($this->get());
     }
 
     /**
@@ -232,7 +245,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getCreator()
     {
-        return $this->get('creator');
+        return $this->get();
     }
 
     /**
@@ -242,7 +255,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getUpdated()
     {
-        return new DateTime($this->get('updated'));
+        return new DateTime($this->get());
     }
 
     /**
@@ -255,7 +268,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getUpdator()
     {
-        return $this->get('updator');
+        return $this->get();
     }
 
     /**
@@ -265,7 +278,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function isHidden()
     {
-        return (bool) $this->get('ishidden');
+        return (bool) $this->get();
     }
 
     /**
@@ -278,6 +291,6 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function isDeleted()
     {
-        return (bool) $this->get('isdeleted');
+        return (bool) $this->get();
     }
 }
