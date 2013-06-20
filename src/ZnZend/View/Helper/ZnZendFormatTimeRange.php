@@ -8,6 +8,7 @@
 
 namespace ZnZend\View\Helper;
 
+use DateTime;
 use Zend\View\Helper\AbstractHelper;
 
 /**
@@ -18,9 +19,9 @@ class ZnZendFormatTimeRange extends AbstractHelper
     /**
      * __invoke
      *
-     * Note that the time parameters are not UNIX timestamps but strings,
-     * eg: '2012-11-20 19:00:00'
+     * For single dates, use PHP date() - the parameter order here caters to time ranges
      *
+     * Start and end times can be DateTime, English textual datetime description or UNIX timestamp
      * If $startTimeString is empty or invalid, '' is returned
      * If $endTimeString is empty or invalid, it will be set to $startTimeString
      *
@@ -28,8 +29,8 @@ class ZnZendFormatTimeRange extends AbstractHelper
      * @param  string  $timeFormat       Output format to use if end time is empty or the same as start time
      * @param  string  $rangeStartFormat Output format to use for start time if the 2 times are different
      * @param  string  $rangeEndFormat   Output format to use for end time if the 2 times are different
-     * @param  string  $startTimeString  Start time as string. Will be converted to UNIX timestamp
-     * @param  string  $endTimeString    End time as string. Will be converted to UNIX timestamp
+     * @param  DateTime|string|int|float $startTime Start time
+     * @param  DateTime|string|int|float $endTime   End time
      * @param  boolean $ignoreMidnight   DEFAULT=false. If true and start time is 00:00:00, return ''.
      *                                   If true and end time is 00:00:00, it will not be shown
      * @return string
@@ -38,31 +39,25 @@ class ZnZendFormatTimeRange extends AbstractHelper
         $timeFormat,
         $rangeStartFormat,
         $rangeEndFormat,
-        $startTimeString,
-        $endTimeString,
+        $startTime,
+        $endTime,
         $ignoreMidnight = false
     ) {
-        // Check start time
-        if (empty($startTimeString) || (int) $startTimeString == 0) {
+        // Convert start time to UNIX timestamp
+        $startTimestamp = $this->getTimestamp($startTime);
+        if (false === $startTimestamp) {
             return '';
         }
-        $startTimestamp = strtotime($startTimeString);
-        if ($startTimestamp === false) {
-            return '';
-        }
-        if ($ignoreMidnight && (int)date('His', $startTimestamp) == 0) {
+        if ($ignoreMidnight && (int) date('His', $startTimestamp) == 0) {
             return '';
         }
 
-        // Check end time
-        if (empty($endTimeString) || (int) $endTimeString == 0) {
-            $endTimeString = $startTimeString;
-        }
-        $endTimestamp = strtotime($endTimeString);
-        if ($endTimestamp === false) {
+        // Convert end time to UNIX timestamp
+        $endTimestamp = $this->getTimestamp($endTime);
+        if (false === $endTimestamp) {
             $endTimestamp = $startTimestamp;
         }
-        if ($ignoreMidnight && (int)date('His', $endTimestamp) == 0) {
+        if ($ignoreMidnight && (int) date('His', $endTimestamp) == 0) {
             $endTimestamp = $startTimestamp;
         }
 
@@ -76,4 +71,27 @@ class ZnZendFormatTimeRange extends AbstractHelper
         return $output;
     } // end function __invoke
 
+    /**
+     * Convert various datetime representations into UNIX timestamp
+     *
+     * @param  DateTime|string|int|float $datetime
+     * @return bool|int|float False is returned if $datetime is not a valid timestamp
+     */
+    protected function getTimestamp($datetime)
+    {
+        $timestamp = false;
+
+        // Have to separate objects from primitive types as the other functions do not take in objects
+        if (is_object($datetime)) {
+            if ($datetime instanceof DateTime) {
+                $timestamp = $datetime->getTimestamp();
+            }
+        } elseif (($parsedString = strtotime($datetime)) !== false) {
+            $timestamp = $parsedString;
+        } elseif (is_numeric($datetime)) {
+            $timestamp = $datetime;
+        }
+
+        return $timestamp;
+    }
 }
