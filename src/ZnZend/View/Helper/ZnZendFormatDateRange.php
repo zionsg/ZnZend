@@ -8,6 +8,7 @@
 
 namespace ZnZend\View\Helper;
 
+use DateTime;
 use Zend\View\Helper\AbstractHelper;
 
 /**
@@ -18,9 +19,9 @@ class ZnZendFormatDateRange extends AbstractHelper
     /**
      * __invoke
      *
-     * Note that the date parameters are not UNIX timestamps but strings,
-     * eg: '2012-11-20 19:00:00'
+     * For single dates, use PHP date() - the parameter order here caters to date ranges
      *
+     * Start and end dates can be DateTime, English textual datetime description or UNIX timestamp
      * If start date is empty or invalid, '' is returned
      * If end date is empty or invalid, it will be set to start date
      *
@@ -28,27 +29,21 @@ class ZnZendFormatDateRange extends AbstractHelper
      * @param  string  $dateFormat       Output format to use if end date is empty or the same as start date
      * @param  string  $rangeStartFormat Output format to use for start date if the 2 dates are different
      * @param  string  $rangeEndFormat   Output format to use for end date if the 2 dates are different
-     * @param  string  $startDateString  Start date as string. Will be converted to UNIX timestamp
-     * @param  string  $endDateString    End date as string. Will be converted to UNIX timestamp
+     * @param  DateTime|string|int|float $startDate Start date
+     * @param  DateTime|string|int|float $endDate   End date
      * @return string
      */
-    public function __invoke($dateFormat, $rangeStartFormat, $rangeEndFormat, $startDateString, $endDateString)
+    public function __invoke($dateFormat, $rangeStartFormat, $rangeEndFormat, $startDate, $endDate)
     {
-        // Check start date
-        if (empty($startDateString) || (int) $startDateString == 0) {
-            return '';
-        }
-        $startTimestamp = strtotime($startDateString);
-        if ($startTimestamp === false) {
+        // Convert start date to UNIX timestamp
+        $startTimestamp = $this->getTimestamp($startDate);
+        if (false === $startTimestamp) {
             return '';
         }
 
-        // Check end date
-        if (empty($endDateString) || (int) $endDateString == 0) {
-            $endDateString = $startDateString;
-        }
-        $endTimestamp = strtotime($endDateString);
-        if ($endTimestamp === false) {
+        // Convert end date to UNIX timestamp
+        $endTimestamp = $this->getTimestamp($endDate);
+        if (false === $endTimestamp) {
             $endTimestamp = $startTimestamp;
         }
 
@@ -62,4 +57,27 @@ class ZnZendFormatDateRange extends AbstractHelper
         return $output;
     } // end function __invoke
 
+    /**
+     * Convert various datetime representations into UNIX timestamp
+     *
+     * @param  DateTime|string|int|float $datetime
+     * @return bool|int|float False is returned if $datetime is not a valid timestamp
+     */
+    protected function getTimestamp($datetime)
+    {
+        $timestamp = false;
+
+        // Have to separate objects from primitive types as the other functions do not take in objects
+        if (is_object($datetime)) {
+            if ($datetime instanceof DateTime) {
+                $timestamp = $datetime->getTimestamp();
+            }
+        } elseif (($parsedString = strtotime($datetime)) !== false) {
+            $timestamp = $parsedString;
+        } elseif (is_numeric($datetime)) {
+            $timestamp = $datetime;
+        }
+
+        return $timestamp;
+    }
 }
