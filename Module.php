@@ -19,8 +19,9 @@ class Module
     public function onBootstrap(MvcEvent $e)
     {
         $sm = $e->getApplication()->getServiceManager();
-        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-        GlobalAdapterFeature::setStaticAdapter($dbAdapter);
+        if ($sm->has('Zend\Db\Adapter\Adapter')) {
+            GlobalAdapterFeature::setStaticAdapter($sm->get('Zend\Db\Adapter\Adapter'));
+        }
     }
 
     public function getAutoloaderConfig()
