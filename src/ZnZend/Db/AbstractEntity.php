@@ -6,11 +6,11 @@
  * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
 
-namespace ZnZend\Model;
+namespace ZnZend\Db;
 
 use DateTime;
 use Zend\Stdlib\ArraySerializableInterface;
-use ZnZend\Model\Exception;
+use ZnZend\Db\Exception;
 
 /**
  * Base class for entities corresponding to rows in database tables

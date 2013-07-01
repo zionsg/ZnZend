@@ -6,7 +6,7 @@
  * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
 
-namespace ZnZend\Model;
+namespace ZnZend\Db;
 
 /**
  * Interface for entities corresponding to rows in database tables
@@ -23,7 +23,8 @@ interface EntityInterface
      * the names of the getters used for each <table> column in the view script and update the Select
      * object accordingly.
      *
-     * @return array Example: array('getTimestamp' => 'log_timestamp', 'getDescription' => 'log_text')
+     * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
+     * @return  array
      */
     public static function mapGettersColumns();
 

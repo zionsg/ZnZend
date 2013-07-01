@@ -6,7 +6,7 @@
  * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
 
-namespace ZnZend\Model\Exception;
+namespace ZnZend\Db\Exception;
 
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {}

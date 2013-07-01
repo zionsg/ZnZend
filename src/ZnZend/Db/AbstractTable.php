@@ -6,7 +6,7 @@
  * @link   http://github.com/zionsg/ZnZend for canonical source repository
  */
 
-namespace ZnZend\Model;
+namespace ZnZend\Db;
 
 use ReflectionClass;
 use Zend\Db\ResultSet\HydratingResultSet;
@@ -18,8 +18,8 @@ use Zend\Db\TableGateway\Feature;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\ArraySerializableInterface;
 use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
-use ZnZend\Model\EntityInterface;
-use ZnZend\Model\Exception;
+use ZnZend\Db\EntityInterface;
+use ZnZend\Db\Exception;
 use ZnZend\Paginator\Adapter\DbSelect;
 
 /**
