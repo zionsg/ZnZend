@@ -289,7 +289,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     /**
      * Defined by EntityInterface; Check whether entity is marked as hidden
      *
-     * @return boolean
+     * @return bool
      */
     public function isHidden()
     {
@@ -302,7 +302,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      * Ideally, no records should ever be deleted from the database and
      * should have a field to mark it as deleted instead.
      *
-     * @return boolean
+     * @return bool
      */
     public function isDeleted()
     {

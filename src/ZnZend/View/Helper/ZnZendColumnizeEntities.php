@@ -41,7 +41,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *
      * @param  array $params Key-value pairs as follows:
      *         'cols'           int      DEFAULT=1. No. of columns to split entities in
-     *         'drawTable'      boolean  DEFAULT=true. Whether to enclose all entities in a table with
+     *         'drawTable'      bool     DEFAULT=true. Whether to enclose all entities in a table with
      *                                   1 entity per cell. Sometimes the user may only want to process
      *                                   1 entity in which case the outermost table is not needed
      *         'entities'       object[] Array of entity objects. Single object may be passed
@@ -50,7 +50,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *                                   of url, thumbnail and name is used
      *         'nameClass'      string   CSS class for entity name
      *         'nameCallback'   callback Callback function that takes in entity and returns name
-     *         'leftToRight'    boolean  DEFAULT=true. Whether to list entities from left to right
+     *         'leftToRight'    bool     DEFAULT=true. Whether to list entities from left to right
      *                                   or top to down. Examples with $remainderAlign set to 'center'
      *                                       Left to right
      *                                       1   2   3
@@ -73,7 +73,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
      *         'urlTarget'      string   Target for entity url. <a target="urlTarget"...
      *
      *         Keys for drawing thumbnail images:
-     *         'drawThumbnailBox'   boolean  DEFAULT=true. Whether to enclose thumbnail <img> in <td>.
+     *         'drawThumbnailBox'   bool     DEFAULT=true. Whether to enclose thumbnail <img> in <td>.
      *                                       If true, box will be drawn even if there's no thumbnail
      *         'thumbnailBoxClass'  string   CSS class for <td> box enclosing thumbnail image
      *         'thumbnailClass'     string   CSS class for thumbnail image

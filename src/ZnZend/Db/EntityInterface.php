@@ -109,7 +109,7 @@ interface EntityInterface
     /**
      * Check whether entity is marked as hidden
      *
-     * @return boolean
+     * @return bool
      */
     public function isHidden();
 
@@ -119,7 +119,7 @@ interface EntityInterface
      * Ideally, no records should ever be deleted from the database and
      * should have a field to mark it as deleted instead.
      *
-     * @return boolean
+     * @return bool
      */
     public function isDeleted();
 }

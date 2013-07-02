@@ -30,7 +30,7 @@ class ZnZendFormatBytes extends AbstractHelper
      * Precision is set to 2 decimal places
      *
      * @param  int|float $bytes            Value in bytes
-     * @param  boolean   $returnMultiplier DEFAULT=false. Whether to return multiplier only.
+     * @param  bool      $returnMultiplier DEFAULT=false. Whether to return multiplier only.
      *                                     $multiplier x $finalValue = $bytes
      *                                     This is provided for use in calculations if need be
      * @return string

@@ -31,7 +31,7 @@ class ZnZendFormatTimeRange extends AbstractHelper
      * @param  string  $rangeEndFormat   Output format to use for end time if the 2 times are different
      * @param  DateTime|string|int|float $startTime Start time
      * @param  DateTime|string|int|float $endTime   End time
-     * @param  boolean $ignoreMidnight   DEFAULT=false. If true and start time is 00:00:00, return ''.
+     * @param  bool    $ignoreMidnight   DEFAULT=false. If true and start time is 00:00:00, return ''.
      *                                   If true and end time is 00:00:00, it will not be shown
      * @return string
      */
