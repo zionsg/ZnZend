@@ -75,9 +75,6 @@ class TableGenerator
             $deletedRowStateFunc = $rowStateFunc(1);
         }
 
-        $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
-        $fp = function ($name) use ($dbAdapter) { return $dbAdapter->driver->formatParameterName($name); };
-
         // Iterate thru tables
         $databaseName = $dbAdapter->getCurrentSchema();
         $tables = $dbAdapter->query(
