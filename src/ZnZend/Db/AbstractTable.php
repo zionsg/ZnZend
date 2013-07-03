@@ -130,8 +130,8 @@ abstract class AbstractTable extends AbstractTableGateway
      * Get base Select with from, joins, columns added
      *
      * All other queries should build upon this so that the columns selected and joins are standardised
-     * Extending classes may override this with their own implementation as this only
-     * provides the most basic 'SELECT * FROM table'.
+     * Extending classes should call parent::getBaseSelect() and add on to the returned Select
+     * as this takes into account the row state.
      *
      * By default, only active records are selected.
      * Use setRowState() to change behaviour before calling query function.
@@ -174,10 +174,12 @@ abstract class AbstractTable extends AbstractTableGateway
         if (null === $resultSetPrototype) {
             $resultSetPrototype = $this->getResultSetPrototype();
         }
+
         $paginator = new Paginator(
             new DbSelect($select, $this->adapter, $resultSetPrototype)
         );
         $paginator->setItemCountPerPage(-1)->setCurrentPageNumber(1);
+
         return $paginator;
     }
 
@@ -262,7 +264,41 @@ abstract class AbstractTable extends AbstractTableGateway
      */
     public function find($key)
     {
-        // Get primary key column
+        $select = $this->getBaseSelect();
+        $select->where(array($this->getPrimaryKey() => $key));
+        return $this->getResultSet($select, false);
+    }
+
+    /**
+     * Get columns
+     *
+     * @return array
+     */
+    public function getColumns()
+    {
+        // Feature\MetadataFeature is not used as it is very slow
+        if (empty($this->columns)) {
+            $columns = $this->adapter->query(
+                'SELECT column_name FROM information_schema.columns '
+                . 'WHERE table_schema = ? AND table_name = ?',
+                array($this->adapter->getCurrentSchema(), $this->table)
+            );
+            $this->columns = array();
+            foreach ($columns as $column) {
+                $this->columns[] = $column->column_name;
+            }
+        }
+
+        return $this->columns;
+    }
+
+    /**
+     * Get primary key
+     *
+     * @return string|array
+     */
+    public function getPrimaryKey()
+    {
         if (empty($this->primaryKey)) {
             $columns = $this->adapter->query(
                 'SELECT column_name FROM information_schema.columns '
@@ -276,9 +312,7 @@ abstract class AbstractTable extends AbstractTableGateway
             $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
         }
 
-        $select = $this->getBaseSelect();
-        $select->where(array($this->primaryKey => $key));
-        return $this->getResultSet($select, false);
+        return $this->primaryKey;
     }
 
     /*** CRUD OPERATIONS ***/
@@ -310,23 +344,9 @@ abstract class AbstractTable extends AbstractTableGateway
             return $data;
         }
 
-        // Get columns only when needed
-        // Feature\MetadataFeature is not used as it is very slow
-        if (empty($this->columns)) {
-            $columns = $this->adapter->query(
-                'SELECT column_name FROM information_schema.columns '
-                . 'WHERE table_schema = ? AND table_name = ?',
-                array($this->adapter->getCurrentSchema(), $this->table)
-            );
-            $this->columns = array();
-            foreach ($columns as $column) {
-                $this->columns[] = $column->column_name;
-            }
-        }
-
         // remove invalid keys from $data
         // array_intersect() not used as keys with empty strings or boolean false are removed
-        $tableCols = array_flip($this->columns);  // need to flip
+        $tableCols = array_flip($this->getColumns());  // need to flip
         foreach ($data as $key => $value) {
             // isset() faster than array_key_exists()
             $column = str_replace("{$this->table}.", '', $key);
@@ -385,5 +405,50 @@ abstract class AbstractTable extends AbstractTableGateway
     public function undelete($where)
     {
         return parent::update($this->activeRowState, $where);
+    }
+
+    /**
+     * Insert a new row and update if a duplicate record exists
+     *
+     * This is an implementation of "INSERT ... ON DUPLICATE KEY UPDATE" in MySQL.
+     * The equivalent from SQL-99, "MERGE INTO ...", is not supported in MySQL.
+     *
+     * @param  array $set
+     * @return int
+     */
+    public function insertOnDuplicate($set)
+    {
+        $set = $this->filterColumns($set);
+
+        $dbAdapter = $this->adapter;
+        $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
+        $fp = function ($name) use ($dbAdapter) { return $dbAdapter->driver->formatParameterName($name); };
+
+        $keys = array_keys($set);
+        $columns = array_map($qi, $keys);
+        $parameters = array_map($fp, array_values($keys));
+
+        $primaryKey = $this->getPrimaryKey();
+        $updateValues = array();
+        foreach ($keys as $index => $key) {
+            $column = $columns[$index];
+            if ($primaryKey == $key) {
+                $updateValues[] = $column . ' = LAST_INSERT_ID(' . $column . ')';
+                continue;
+            }
+
+            $updateValues[] = $column . ' = VALUES(' . $column . ')';
+        }
+
+        $sql = sprintf(
+            'INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s',
+            $qi($this->table),
+            implode(',', $columns),
+            implode(',', $parameters),
+            implode(',', $updateValues)
+        );
+        $result = $dbAdapter->query($sql, $set);
+
+        return (int) $result->getGeneratedValue();
     }
 }
