@@ -1,5 +1,4 @@
-ZnZend
-======
+#ZnZend
 
 [![Build Status](https://secure.travis-ci.org/zionsg/ZnZend.png?branch=master)](https://travis-ci.org/zionsg/ZnZend)
 
@@ -12,8 +11,38 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 
 ## Requirements
 
-* PHP 5.3.3 and above
-* Zend Framework 2
+*   PHP 5.3.3 and above
+
+*   Zend Framework 2
+
+*   Doctrine Common 2.1 and above (for use in `Zend\Form\Annotation`)
+
+    If you downloaded Doctrine from GitHub instead of using Composer, you will need to add Doctrine
+    to the autoloading namespaces in `init_autoloader.php` or `Module.php`. The same goes for any non-ZF2 modules:
+    ```php
+    // init_autoloader.php
+    Zend\Loader\AutoloaderFactory::factory(array(
+        'Zend\Loader\StandardAutoloader' => array(
+            'autoregister_zf' => true,
+            'namespaces' => array(
+                'Doctrine' => __DIR__ . '/vendor/doctrine',
+            ),
+        )
+    ));
+
+    // Module.php
+    public function getAutoloaderConfig()
+    {
+        return array(
+            'ZendLoaderStandardAutoloader' => array(
+                'namespaces' => array(
+                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                    'Doctrine' => __DIR__ . '/vendor/doctrine',
+                ),
+            ),
+        );
+    }
+    ```
 
 ## Installation
 
@@ -22,8 +51,7 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 2. Examples can be found in the `examples` directory
 3. Tests can be run in browser using `test/phpunit_browser.php` (see inline docblock)
 
-Classes
--------
+## Classes
 * `ZnZend\Form\AbstractForm` - Base form class with additional features
 * `ZnZend\Db\EntityInterface` - An entity interface for database rows
 * `ZnZend\Db\AbstractEntity` - An abstract entity class for database rows
@@ -33,25 +61,21 @@ Classes
 * `ZnZend\Permissions\Acl\Acl` - Additional method to add a resource and its parents recursively
 * `ZnZend\Permissions\Acl\Privilege` - A standardized set of constants for Acl privileges
 
-Controller Plugins
-------------------
+## Controller Plugins
 * `znZendDataTable` - Update Paginator (DbSelect) with params sent from jQuery DataTables plugin
 * `znZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `znZendPageStore` - Persist data for current page across reloads of the same page
 * `znZendTimestamp` - Return timestamp formatted to standard length and converted to base 36
 
-Captcha Adapters
-----------------
+## Captcha Adapters
 * `ZnZend\Captcha\Question` - Captcha adapter for custom questions and answers
 
-Form View Helpers
------------------
+## Form View Helpers
 * `znZendFormCaptchaQuestion` - Render captcha element using ZnZend\Captcha\Question adapter
 * `znZendFormRow` - Extension to FormRow view helper to allow rendering format to be customized
 * `znZendFormTable` - Render form as 2-column table
 
-View Helpers
-------------
+## View Helpers
 * `znZendColumnizeEntities` - Output entities in columns
 * `znZendExcerpt` - Extract excerpt from text
 * `znZendFlashMessages` - Retrieve messages from FlashMessenger
