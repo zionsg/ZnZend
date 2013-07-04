@@ -18,7 +18,7 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 *   Doctrine Common 2.1 and above (for use in `Zend\Form\Annotation`)
 
     If you downloaded Doctrine from GitHub instead of using Composer, you will need to add Doctrine
-    to the autoloading namespaces in `init_autoloader.php` or `Module.php`. The same goes for any non-ZF2 modules:
+    to the autoloading namespaces in `init_autoloader.php` or `Module.php`. The same goes for any non-ZF2 modules.
     ```php
     // init_autoloader.php
     Zend\Loader\AutoloaderFactory::factory(array(
