@@ -162,14 +162,14 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     public static function mapGettersColumns()
     {
         $caller = get_called_class();
-        return $caller::$mapGettersColumns;
+        return $caller::$_mapGettersColumns;
     }
 
     /**
      * Generic internal getter for entity properties
      *
      * @param  null|string $property Optional property to retrieve. If not specified,
-     *                               $mapGettersColumns is checked for the name of the calling
+     *                               $_mapGettersColumns is checked for the name of the calling
      *                               function to get the mapped property.
      * @param  null|mixed  $default  Optional default value if key or property does not exist
      * @return mixed
@@ -180,9 +180,9 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
         if (null === $property) {
             $trace = debug_backtrace();
             $callerFunction = $trace[1]['function'];
-            $callerClass = get_called_class(); // 'self::' will point to AbstractEntity, hence this
-            if (array_key_exists($callerFunction, $callerClass::$mapGettersColumns)) {
-                $property = $callerClass::$mapGettersColumns[$callerFunction];
+            $map = self::mapGettersColumns();
+            if (array_key_exists($callerFunction, $map)) {
+                $property = $map[$callerFunction];
             }
         }
 
@@ -216,7 +216,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      *                               to primitive type, eg. (string) $value, else cast to object,
      *                               eg. new DateTime($value).
      * @param  null|string $property Optional property to set $value to. If not specified,
-     *                               $mapGettersColumns is checked for the corresponding getter
+     *                               $_mapGettersColumns is checked for the corresponding getter
      *                               of the calling function to get the mapped property.
      *                               In general, for setX(), the corresponding getter is either
      *                               getX() or isX().
@@ -229,14 +229,14 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
         if (null === $property) {
             $trace = debug_backtrace();
             $callerFunction = $trace[1]['function'];
-            $callerClass = get_called_class(); // 'self::' will point to AbstractEntity, hence this
+            $map = self::mapGettersColumns();
 
             $getFunc = substr_replace($callerFunction, 'get', 0, 3);
             $isFunc = substr_replace($callerFunction, 'is', 0, 3);
-            if (array_key_exists($getFunc, $callerClass::$mapGettersColumns)) {
-                $property = $callerClass::$mapGettersColumns[$getFunc];
-            } elseif (array_key_exists($isFunc, $callerClass::$mapGettersColumns)) {
-                $property = $callerClass::$mapGettersColumns[$isFunc];
+            if (array_key_exists($getFunc, $map)) {
+                $property = $map[$getFunc];
+            } elseif (array_key_exists($isFunc, $map)) {
+                $property = $map[$isFunc];
             }
         }
 
