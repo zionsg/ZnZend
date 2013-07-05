@@ -24,7 +24,8 @@ use ZnZend\Db\Exception;
  * Also, additional validation/other stuff can be added to the setter/getter without having
  * to get everyone in the world to convert their code from $entity->foo = $x; to $entity->setFoo($x);
  *
- * @Annotation\Name("entity")
+ * @Annotation\Name("Entity")
+ * @Annotation\Type("Zend\Form\Form")
  * @Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")
  */
 abstract class AbstractEntity implements ArraySerializableInterface, EntityInterface
