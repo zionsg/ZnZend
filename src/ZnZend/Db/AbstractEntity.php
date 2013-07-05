@@ -9,35 +9,49 @@
 namespace ZnZend\Db;
 
 use DateTime;
+use Zend\Form\Annotation;
 use Zend\Stdlib\ArraySerializableInterface;
 use ZnZend\Db\Exception;
 
 /**
  * Base class for entities corresponding to rows in database tables
  *
- * Methods from EntityInterface are implemented as examples and should
- * be overwritten by concrete classes.
+ * Methods from EntityInterface are implemented for defaults and should
+ * be overwritten by concrete classes if required.
+ *
+ * Getters are preferred over public properties as the latter would likely be named
+ * after the actual database columns, which the user should not know about.
+ * Also, additional validation/other stuff can be added to the setter/getter without having
+ * to get everyone in the world to convert their code from $entity->foo = $x; to $entity->setFoo($x);
+ *
+ * @Annotation\Name("entity")
+ * @Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")
  */
 abstract class AbstractEntity implements ArraySerializableInterface, EntityInterface
 {
     /**
-     * Array of property-value pairs for entity - set by constructor and exchangeArray(), not extending class
+     * NOTE: 5 things to do for each entity property: protected, Annotation, getter, setter, $_mapGettersColumns
      *
-     * Properties map exactly to columns.
-     * Use array_key_exists() instead of isset() to check if a key exists.
-     * If a key exists and its value is NULL, isset() will return false.
+     * $id is for example only, and fulfils the 5 things above - getter is getId() and setter is setId().
+     * Internal variables should be prefixed with an underscore, eg. $_mapGettersColumns, to differentiate
+     * between them and entity properties.
      *
-     * @var array
+     * @Annotation\Exclude()
+     * @var int
      */
-    protected $data = array();
+    protected $id;
 
     /**
      * Array mapping getters to columns - to be set by extending class
      *
+     * Various parts of this class assume that for a getter getX() or isX(),
+     * the corresponding setter will be setX().
+     *
+     * @Annotation\Exclude()
      * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
      * @var array
      */
-    protected static $mapGettersColumns = array(
+    protected static $_mapGettersColumns = array(
         // The mappings below are for the getters defined in EntityInterface
         // and are provided for easy copying when coding extending classes
         'getId'          => 'id',
@@ -56,9 +70,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     /**
      * Constructor
      *
-     * Takes in an optional array to populate entity
-     *
-     * @param array $data
+     * @param array $data Optional array to populate entity
      */
     public function __construct(array $data = array())
     {
@@ -66,41 +78,83 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
+     * Value when entity is treated as a string
+     *
+     * This is vital if a getter such as getCreator() returns an EntityInterface (instead of string)
+     * and it is used in log text or in a view script. Should default to getName().
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    /**
      * Defined by ArraySerializableInterface; Set entity properties from array
      *
+     * This uses $_mapGettersColumns - a column must be mapped and have a setter
+     * for the corresponding key in $data to be set. In general, for getX() or isX(),
+     * the corresponding setter is assumed to be setX().
+     * Extending classes should override this if this is not desired.
+     *
      * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::hydrate()
-     * to populate an object.
+     * typically in forms to populate an object.
      *
      * @param  array $data
      * @return void
      */
     public function exchangeArray(array $data)
     {
-        $this->data = $data;
+        $map = array_flip(self::mapGettersColumns());
+        foreach ($data as $key => $value) {
+            if (!array_key_exists($key, $map)) {
+                continue;
+            }
+            $getter = $map[$key];
+            $setter = ('get' === substr($getter, 0, 3))
+                    ? substr_replace($getter, 'set', 0, 3)  // getX() becomes setX()
+                    : substr_replace($getter, 'set', 0, 2); // isX() becomes setX()
+            if (is_callable(array($this, $setter))) {
+                $this->$setter($value);
+            }
+        }
     }
 
     /**
      * Defined by ArraySerializableInterface; Get entity properties as an array
      *
+     * This uses $_mapGettersColumns and calls all the getters to populate the array.
+     * All values are cast to string for use in forms and database calls.
+     * If the value is DateTime, $value->format('c') is used to return the ISO 8601 timestamp.
+     * If the value is an object, $value->__toString() must be defined.
+     * Extending classes should override this if this is not desired.
+     *
      * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::extract()
-     * to extract values from an object.
+     * typically in forms to extract values from an object.
      *
      * @return array
      */
     public function getArrayCopy()
     {
-        return $this->data;
+        $result = array();
+        $map = self::mapGettersColumns();
+        foreach ($map as $getter => $column) {
+            if (!property_exists($this, $column)) {
+                continue; // in case the column is an SQL expression
+            }
+            $value = $this->$getter();
+            if ($value instanceof DateTime) {
+                $value = $value->format('c');
+            }
+            $result[$column] = (string) $value;
+        }
+
+        return $result;
     }
 
     /**
      * Defined by EntityInterface; Map getters to column names in table
-     *
-     * Getters should be used in view scripts to retrieve information instead of properties
-     * which in this case would be named after database columns, which the view should not know about.
-     * This method can be used by a controller plugin (eg. \ZnZend\Controller\Plugin\DataTables) to
-     * work with pagination filtering/sorting params submitted from the view script together with
-     * the names of the getters used for each <table> column in the view script and update the Select
-     * object accordingly.
      *
      * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
      * @return  array
@@ -116,7 +170,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      *
      * @param  null|string $property Optional property to retrieve. If not specified,
      *                               $mapGettersColumns is checked for the name of the calling
-     *                               function.
+     *                               function to get the mapped property.
      * @param  null|mixed  $default  Optional default value if key or property does not exist
      * @return mixed
      * @internal E_USER_NOTICE is triggered if property does not exist
@@ -132,8 +186,8 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
             }
         }
 
-        if (array_key_exists($property, $this->data)) {
-            return $this->data[$property];
+        if (property_exists($this, $property)) {
+            return $this->$property;
         }
 
         if (empty($trace)) {
@@ -141,7 +195,8 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
         }
         trigger_error(
             sprintf(
-                'Undefined property via get(): %s in %s on line %s',
+                'Undefined property: %s::%s in %s on line %s',
+                $trace[1]['class'] . '()',
                 $property,
                 $trace[0]['file'],
                 $trace[0]['line']
@@ -155,23 +210,55 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     /**
      * Generic internal setter for entity properties
      *
-     * @param  string $property Property to set
-     * @param  mixed  $value    Value to set
+     * @param  null|mixed  $value    Value to set
+     * @param  null|string $type     Optional data type to cast to, if any. No casting is done
+     *                               if value is null. If $type is lowercase, cast
+     *                               to primitive type, eg. (string) $value, else cast to object,
+     *                               eg. new DateTime($value).
+     * @param  null|string $property Optional property to set $value to. If not specified,
+     *                               $mapGettersColumns is checked for the corresponding getter
+     *                               of the calling function to get the mapped property.
+     *                               In general, for setX(), the corresponding getter is either
+     *                               getX() or isX().
      * @throws Exception\InvalidArgumentException Property does not exist
-     * @return AbstractEntity   For fluent interface
+     * @return AbstractEntity For fluent interface
      */
-    protected function set($property, $value)
+    protected function set($value, $type = null, $property = null)
     {
-        if (!array_key_exists($property, $this->data)) {
+        // Check if property exists
+        if (null === $property) {
+            $trace = debug_backtrace();
+            $callerFunction = $trace[1]['function'];
+            $callerClass = get_called_class(); // 'self::' will point to AbstractEntity, hence this
+
+            $getFunc = substr_replace($callerFunction, 'get', 0, 3);
+            $isFunc = substr_replace($callerFunction, 'is', 0, 3);
+            if (array_key_exists($getFunc, $callerClass::$mapGettersColumns)) {
+                $property = $callerClass::$mapGettersColumns[$getFunc];
+            } elseif (array_key_exists($isFunc, $callerClass::$mapGettersColumns)) {
+                $property = $callerClass::$mapGettersColumns[$isFunc];
+            }
+        }
+
+        if (!property_exists($this, $property)) {
             throw new Exception\InvalidArgumentException("Property \"{$property}\" does not exist.");
         }
 
-        $this->data[$property] = $value;
+        // Cast to specified type before setting - skip if value is null or no type specified
+        if ($value !== null && $type !== null) {
+            if ($type == strtolower($type)) { // primitive type
+                settype($value, $type);
+            } else { // object
+                $value = new $type($value);
+            }
+        }
+
+        $this->$property = $value;
         return $this;
     }
 
     /**
-     * Defined by EntityInterface; Retrieve record id of entity
+     * Defined by EntityInterface; Get record id
      *
      * @return null|int
      */
@@ -182,7 +269,18 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
-     * Defined by EntityInterface; Retrieve name of entity
+     * Defined by EntityInterface; Set record id
+     *
+     * @param  null|int $value
+     * @return AbstractEntity
+     */
+    public function setId($value)
+    {
+        return $this->set($value, 'int');
+    }
+
+    /**
+     * Defined by EntityInterface; Get name
      *
      * @return null|string
      */
@@ -192,7 +290,18 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
-     * Defined by EntityInterface; Retrieve description of entity
+     * Defined by EntityInterface; Set name
+     *
+     * @param  null|string $value
+     * @return AbstractEntity
+     */
+    public function setName($value)
+    {
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Get description
      *
      * @return null|string
      */
@@ -202,10 +311,18 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
-     * Defined by EntityInterface; Retrieve filename of thumbnail image for entity
+     * Defined by EntityInterface; Set description
      *
-     * Typical thumbnail fits in a box of 160 x 160 pixels, usually used when
-     * listing entities. Can refer to the logo of an establishment.
+     * @param  null|string $value
+     * @return AbstractEntity
+     */
+    public function setDescription($value)
+    {
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Get filename of thumbnail image for entity
      *
      * @return null|string
      */
@@ -215,7 +332,18 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
-     * Defined by EntityInterface; Retrieve priority of entity
+     * Defined by EntityInterface; Set filename of thumbnail image for entity
+     *
+     * @param  null|string $value
+     * @return AbstractEntity
+     */
+    public function setThumbnail($value)
+    {
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Get priority
      *
      * When listing entities, smaller numbers typically come first.
      *
@@ -227,9 +355,22 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
-     * Defined by EntityInterface; Retrieve timestamp when entity was created
+     * Set priority
      *
-     * Need to handle default DATETIME value of '0000-00-00 00:00:00' in SQL
+     * When listing entities, smaller numbers typically come first.
+     *
+     * @param  null|int $value
+     * @return AbstractEntity
+     */
+    public function setPriority($value)
+    {
+        return $this->set($value, 'int');
+    }
+
+    /**
+     * Defined by EntityInterface; Get timestamp when entity was created
+     *
+     * Return null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
      *
      * @return null|DateTime
      */
@@ -244,7 +385,21 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
-     * Defined by EntityInterface; Retrieve user who created the entity
+     * Defined by EntityInterface; Set timestamp when entity was created
+     *
+     * Set to null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
+     *
+     * @param  null|string|DateTime $value String must be parsable by DateTime
+     * @return AbstractEntity
+     */
+    public function setCreated($value)
+    {
+        $value = (false === strtotime($value)) ? null : new DateTime($value);
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Get user who created the entity
      *
      * A simple string can be returned (eg. userid) or preferrably, an object
      * which implements EntityInterface.
@@ -257,9 +412,20 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
-     * Defined by EntityInterface; Retrieve timestamp when entity was last updated
+     * Defined by EntityInterface; Set user who created the entity
      *
-     * Need to handle default DATETIME value of '0000-00-00 00:00:00' in SQL
+     * @param  null|string|EntityInterface $value
+     * @return AbstractEntity
+     */
+    public function setCreator($value)
+    {
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Get timestamp when entity was last updated
+     *
+     * Return null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
      *
      * @return null|DateTime
      */
@@ -274,7 +440,21 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
-     * Defined by EntityInterface; Retrieve user who last updated the entity
+     * Defined by EntityInterface; Set timestamp when entity was last updated
+     *
+     * Set to null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
+     *
+     * @param  null|string|DateTime $value String must be parsable by DateTime
+     * @return AbstractEntity
+     */
+    public function setUpdated($value)
+    {
+        $value = (false === strtotime($value)) ? null : new DateTime($value);
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Get user who last updated the entity
      *
      * A simple string can be returned (eg. userid) or preferrably, an object
      * which implements EntityInterface.
@@ -284,6 +464,17 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     public function getUpdator()
     {
         return $this->get();
+    }
+
+    /**
+     * Defined by EntityInterface; Set user who last updated the entity
+     *
+     * @param  null|string|EntityInterface $value
+     * @return AbstractEntity
+     */
+    public function setUpdator($value)
+    {
+        return $this->set($value);
     }
 
     /**
@@ -297,6 +488,17 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     }
 
     /**
+     * Defined by EntityInterface; Set hidden status of entity
+     *
+     * @param  bool $value
+     * @return AbstractEntity
+     */
+    public function setHidden($value)
+    {
+        return $this->set($value, 'bool');
+    }
+
+    /**
      * Defined by EntityInterface; Check whether entity is marked as deleted
      *
      * Ideally, no records should ever be deleted from the database and
@@ -307,5 +509,16 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     public function isDeleted()
     {
         return (bool) $this->get();
+    }
+
+    /**
+     * Defined by EntityInterface; Set deleted status of entity
+     *
+     * @param  bool $value
+     * @return AbstractEntity
+     */
+    public function setDeleted($value)
+    {
+        return $this->set($value, 'bool');
     }
 }
