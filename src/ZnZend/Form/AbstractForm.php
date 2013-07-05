@@ -117,11 +117,11 @@ abstract class AbstractForm extends Form implements ResourceInterface
     }
 
     /**
-     * Retrieve stored params
+     * Retrieve all stored params
      *
      * @return array
      */
-    public function getParam($name, $default = null)
+    public function getParams()
     {
         return $this->params;
     }
