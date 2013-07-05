@@ -8,7 +8,6 @@
 
 namespace ZnZend\Form;
 
-use Zend\Filter\StringTrim;
 use Zend\Form\Element;
 use Zend\Form\Form;
 use Zend\Form\FormInterface;
@@ -23,7 +22,6 @@ use ZnZend\Form\Exception;
  *   - Params for dynamic elements can be injected via the constructor and retrieved with getParam()
  *   - init() method created for adding of elements in extending classes
  *   - CSRF element is added by default
- *   - Validated data is trimmed upon retrieval
  *   - Implements ResourceInterface allowing it to return resource id for itself or its elements
  *   - Allows setting of parent resource id which will be prefixed to its own resource id
  */
@@ -101,60 +99,6 @@ abstract class AbstractForm extends Form implements ResourceInterface
     }
 
     /**
-     * Map function recursively on array
-     *
-     * @param   callback $callback Callback function to map on array elements
-     * @param   array    $array
-     * @throws  Exception\InvalidArgumentException If $callback is not callable
-     * @return  array
-     */
-    protected function array_map_recursive($callback, array $array)
-    {
-        if (!is_callable($callback)) {
-            throw new Exception\InvalidArgumentException('Invalid map callback provided');
-        }
-
-        $result   = array();
-        $function = __FUNCTION__;
-
-        foreach ($array as $key => $value) {
-            if (!is_array($value)) {
-                $result[$key] = $callback($value);
-            } else {
-                $result[$key] = $this->$function($callback, $value);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Retrieve the validated data
-     *
-     * By default, retrieves normalized values; pass one of the
-     * FormInterface::VALUES_* constants to shape the behavior.
-     *
-     * If normalized values are retrieved, the StringTrim filter is applied
-     * before returning values
-     *
-     * @see    Form::getData()
-     * @param  int $flag
-     * @throws Exception\DomainException
-     * @return array|object
-     */
-    public function getData($flag = FormInterface::VALUES_NORMALIZED)
-    {
-        $data = parent::getData($flag);
-
-        if (FormInterface::VALUES_NORMALIZED === $flag) {
-            $filter = new StringTrim();
-            $data = $this->array_map_recursive($filter, $data);
-        }
-
-        return $data;
-    }
-
-    /**
      * Retrieve stored param
      *
      * Not named get() due to FieldSet::get()
@@ -170,6 +114,16 @@ abstract class AbstractForm extends Form implements ResourceInterface
         }
 
         return $default;
+    }
+
+    /**
+     * Retrieve stored params
+     *
+     * @return array
+     */
+    public function getParam($name, $default = null)
+    {
+        return $this->params;
     }
 
     /**
