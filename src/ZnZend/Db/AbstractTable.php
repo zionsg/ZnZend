@@ -30,12 +30,10 @@ use ZnZend\Paginator\Adapter\DbSelect;
  *
  * Modifications to AbstractTableGateway:
  *   - Ability to use global/static db adapter
- *   - Column and primary key information populated during instantiation
  *   - Custom class for result set objects set via property $resultSetClass
  *   - Paginator is returned for result sets
  *   - Row state (active, deleted, all) is taken into consideration when querying
- *   - delete() only marks records as deleted and does not delete them
- *   - undelete() added
+ *   - markActive() and markDeleted() added for marking records
  *   - insert() and update() modified to filter out keys in user data that do not map to columns in table
  */
 abstract class AbstractTable extends AbstractTableGateway
@@ -372,39 +370,59 @@ abstract class AbstractTable extends AbstractTableGateway
     /**
      * Update
      *
+     * If an entity is passed in for $where, it is assumed that the
+     * update is for that entity. This is useful for updating an entity
+     * (eg. in controller) where the user does not and should not know
+     * the column name or how to construct a where clause.
+     *
      * @param  array $set
-     * @param  string|array|closure $where
+     * @param  string|array|closure|EntityInterface $where
      * @return int
      */
     public function update($set, $where = null)
     {
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
         return parent::update($this->filterColumns($set), $where);
     }
 
     /**
-     * Delete
+     * Mark records as active
      *
-     * Modified to mark records as deleted instead of actually deleting them
+     * If an entity is passed in for $where, it is assumed that the
+     * update is for that entity. This is useful for updating an entity
+     * (eg. in controller) where the user does not and should not know
+     * the column name or how to construct a where clause.
      *
-     * @param  Where|\Closure|string|array $where
+     * @param  string|array|closure|EntityInterface $where
      * @return int
      */
-    public function delete($where)
+    public function markActive($where)
     {
-        return parent::update($this->deletedRowState, $where);
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
+        return parent::update($this->activeRowState, $where);
     }
 
     /**
-     * Undelete
+     * Mark records as deleted
      *
-     * Mark records as active
+     * If an entity is passed in for $where, it is assumed that the
+     * update is for that entity. This is useful for updating an entity
+     * (eg. in controller) where the user does not and should not know
+     * the column name or how to construct a where clause.
      *
-     * @param  Where|\Closure|string|array $where
+     * @param  string|array|closure|EntityInterface $where
      * @return int
      */
-    public function undelete($where)
+    public function markDeleted($where)
     {
-        return parent::update($this->activeRowState, $where);
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
+        return parent::update($this->deletedRowState, $where);
     }
 
     /**

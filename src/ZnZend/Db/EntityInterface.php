@@ -10,6 +10,11 @@ namespace ZnZend\Db;
 
 /**
  * Interface for entities corresponding to rows in database tables
+ *
+ * Of all the methods, the most vital are getId(), getName() and mapGetterColumns(),
+ * with the first two used generally in logs and generic view scripts.
+ * The other methods are to facilitate generic treatment of entities in a
+ * Content Management System.
  */
 interface EntityInterface
 {
