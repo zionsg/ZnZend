@@ -39,7 +39,6 @@ class TableGenerator
      *                                      and returns array('deletedColumn' => 'deletedValue') for
      *                                      AbstractTable::$deletedRowState
      * @param DocBlockGenerator $fileDocBlock  Optional docblock for all files
-     * @param DocBlockGenerator $tableDocBlock Optional docblock for all table classes
      * @throws Exception\InvalidArgumentException When path is not writable
      * @return void
      */
@@ -49,8 +48,7 @@ class TableGenerator
         $namespace,
         $activeRowStateFunc = null,
         $deletedRowStateFunc = null,
-        DocBlockGenerator $fileDocBlock = null,
-        DocBlockGenerator $tableDocBlock = null
+        DocBlockGenerator $fileDocBlock = null
     ) {
         if (!is_writable($filePath)) {
             throw new Exception\InvalidArgumentException("{$filePath} is not writable");
@@ -98,9 +96,6 @@ class TableGenerator
 
             // Generate class
             $tableClass = new ClassGenerator();
-            if ($tableDocBlock !== null) {
-                $tableClass->setDocBlock($tableDocBlock);
-            }
             $properties = array(
                 PropertyGenerator::fromArray(array(
                     'name'         => 'table',

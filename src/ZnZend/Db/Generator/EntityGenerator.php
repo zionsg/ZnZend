@@ -72,8 +72,7 @@ class EntityGenerator
         $namespace,
         $columnToGetterFunc = null,
         $columnToSetterFunc = null,
-        DocBlockGenerator $fileDocBlock = null,
-        DocBlockGenerator $entityDocBlock = null
+        DocBlockGenerator $fileDocBlock = null
     ) {
         if (!is_writable($filePath)) {
             throw new Exception\InvalidArgumentException("{$filePath} is not writable");
@@ -199,6 +198,7 @@ class EntityGenerator
             $entityClass = new ClassGenerator();
             $entityClass->setName($entityName)
                         ->setNamespaceName($namespace)
+                        ->addUse('DateTime')
                         ->addUse('Zend\Form\Annotation')
                         ->addUse('ZnZend\Db\AbstractEntity')
                         ->setExtendedClass('AbstractEntity')
