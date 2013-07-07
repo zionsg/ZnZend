@@ -152,9 +152,7 @@ class EntityGenerator
                     $desc = 'Get ' . lcfirst($label);
                     $methods[] = MethodGenerator::fromArray(array(
                         'name'       => $getterName,
-                        'body'       =>   ('string' == $phpType)
-                                        ? 'return $this->get();'
-                                        : 'return ' . self::getTypeCast('$this->get()', $sqlType),
+                        'body'       => 'return $this->get();',
                         'docblock'   => DocBlockGenerator::fromArray(array(
                             'shortDescription' => $desc,
                             'longDescription'  => null,
@@ -318,25 +316,5 @@ class EntityGenerator
     protected static function getPhpType($sqlType)
     {
         return (isset(self::$mapTypes[$sqlType]) ? self::$mapTypes[$sqlType] : 'string');
-    }
-
-    /**
-     * Get type cast for use in method body
-     *
-     * @example getTypeCast('$this->get()', 'int') will return '(int) $this->get();'
-     * @example getTypeCast('$this->get()', 'timestamp') will return 'new DateTime($this->get());'
-     * @param   string $expr    Expression
-     * @param   string $sqlType SQL data type
-     * @return  string
-     */
-    protected static function getTypeCast($expr, $sqlType)
-    {
-        $phpType = self::getPhpType($sqlType);
-        if ($phpType == strtolower($phpType)) {
-            return "({$phpType}) {$expr};";
-        }
-
-        // Cast to object
-        return "new {$phpType}({$expr});";
     }
 }

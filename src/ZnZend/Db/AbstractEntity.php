@@ -24,6 +24,8 @@ use ZnZend\Db\Exception;
  * Also, additional validation/other stuff can be added to the setter/getter without having
  * to get everyone in the world to convert their code from $entity->foo = $x; to $entity->setFoo($x);
  *
+ * Typically, type checking/casting is done once in setters and not repeated in getters.
+ *
  * @Annotation\Name("Entity")
  * @Annotation\Type("Zend\Form\Form")
  * @Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")
@@ -107,7 +109,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function exchangeArray(array $data)
     {
-        $map = array_flip(self::mapGettersColumns());
+        $map = array_flip(static::$_mapGettersColumns);
         foreach ($data as $key => $value) {
             if (!array_key_exists($key, $map)) {
                 continue;
@@ -139,7 +141,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     public function getArrayCopy()
     {
         $result = array();
-        $map = self::mapGettersColumns();
+        $map = static::$_mapGettersColumns;
         foreach ($map as $getter => $column) {
             if (!property_exists($this, $column)) {
                 continue; // in case the column is an SQL expression
@@ -162,8 +164,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public static function mapGettersColumns()
     {
-        $caller = get_called_class();
-        return $caller::$_mapGettersColumns;
+        return static::$_mapGettersColumns;
     }
 
     /**
@@ -181,7 +182,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
         if (null === $property) {
             $trace = debug_backtrace();
             $callerFunction = $trace[1]['function'];
-            $map = self::mapGettersColumns();
+            $map = static::$_mapGettersColumns;
             if (array_key_exists($callerFunction, $map)) {
                 $property = $map[$callerFunction];
             }
@@ -197,7 +198,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
         trigger_error(
             sprintf(
                 'Undefined property: %s::%s in %s on line %s',
-                $trace[1]['class'] . '()',
+                $trace[0]['class'] . '()',
                 $property,
                 $trace[0]['file'],
                 $trace[0]['line']
@@ -230,7 +231,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
         if (null === $property) {
             $trace = debug_backtrace();
             $callerFunction = $trace[1]['function'];
-            $map = self::mapGettersColumns();
+            $map = static::$_mapGettersColumns;
 
             $getFunc = substr_replace($callerFunction, 'get', 0, 3);
             $isFunc = substr_replace($callerFunction, 'is', 0, 3);
@@ -249,6 +250,9 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
         if ($value !== null && $type !== null) {
             if ($type == strtolower($type)) { // primitive type
                 settype($value, $type);
+            } elseif ('DateTime' == $type && !$value instanceof DateTime) { // special handling for DateTime
+                $value = (string) $value;
+                $value = (false === strtotime($value)) ? null : new DateTime($value);
             } else { // object
                 $value = new $type($value);
             }
@@ -266,7 +270,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     public function getId()
     {
         // Alternative: $this->get('id') where 'id' is the column name
-        return (int) $this->get();
+        return $this->get();
     }
 
     /**
@@ -277,6 +281,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function setId($value)
     {
+        // Alternative: $this->set($value, 'int', 'id') where 'id' is the column name
         return $this->set($value, 'int');
     }
 
@@ -352,7 +357,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getPriority()
     {
-        return (int) $this->get();
+        return $this->get();
     }
 
     /**
@@ -371,18 +376,11 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
     /**
      * Defined by EntityInterface; Get timestamp when entity was created
      *
-     * Return null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
-     *
      * @return null|DateTime
      */
     public function getCreated()
     {
-        $timestamp = $this->get();
-        if (false === strtotime($timestamp)) {
-            return null;
-        }
-
-        return new DateTime($timestamp);
+        return $this->get();
     }
 
     /**
@@ -395,8 +393,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function setCreated($value)
     {
-        $value = (false === strtotime($value)) ? null : new DateTime($value);
-        return $this->set($value);
+        return $this->set($value, 'DateTime');
     }
 
     /**
@@ -432,12 +429,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function getUpdated()
     {
-        $timestamp = $this->get();
-        if (false === strtotime($timestamp)) {
-            return null;
-        }
-
-        return new DateTime($timestamp);
+        return $this->get();
     }
 
     /**
@@ -450,8 +442,7 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
      */
     public function setUpdated($value)
     {
-        $value = (false === strtotime($value)) ? null : new DateTime($value);
-        return $this->set($value);
+        return $this->set($value, 'DateTime');
     }
 
     /**
