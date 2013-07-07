@@ -9,8 +9,7 @@
 namespace ZnZend\Form;
 
 use Zend\Form\Element;
-use Zend\Form\Form;
-use Zend\Form\FormInterface;
+use Zend\Form\Form as ZendForm;
 use Zend\InputFilter\InputFilter;
 use Zend\Permissions\Acl\Resource\ResourceInterface;
 use ZnZend\Form\Exception;
@@ -25,7 +24,7 @@ use ZnZend\Form\Exception;
  *   - Implements ResourceInterface allowing it to return resource id for itself or its elements
  *   - Allows setting of parent resource id which will be prefixed to its own resource id
  */
-abstract class AbstractForm extends Form implements ResourceInterface
+class Form extends ZendForm implements ResourceInterface
 {
     /**
      * Params for use with dynamic elements
@@ -124,6 +123,38 @@ abstract class AbstractForm extends Form implements ResourceInterface
     public function getParams()
     {
         return $this->params;
+    }
+
+    /**
+     * Add param
+     *
+     * If a key exists, the new value will override the existing value.
+     *
+     * @param  string $name
+     * @param  mixed  $value
+     * @return Form
+     */
+    public function addParam($key, $value)
+    {
+        $this->params[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * Add params
+     *
+     * If a key exists, the new value will override the existing value.
+     *
+     * @param  array $params Key-value pairs
+     * @return Form
+     */
+    public function addParams(array $params = array())
+    {
+        $this->params = array_merge(
+            $this->params,
+            $params
+        );
+        return $this;
     }
 
     /**
