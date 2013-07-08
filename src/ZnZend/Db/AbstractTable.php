@@ -96,8 +96,7 @@ abstract class AbstractTable extends AbstractTableGateway
     public function __construct()
     {
         // Add ability to use global/static adapter
-        $this->featureSet = new Feature\FeatureSet();
-        $this->featureSet->addFeature(new Feature\GlobalAdapterFeature());
+        $this->getFeatureSet()->addFeature(new Feature\GlobalAdapterFeature());
 
         // Set result set prototype
         $this->resultSetPrototype = $this->getResultSetPrototype();
@@ -105,6 +104,21 @@ abstract class AbstractTable extends AbstractTableGateway
 
         // Initialize
         $this->initialize();
+    }
+
+    /**
+     * Defined by AbstractTableGateway; Get Feature\FeatureSet
+     *
+     * Modified to instantiate feature on first call
+     *
+     * @return Feature\FeatureSet
+     */
+    public function getFeatureSet()
+    {
+        if (!$this->featureSet instanceof Feature\FeatureSet) {
+            $this->featureSet = new Feature\FeatureSet();
+        }
+        return $this->featureSet;
     }
 
     /*** IMPORTANT FUNCTIONS ***/
