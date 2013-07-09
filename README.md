@@ -55,7 +55,7 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 * `ZnZend\Form\AbstractForm` - Base form class with additional features
 * `ZnZend\Db\EntityInterface` - An entity interface for database rows
 * `ZnZend\Db\AbstractEntity` - An abstract entity class for database rows
-* `ZnZend\Db\MapperInterface` - An entity mapper interface for database rows
+* `ZnZend\Db\MapperInterface` - An entity mapper interface for database tables
 * `ZnZend\Db\AbstractMapper` - An abstract entity mapper class for database tables
 * `ZnZend\Db\Generator\EntityGenerator` - For generating entity classes from tables in a database
 * `ZnZend\Db\Generator\MapperGenerator` - For generating entity mapper classes from tables in a database
