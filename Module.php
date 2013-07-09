@@ -14,7 +14,7 @@ use Zend\Mvc\MvcEvent;
 class Module
 {
     /**
-     * Set global/static db adapter for feature-enabled TableGateways such as ZnZend\Model\AbstractTable
+     * Set global/static db adapter for feature-enabled TableGateways such as ZnZend\Model\AbstractMapper
      */
     public function onBootstrap(MvcEvent $e)
     {

@@ -55,9 +55,10 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 * `ZnZend\Form\AbstractForm` - Base form class with additional features
 * `ZnZend\Db\EntityInterface` - An entity interface for database rows
 * `ZnZend\Db\AbstractEntity` - An abstract entity class for database rows
-* `ZnZend\Db\AbstractTable` - An abstract table gateway for database tables
+* `ZnZend\Db\MapperInterface` - An entity mapper interface for database rows
+* `ZnZend\Db\AbstractMapper` - An abstract entity mapper class for database tables
 * `ZnZend\Db\Generator\EntityGenerator` - For generating entity classes from tables in a database
-* `ZnZend\Db\Generator\TableGenerator` - For generating table gateway classes from tables in a database
+* `ZnZend\Db\Generator\MapperGenerator` - For generating entity mapper classes from tables in a database
 * `ZnZend\Permissions\Acl\Acl` - Additional method to add a resource and its parents recursively
 * `ZnZend\Permissions\Acl\Privilege` - A standardized set of constants for Acl privileges
 

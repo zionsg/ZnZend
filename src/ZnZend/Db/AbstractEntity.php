@@ -12,6 +12,7 @@ use DateTime;
 use Zend\Form\Annotation;
 use Zend\Permissions\Acl\Resource\ResourceInterface;
 use Zend\Stdlib\ArraySerializableInterface;
+use ZnZend\Db\EntityInterface;
 use ZnZend\Db\Exception;
 
 /**

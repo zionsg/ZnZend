@@ -12,21 +12,21 @@ use Zend\Code\Generator\FileGenerator;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\PropertyGenerator;
-use ZnZend\Db\AbstractTable;
+use ZnZend\Db\AbstractMapper;
 use ZnZend\Db\Exception;
 
 /**
- * Generate table gateway classes for tables in the database based on AbstractTable
+ * Generate entity mapper classes for tables in the database based on AbstractMapper
  *
  * This only generates the initial classes and does not do all the work for you.
  * Simple naming is used for the class name. Eg: For a `map_company_employee` table,
  * the generated class will be named 'Map_company_employee' and not 'MapCompanyEmployee'
  * nor 'Map_Company_Employee'.
  */
-class TableGenerator
+class MapperGenerator
 {
     /**
-     * Generate table gateway classes for all tables in active database based on AbstractTable
+     * Generate entity mapper for all tables in active database based on AbstractMapper
      *
      * The params are applied to all the tables.
      *
@@ -34,10 +34,10 @@ class TableGenerator
      * @param string   $namespace           Namespace for entity and table gateway classes
      * @param callable $activeRowStateFunc  Optional callback that takes in (string $tableName, array $columnNames)
      *                                      and returns array('activeColumn' => 'activeValue') for
-     *                                      AbstractTable::$activeRowState
+     *                                      AbstractMapper::$activeRowState
      * @param callable $deletedRowStateFunc Optional callback that takes in (string $tableName, array $columnNames)
      *                                      and returns array('deletedColumn' => 'deletedValue') for
-     *                                      AbstractTable::$deletedRowState
+     *                                      AbstractMapper::$deletedRowState
      * @param DocBlockGenerator $fileDocBlock  Optional docblock for all files
      * @throws Exception\InvalidArgumentException When path is not writable
      * @return void
@@ -95,7 +95,7 @@ class TableGenerator
             }
 
             // Generate class
-            $tableClass = new ClassGenerator();
+            $mapperClass = new ClassGenerator();
             $properties = array(
                 PropertyGenerator::fromArray(array(
                     'name'         => 'table',
@@ -128,30 +128,30 @@ class TableGenerator
                     ));
                 }
             }
-            $tableClass->setName($entityName . 'Table')
-                       ->setNamespaceName($namespace)
-                       ->addUse("{$namespace}\\{$entityName}")
-                       ->addUse('ZnZend\Db\AbstractTable')
-                       ->setExtendedClass('AbstractTable')
-                       ->addProperties($properties);
+            $mapperClass->setName($entityName . 'Mapper')
+                        ->setNamespaceName($namespace)
+                        ->addUse("{$namespace}\\{$entityName}")
+                        ->addUse('ZnZend\Db\AbstractMapper')
+                        ->setExtendedClass('AbstractMapper')
+                        ->addProperties($properties);
 
             // Generate file
-            $tableFile = new FileGenerator();
+            $mapperFile = new FileGenerator();
             if ($fileDocBlock !== null) {
-                $tableFile->setDocBlock($fileDocBlock);
+                $mapperFile->setDocBlock($fileDocBlock);
             }
-            $tableFile->setFilename("{$entityName}Table.php")
-                      ->setClass($tableClass);
+            $mapperFile->setFilename("{$entityName}Mapper.php")
+                       ->setClass($mapperClass);
 
             // Adjust whitespace
             // 1) Only 1 blank line between file docblock and namespace
             // 2) No blank line between opening brace for class and first property
             // 3) No blank line between last method and closing brace for class
-            $output = $tableFile->generate();
+            $output = $mapperFile->generate();
             $output = str_replace("\nnamespace", "namespace", $output);
             $output = str_replace("{\n\n", "{\n", $output);
             $output = str_replace("\n\n}\n\n", "}\n", $output);
-            file_put_contents("{$filePath}/{$entityName}Table.php", $output);
+            file_put_contents("{$filePath}/{$entityName}Mapper.php", $output);
         }
     }
 }

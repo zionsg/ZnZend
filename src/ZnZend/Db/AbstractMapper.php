@@ -20,6 +20,7 @@ use Zend\Stdlib\ArraySerializableInterface;
 use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
 use ZnZend\Db\EntityInterface;
 use ZnZend\Db\Exception;
+use ZnZend\Db\MapperInterface;
 use ZnZend\Paginator\Adapter\DbSelect;
 
 /**
@@ -36,7 +37,7 @@ use ZnZend\Paginator\Adapter\DbSelect;
  *   - markActive() and markDeleted() added for marking records
  *   - insert() and update() modified to filter out keys in user data that do not map to columns in table
  */
-abstract class AbstractTable extends AbstractTableGateway
+abstract class AbstractMapper extends AbstractTableGateway implements MapperInterface
 {
     /**
      * Constants for referring to row state
@@ -81,7 +82,8 @@ abstract class AbstractTable extends AbstractTableGateway
     /**
      * Current row state
      *
-     * @var string Options: AbstractTable::ACTIVE_ROWS (default), AbstractTable::DELETED_ROWS, AbstractTable::ALL_ROWS
+     * @var string Options: AbstractMapper::ACTIVE_ROWS (default),
+     *             AbstractMapper::DELETED_ROWS, AbstractMapper::ALL_ROWS
      */
     protected $rowState = self::ACTIVE_ROWS;
 
@@ -124,13 +126,29 @@ abstract class AbstractTable extends AbstractTableGateway
     /*** IMPORTANT FUNCTIONS ***/
 
     /**
-     * Set row state
+     * Defined by MapperInterface; Check whether the mapper and its entity support
+     * row states (active, deleted, all)
+     *
+     * Ideally, no records should ever be deleted from the database and should have
+     * a field to mark it as deleted instead - this is what row state refers to.
+     *
+     * @return bool
+     */
+    public function hasRowState()
+    {
+        $hasActiveRowState  = is_array($this->activeRowState) && !empty($this->activeRowState);
+        $hasDeletedRowState = is_array($this->deletedRowState) && !empty($this->deletedRowState);
+        return ($hasActiveRowState && $hasDeletedRowState);
+    }
+
+    /**
+     * Defined by MapperInterface; Set row state
      *
      * Rows returned from query results will conform to the current specified row state
      *
-     * @param  string $rowState Options: AbstractTable::ACTIVE_ROWS, AbstractTable::DELETED_ROWS,
-     *                          AbstractTable::ALL_ROWS
-     * @return AbstractTable For fluent interface
+     * @param  string $rowState Options: AbstractMapper::ACTIVE_ROWS, AbstractMapper::DELETED_ROWS,
+     *                          AbstractMapper::ALL_ROWS
+     * @return AbstractMapper For fluent interface
      */
     public function setRowState($rowState)
     {
@@ -154,6 +172,10 @@ abstract class AbstractTable extends AbstractTableGateway
     {
         $select = $this->sql->select();
 
+        if (!$this->hasRowState()) {
+            return $select;
+        }
+
         // Any other value besides ACTIVE_ROWS and DELETED_ROWS will default to ALL_ROWS
         if (self::ACTIVE_ROWS == $this->rowState && !empty($this->activeRowState)) {
             $select->where($this->activeRowState);
@@ -165,17 +187,17 @@ abstract class AbstractTable extends AbstractTableGateway
     }
 
     /**
-     * Return result set as Paginator for select query
+     * Return result set as Paginator or ResultSetInterface for select query
      *
      * All query functions should use this as a common return point, even extending classes.
      * The returned Paginator is set to page 1 with item count set to -1 so that the full result
      * is returned by default when iterated over without use of pagination.
      *
      * @param  Select $select
-     * @param  bool   $fetchAll Default = true. Whether to return all rows (as Paginator)
-     *                          or only the 1st row (as result set protoype).
+     * @param  bool   $fetchAll Default = true. Whether to return all rows (as Paginator using ResultSetInterface)
+     *                          or only the 1st row (as ResultSetInterface).
      * @param  ResultSetInterface $resultSetPrototype Optional alternate result set prototype to use.
-     * @return Paginator|object
+     * @return Paginator|ResultSetInterface
      */
     protected function getResultSet(Select $select, $fetchAll = true, ResultSetInterface $resultSetPrototype = null)
     {
@@ -206,7 +228,6 @@ abstract class AbstractTable extends AbstractTableGateway
      * which in turn should have getCompany() and getEmployee() methods. As such, findMapCompanyEmployee()
      * should call $this->getResultSet($select, null, $this->getResultSetPrototype('CompanyEmployee')).
      *
-     * @used-by AbstractTable::getResultSet()
      * @param  string $resultSetClass Fully qualified name of class to be used for result set prototype.
      *                                Class must implement EntityInterface.
      * @throws Exception\InvalidArgumentException If class does not implement EntityInterface.
@@ -258,7 +279,7 @@ abstract class AbstractTable extends AbstractTableGateway
     /*** QUERY FUNCTIONS ***/
 
     /**
-     * Fetch all rows
+     * Defined by MapperInterface; Fetch all rows
      *
      * @return Paginator
      */
@@ -269,10 +290,10 @@ abstract class AbstractTable extends AbstractTableGateway
     }
 
     /**
-     * Find row by primary key
+     * Defined by MapperInterface; Find row by primary key
      *
      * @param  string $key The value for the primary key
-     * @return object
+     * @return EntityInterface
      */
     public function find($key)
     {
@@ -371,7 +392,7 @@ abstract class AbstractTable extends AbstractTableGateway
     }
 
     /**
-     * Insert
+     * Defined by TableGatewayInterface; Insert
      *
      * @param  array $set
      * @return int
@@ -382,12 +403,12 @@ abstract class AbstractTable extends AbstractTableGateway
     }
 
     /**
-     * Update
+     * Defined by TableGatewayInterface; Update
      *
      * If an entity is passed in for $where, it is assumed that the
-     * update is for that entity. This is useful for updating an entity
-     * (eg. in controller) where the user does not and should not know
-     * the column name or how to construct a where clause.
+     * update is for that entity. This is useful, eg. in the controller,
+     * where the user does not and should not know the column name or how to
+     * construct a where clause.
      *
      * @param  array $set
      * @param  string|array|closure|EntityInterface $where
@@ -402,18 +423,41 @@ abstract class AbstractTable extends AbstractTableGateway
     }
 
     /**
-     * Mark records as active
+     * Defined by TableGatewayInterface; Delete
      *
      * If an entity is passed in for $where, it is assumed that the
-     * update is for that entity. This is useful for updating an entity
-     * (eg. in controller) where the user does not and should not know
-     * the column name or how to construct a where clause.
+     * entity is to be deleted. This is useful, eg. in the controller,
+     * where the user does not and should not know the column name or how to
+     * construct a where clause.
      *
      * @param  string|array|closure|EntityInterface $where
      * @return int
      */
+    public function delete($where)
+    {
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
+        return parent::delete($where);
+    }
+
+    /**
+     * Defined by MapperInterface; Mark records as active
+     *
+     * If an entity is passed in for $where, it is assumed that the
+     * entity is to be marked as active. This is useful, eg. in the controller,
+     * where the user does not and should not know the column name or how to
+     * construct a where clause.
+     *
+     * @param  string|array|closure|EntityInterface $where
+     * @return bool|int Return false if row state not supported
+     */
     public function markActive($where)
     {
+        if (!$this->hasRowState()) {
+            return false;
+        }
+
         if ($where instanceof EntityInterface) {
             $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
         }
@@ -421,18 +465,22 @@ abstract class AbstractTable extends AbstractTableGateway
     }
 
     /**
-     * Mark records as deleted
+     * Defined by MapperInterface; Mark records as deleted
      *
      * If an entity is passed in for $where, it is assumed that the
-     * update is for that entity. This is useful for updating an entity
-     * (eg. in controller) where the user does not and should not know
-     * the column name or how to construct a where clause.
+     * entity is to be marked as deleted. This is useful, eg. in the controller,
+     * where the user does not and should not know the column name or how to
+     * construct a where clause.
      *
      * @param  string|array|closure|EntityInterface $where
-     * @return int
+     * @return bool|int Return false if row state not supported
      */
     public function markDeleted($where)
     {
+        if (!$this->hasRowState()) {
+            return false;
+        }
+
         if ($where instanceof EntityInterface) {
             $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
         }
