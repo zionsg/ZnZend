@@ -10,6 +10,7 @@ namespace ZnZend\Db;
 
 use DateTime;
 use Zend\Form\Annotation;
+use Zend\Permissions\Acl\Resource\ResourceInterface;
 use Zend\Stdlib\ArraySerializableInterface;
 use ZnZend\Db\Exception;
 
@@ -27,10 +28,10 @@ use ZnZend\Db\Exception;
  * Typically, type checking/casting is done once in setters and not repeated in getters.
  *
  * @Annotation\Name("Entity")
- * @Annotation\Type("Zend\Form\Form")
+ * @Annotation\Type("ZnZend\Form\Form")
  * @Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")
  */
-abstract class AbstractEntity implements ArraySerializableInterface, EntityInterface
+abstract class AbstractEntity implements EntityInterface
 {
     /**
      * NOTE: 5 things to do for each entity property: protected, Annotation, getter, setter, $_mapGettersColumns
@@ -154,6 +155,19 @@ abstract class AbstractEntity implements ArraySerializableInterface, EntityInter
         }
 
         return $result;
+    }
+
+    /**
+     * Defined by ResourceInterface; Returns the string identifier of the Resource
+     *
+     * By default, the resource id is derived from the class name.
+     * Eg: ZnZend\Db\AbstractEntity becomes znzend.db.abstractentity
+     *
+     * @return string
+     */
+    public function getResourceId()
+    {
+        return strtolower(str_replace(array('\\', '/', '_'), '.', __CLASS__));
     }
 
     /**

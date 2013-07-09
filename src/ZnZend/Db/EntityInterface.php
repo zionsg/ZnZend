@@ -8,15 +8,18 @@
 
 namespace ZnZend\Db;
 
+use Zend\Permissions\Acl\Resource\ResourceInterface;
+use Zend\Stdlib\ArraySerializableInterface;
+
 /**
  * Interface for entities corresponding to rows in database tables
  *
  * Of all the methods, the most vital are getId(), getName() and mapGetterColumns(),
  * with the first two used generally in logs and generic view scripts.
- * The other methods are to facilitate generic treatment of entities in a
- * Content Management System.
+ * The other methods and interfaces are to facilitate generic treatment of entities
+ * in a Content Management System.
  */
-interface EntityInterface
+interface EntityInterface extends ArraySerializableInterface, ResourceInterface
 {
     /**
      * Map getters to column names in table
