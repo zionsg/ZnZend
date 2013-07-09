@@ -8,13 +8,12 @@
 
 namespace ZnZend\Db;
 
-use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Paginator\Paginator;
 
 /**
  * Interface for entity mappers corresponding to database tables
  */
-interface MapperInterface extends TableGatewayInterface
+interface MapperInterface
 {
     /**
      * Check whether the mapper and its entity support row states (active, deleted, all)
