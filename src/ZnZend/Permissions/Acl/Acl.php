@@ -29,6 +29,8 @@ class Acl extends ZendAcl
      *   addResource('root.parent.child', 'root.parent');
      *   addResource('root.parent', 'root');
      *
+     * $parent is ignored due to the inheritance laid out above.
+     *
      * @param  Resource\ResourceInterface|string $resource
      * @param  Resource\ResourceInterface|string $parent
      * @throws Exception\InvalidArgumentException
@@ -44,20 +46,8 @@ class Acl extends ZendAcl
             );
         }
         if ($this->hasResource($resource->getResourceId())) {
+            // Do not add resource if it exists, else Exception will be thrown
             return $this;
-        }
-
-        if ($parent != null) {
-            if (is_string($parent)) {
-                $parent = new Resource\GenericResource($parent);
-            } elseif (!$parent instanceof Resource\ResourceInterface) {
-                throw new Exception\InvalidArgumentException(
-                    'addResource() expects $parent to be of type Zend\Permissions\Acl\Resource\ResourceInterface'
-                );
-            }
-            if (!$this->hasResource($parent->getResourceId())) {
-                $this->addResource($parent);
-            }
         }
 
         $currentResources = $this->getResources();
@@ -65,7 +55,7 @@ class Acl extends ZendAcl
         $count = count($resourceIds);
 
         $resourceId = $resourceIds[0];
-        $parentResourceId = ($parent ? $parent->getResourceId() : null);
+        $parentResourceId = null;
 
         for ($i = 0; $i < $count; $i++) {
             if ($i > 0) {
@@ -74,16 +64,12 @@ class Acl extends ZendAcl
 
             // Do not add resource if it exists, else Exception will be thrown
             if (in_array($resourceId, $currentResources)) {
+                $parentResourceId = $resourceId; // remember to update parent!
                 continue;
             }
 
-            if (0 == $i) {
-                // Root
-                parent::addResource($resourceId, $parentResourceId);
-            } else {
-                parent::addResource($resourceId, $parentResourceId);
-                $parentResourceId = $resourceId;
-            }
+            parent::addResource($resourceId, $parentResourceId);
+            $parentResourceId = $resourceId;
         }
 
         return $this;
