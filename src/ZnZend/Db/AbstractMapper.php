@@ -36,6 +36,7 @@ use ZnZend\Paginator\Adapter\DbSelect;
  *   - Row state (active, deleted, all) is taken into consideration when querying
  *   - markActive() and markDeleted() added for marking records
  *   - insert() and update() modified to filter out keys in user data that do not map to columns in table
+ *   - allows populating of records from non-database source
  */
 abstract class AbstractMapper extends AbstractTableGateway implements MapperInterface
 {
@@ -45,6 +46,13 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     const ACTIVE_ROWS  = 'active';
     const DELETED_ROWS = 'deleted';
     const ALL_ROWS     = 'all';
+
+    /**
+     * Records populated via non-database source
+     *
+     * @var array
+     */
+    protected $records = array();
 
     /**
      * Fully qualified name of class used for result set objects - set by user
@@ -124,6 +132,29 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     }
 
     /*** IMPORTANT FUNCTIONS ***/
+
+    /**
+     * Defined by ArraySerializableInterface via MapperInterface; Populate mapper
+     * with records from non-database source
+     *
+     * @param  array $data
+     * @return void
+     */
+    public function exchangeArray(array $data)
+    {
+        $this->records = $data;
+    }
+
+    /**
+     * Defined by ArraySerializableInterface via MapperInterface; Get records
+     * populated from non-database source
+     *
+     * @return array
+     */
+    public function getArrayCopy()
+    {
+        return $this->records;
+    }
 
     /**
      * Defined by MapperInterface; Check whether the mapper and its entity support
