@@ -134,26 +134,14 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     /*** IMPORTANT FUNCTIONS ***/
 
     /**
-     * Defined by ArraySerializableInterface via MapperInterface; Populate mapper
-     * with records from non-database source
+     * Defined by MapperInterface; Populate mapper with records from non-database source
      *
-     * @param  array $data
-     * @return void
+     * @param  array $records
+     * @return AbstractMapper
      */
-    public function exchangeArray(array $data)
+    public function setRecords($records)
     {
-        $this->records = $data;
-    }
-
-    /**
-     * Defined by ArraySerializableInterface via MapperInterface; Get records
-     * populated from non-database source
-     *
-     * @return array
-     */
-    public function getArrayCopy()
-    {
-        return $this->records;
+        $this->records = $records;
     }
 
     /**
