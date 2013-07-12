@@ -21,6 +21,7 @@ use ZnZend\Form\Exception;
  *   - Params for dynamic elements can be injected via the constructor and retrieved with getParam()
  *   - init() method created for adding of elements in extending classes
  *   - CSRF element is added by default
+ *   - Allows setting and getting of custom form-level error messages like in ZF1
  *   - Implements ResourceInterface allowing it to return resource id for itself or its elements
  *   - Allows setting of parent resource id which will be prefixed to its own resource id
  */
@@ -32,6 +33,13 @@ class Form extends ZendForm implements ResourceInterface
      * @var array
      */
     protected $params = array();
+
+    /**
+     * Custom form-level error messages
+     *
+     * @var array
+     */
+    protected $errorMessages = array();
 
     /**
      * Resource id of form
@@ -154,6 +162,78 @@ class Form extends ZendForm implements ResourceInterface
             $this->params,
             $params
         );
+        return $this;
+    }
+
+    /**
+     * Checks if the form has errors
+     *
+     * @return bool
+     */
+    public function hasErrors()
+    {
+        if ($this->hasValidated) {
+            return $this->isValid;
+        }
+        return (!empty($this->errorMessages));
+    }
+
+    /**
+     * Add a custom error message to return in the event of failed validation
+     *
+     * @param  string $message
+     * @return Form
+     */
+    public function addErrorMessage($message)
+    {
+        $this->errorMessages[] = (string) $message;
+        return $this;
+    }
+
+    /**
+     * Add multiple custom error messages to return in the event of failed validation
+     *
+     * @param  array $messages
+     * @return Form
+     */
+    public function addErrorMessages(array $messages)
+    {
+        foreach ($messages as $message) {
+            $this->addErrorMessage($message);
+        }
+        return $this;
+    }
+
+    /**
+     * Same as addErrorMessages(), but clears custom error message stack first
+     *
+     * @param  array $messages
+     * @return Form
+     */
+    public function setErrorMessages(array $messages)
+    {
+        $this->clearErrorMessages();
+        return $this->addErrorMessages($messages);
+    }
+
+    /**
+     * Retrieve custom error messages
+     *
+     * @return array
+     */
+    public function getErrorMessages()
+    {
+        return $this->errorMessages;
+    }
+
+    /**
+     * Clear custom error messages stack
+     *
+     * @return Form
+     */
+    public function clearErrorMessages()
+    {
+        $this->errorMessages = array();
         return $this;
     }
 
