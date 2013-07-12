@@ -96,7 +96,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Defined by ArraySerializableInterface; Set entity properties from array
+     * Defined by ArraySerializableInterface via EntityInterface; Set entity properties from array
      *
      * This uses $_mapGettersColumns - a column must be mapped and have a setter
      * for the corresponding key in $data to be set. In general, for getX() or isX(),
@@ -127,7 +127,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Defined by ArraySerializableInterface; Get entity properties as an array
+     * Defined by ArraySerializableInterface via EntityInterface; Get entity properties as an array
      *
      * This uses $_mapGettersColumns and calls all the getters to populate the array.
      * All values are cast to string for use in forms and database calls.
