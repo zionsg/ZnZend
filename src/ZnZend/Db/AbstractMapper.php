@@ -141,6 +141,10 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public function setRecords($records)
     {
+        if (!is_array($records)) {
+            throw new Exception\InvalidArgumentException('Array expected');
+        }
+
         $this->records = $records;
     }
 
