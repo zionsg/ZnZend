@@ -168,7 +168,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getResourceId()
     {
-        return strtolower(str_replace(array('\\', '/', '_'), '.', __CLASS__));
+        return strtolower(str_replace(array('\\', '/', '_'), '.', get_called_class()));
     }
 
     /**
