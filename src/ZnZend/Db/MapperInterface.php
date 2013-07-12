@@ -9,17 +9,25 @@
 namespace ZnZend\Db;
 
 use Zend\Paginator\Paginator;
-use Zend\Stdlib\ArraySerializableInterface;
 
 /**
  * Interface for entity mappers corresponding to database tables
- *
- * The ArraySerializableInterface allows the populating of records for a mapper
- * from a non-database source, eg. a UserMapper which reads from a config file
- * containing an array of user records rather than querying a database.
  */
-interface MapperInterface extends ArraySerializableInterface
+interface MapperInterface
 {
+    /**
+     * Populate mapper with records from non-database source
+     *
+     * This is used when the mapper is not linked to a database table,
+     * eg. a UserMapper which reads from a config file (containing an array of user records)
+     * rather than querying a database, after which all query functions will query
+     * this set of records.
+     *
+     * @param  array $records
+     * @return MapperInterface
+     */
+    public function setRecords($records);
+
     /**
      * Check whether the mapper and its entity support row states (active, deleted, all)
      *
