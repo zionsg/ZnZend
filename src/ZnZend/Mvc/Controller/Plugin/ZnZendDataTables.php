@@ -8,6 +8,7 @@
 
 namespace ZnZend\Mvc\Controller\Plugin;
 
+use DateTime;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Where;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
@@ -161,7 +162,11 @@ class ZnZendDataTables extends AbstractPlugin
                     $value = null;
                 }
 
-                $rowRender[] = $value;
+                // Value has to be a string as Javascript would not know how to handle PHP object
+                if ($value instanceof DateTime) {
+                    $value = $value->format('c');
+                }
+                $rowRender[] = (string) $value;
             }
             $aaData[] = $rowRender;
         }
