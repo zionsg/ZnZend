@@ -149,4 +149,17 @@ class ZnZendMvcParams extends AbstractPlugin
 
         return $this->routeMatch;
     }
+
+    /**
+     * Set current RouteMatch
+     *
+     * This is useful if the plugin is not called within an controller, eg. in bootstrap.
+     *
+     * @return ZnZendMvcParams
+     */
+    public function setRouteMatch(RouteMatch $routeMatch)
+    {
+        $this->routeMatch = $routeMatch;
+        return $this;
+    }
 }
