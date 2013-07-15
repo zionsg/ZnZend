@@ -14,7 +14,7 @@ use Zend\Stdlib\ArraySerializableInterface;
 /**
  * Interface for entities corresponding to rows in database tables
  *
- * Of all the methods, the most vital are getId(), getName() and mapGetterColumns(),
+ * Of all the methods, the most vital are getId(), getName(), isDeleted() and mapGetterColumns(),
  * with the first two used generally in logs and generic view scripts.
  * The other methods and interfaces are to facilitate generic treatment of entities
  * in a Content Management System.
