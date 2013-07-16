@@ -51,12 +51,15 @@ class DbSelect extends ZendDbSelect
      * the constructor ($adapterOrSqlObject, $resultSetPrototype) in order to recreate the
      * instance with the updated Select object.
      *
+     * $rowCount needs to be reset to null else getTotalItemCount() will return count from old Select.
+     *
      * @param  Select Updated Select object, eg. with addition WHERE or ORDER BY clauses applied.
      * @return DbSelect For fluent interface
      */
     public function updateSelect(Select $select)
     {
         $this->select = $select;
+        $this->rowCount = null;
         return $this;
     }
 }
