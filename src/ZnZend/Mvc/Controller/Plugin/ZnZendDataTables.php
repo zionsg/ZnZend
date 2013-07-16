@@ -166,7 +166,7 @@ class ZnZendDataTables extends AbstractPlugin
                 if ($value instanceof DateTime) {
                     $value = $value->format('c');
                 }
-                $rowRender[] = (string) $value;
+                $rowRender[] = nl2br((string) $value); // convert newlines to br for viewing in HTML table
             }
             $aaData[] = $rowRender;
         }
