@@ -78,11 +78,12 @@ class ZnZendDataTables extends AbstractPlugin
      */
     public function __invoke(Paginator $paginator, array $dataTablesParams, array $mapGettersColumns)
     {
-        $adapter = $paginator->getAdapter();
+        // The adapter and Select must be cloned to prevent modification of the original
+        $adapter = clone ($paginator->getAdapter());
 
         // method_exists() not used as it returns true for private methods which are not callable
         if (   !is_callable(array($adapter, 'getSelect'))
-            || !(($select = $adapter->getSelect()) instanceof Select)) {
+            || !(($select = clone ($adapter->getSelect())) instanceof Select)) {
             throw new Exception\InvalidArgumentException(
                 get_class($adapter) . ' does not implement getSelect() method to retrieve \Zend\Db\Sql\Select object'
             );
@@ -108,10 +109,10 @@ class ZnZendDataTables extends AbstractPlugin
         }
 
         // Column filtering
-        $where = new Where();
+        $where = $select->where; // build upon existing Where clause
         for ($i = 0; $i < (int) $dataTablesParams['iColumns']; $i++) {
             $searchText = $dataTablesParams['sSearch_' . $i];
-            if (empty($searchText) || 'false' == $dataTablesParams['bSearchable_' . $i]) {
+            if ('' == $searchText || 'false' == $dataTablesParams['bSearchable_' . $i]) {
                 continue;
             }
 
@@ -141,7 +142,7 @@ class ZnZendDataTables extends AbstractPlugin
         $filteredPaginator->setItemCountPerPage($itemCountPerPage)
                           ->setCurrentPageNumber($page);
 
-        // Construct data for each row and column
+        // Construct data for each row and column for current page
         $aaData = array();
         foreach ($filteredPaginator as $row) {
             if (false === $row) {
