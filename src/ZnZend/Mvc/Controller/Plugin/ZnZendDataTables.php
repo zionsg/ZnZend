@@ -92,10 +92,12 @@ class ZnZendDataTables extends AbstractPlugin
         // 'sColumns' is used to pass in the names of the getters used for each column
         $columnGetters = explode(',', $dataTablesParams['sColumns']);
 
-        // Column sorting
+        // Column sorting - must precede the existing ORDER BY clause
+        $orders = $select->getRawState(Select::ORDER);
+        $select->reset(Select::ORDER);
         for ($i = 0; $i < (int) $dataTablesParams['iSortingCols']; $i++) {
-            $dataColumn = $dataTablesParams['iSortCol_' . $i];
-            if ('false' == $dataTablesParams['bSortable_' . $i]) {
+            $dataColumn = (int) $dataTablesParams['iSortCol_' . $i];
+            if ('false' == $dataTablesParams['bSortable_' . $dataColumn]) {
                 continue;
             }
 
@@ -106,6 +108,10 @@ class ZnZendDataTables extends AbstractPlugin
 
             $column = $mapGettersColumns[$getter];
             $select->order($column . ' ' . strtoupper($dataTablesParams['sSortDir_' . $i]));
+        }
+        // Append original order by iteration so that the keys will not upset precedence
+        foreach ($orders as $order) {
+            $select->order($order);
         }
 
         // Column filtering
