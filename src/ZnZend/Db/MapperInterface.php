@@ -9,12 +9,25 @@
 namespace ZnZend\Db;
 
 use Zend\Paginator\Paginator;
+use ZnZend\Db\EntityInterface;
 
 /**
  * Interface for entity mappers corresponding to database tables
  */
 interface MapperInterface
 {
+    /**
+     * Constants for referring to row state
+     *
+     * Generally it is not a good idea to have constants in interfaces as values have
+     * to be set and cannot be overridden in implementing classes.
+     * These are placed here to enforce availability in implementing classes, especially
+     * for use in setRowState().
+     */
+    const ACTIVE_ROWS  = 'active';
+    const DELETED_ROWS = 'deleted';
+    const ALL_ROWS     = 'all';
+
     /**
      * Populate mapper with records from non-database source
      *
@@ -27,6 +40,13 @@ interface MapperInterface
      * @return MapperInterface
      */
     public function setRecords($records);
+
+    /**
+     * Get available row states as value-option pairs which can be used to populate a dropdown list
+     *
+     * @return  array
+     */
+    public static function getRowStates();
 
     /**
      * Check whether the mapper and its entity support row states (active, deleted, all)
