@@ -85,13 +85,17 @@ class MapperGenerator
 
             // Get column names for each table
             $columns = $dbAdapter->query(
-                'SELECT column_name FROM information_schema.columns '
+                'SELECT column_name, column_key FROM information_schema.columns '
                 . 'WHERE table_schema = ? AND table_name = ?',
                 array($databaseName, $tableName)
             );
             $columnNames = array();
+            $primaryKeys = array();
             foreach ($columns as $column) {
                 $columnNames[] = $column->column_name;
+                if ('PRI' == $column->column_key) {
+                    $primaryKeys[] = $column->column_name;
+                }
             }
 
             // Generate class
@@ -108,6 +112,16 @@ class MapperGenerator
                     'defaultValue' => "\\{$namespace}\\{$entityName}",
                 )),
             );
+            if ($primaryKeys) {
+                $value = (1 == count($primaryKeys))
+                       ? $primaryKeys[0]
+                       : 'array(' . implode(',', array_map(function ($v) { return "'$v'"; }, $primaryKeys)) . ')';
+                $properties[] = PropertyGenerator::fromArray(array(
+                    'name'         => 'primaryKey',
+                    'visibility'   => 'protected',
+                    'defaultValue' => $value,
+                ));
+            }
             if (is_callable($activeRowStateFunc)) {
                 $activeColumnValue = $activeRowStateFunc($tableName, $columnNames);
                 if ($activeColumnValue) {
