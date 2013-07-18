@@ -14,7 +14,6 @@ use Zend\Form\View\Helper\FormCollection;
 use ZnZend\Form\Exception;
 use ZnZend\Form\View\Helper\ZnZendFormRow;
 
-
 /**
  * Extension to FormCollection view helper to render form as a 2-column table
  *
@@ -46,19 +45,11 @@ class ZnZendFormTable extends FormCollection
     protected $tableClass = '';
 
     /**
-     * CSS class for <td> cell containing the element and its errors
+     * CSS class for each <tr> row
      *
      * @var string
      */
-    protected $tdElementClass = '';
-
-    /**
-     * Rendering format for <td> cell containing the element and its errors
-     *
-     * @see ZnZendFormRow::setRenderFormat() for use of placeholders
-     * @var string
-     */
-    protected $tdElementFormat = '%element%%errors%';
+    protected $trClass = '';
 
     /**
      * CSS class for <td> cell containing the label
@@ -76,14 +67,22 @@ class ZnZendFormTable extends FormCollection
     protected $tdLabelFormat = '%labelOpen%%label%%labelClose%';
 
     /**
-     * CSS class for each <tr> row
+     * CSS class for <td> cell containing the element and its errors
      *
      * @var string
      */
-    protected $trClass = '';
+    protected $tdElementClass = '';
 
     /**
-     * Retrieve the Form helper
+     * Rendering format for <td> cell containing the element and its errors
+     *
+     * @see ZnZendFormRow::setRenderFormat() for use of placeholders
+     * @var string
+     */
+    protected $tdElementFormat = '%element%%errors%';
+
+    /**
+     * Get the Form helper
      *
      * @return Form
      */
@@ -105,7 +104,7 @@ class ZnZendFormTable extends FormCollection
     }
 
     /**
-     * Retrieve rendering format for each table row
+     * Get rendering format for each table row
      *
      * @return string
      */
@@ -127,7 +126,7 @@ class ZnZendFormTable extends FormCollection
     }
 
     /**
-     * Retrieve CSS class for <table>
+     * Get CSS class for <table>
      *
      * @var string
      */
@@ -137,27 +136,41 @@ class ZnZendFormTable extends FormCollection
     }
 
     /**
-     * Retrieve CSS class for <td> cell containing the element and its errors
+     * Set CSS class for <table>
      *
-     * @var string
+     * @param  string $cssClass
+     * @return ZnZendFormTable
      */
-    public function getTdElementClass()
+    public function setTableClass($cssClass)
     {
-        return $this->tdElementClass;
+        $this->tableClass = $cssClass;
+        return $this;
     }
 
     /**
-     * Retrieve rendering format for <td> cell containing the element and its errors
+     * Get CSS class for <tr> row
      *
      * @var string
      */
-    public function getTdElementFormat()
+    public function getTrClass()
     {
-        return $this->tdElementFormat;
+        return $this->trClass;
     }
 
     /**
-     * Retrieve CSS class for <td> cell containing the label
+     * Set CSS class for <tr> row
+     *
+     * @param  string $cssClass
+     * @return ZnZendFormTable
+     */
+    public function setTrClass($cssClass)
+    {
+        $this->trClass = $cssClass;
+        return $this;
+    }
+
+    /**
+     * Get CSS class for <td> cell containing the label
      *
      * @var string
      */
@@ -167,7 +180,19 @@ class ZnZendFormTable extends FormCollection
     }
 
     /**
-     * Retrieve rendering format for <td> cell containing the label
+     * Set CSS class for <td> cell containing the label
+     *
+     * @param  string $cssClass
+     * @return ZnZendFormTable
+     */
+    public function setTdLabelClass($cssClass)
+    {
+        $this->tdLabelClass = $cssClass;
+        return $this;
+    }
+
+    /**
+     * Get rendering format for <td> cell containing the label
      *
      * @var string
      */
@@ -177,13 +202,59 @@ class ZnZendFormTable extends FormCollection
     }
 
     /**
-     * Retrieve CSS class for <tr> row
+     * Set rendering format for <td> cell containing the label
+     *
+     * @param  string $format
+     * @return ZnZendFormTable
+     */
+    public function setTdLabelFormat($format)
+    {
+        $this->tdLabelFormat = $format;
+        return $this;
+    }
+
+    /**
+     * Get CSS class for <td> cell containing the element and its errors
      *
      * @var string
      */
-    public function getTrClass()
+    public function getTdElementClass()
     {
-        return $this->trClass;
+        return $this->tdElementClass;
+    }
+
+    /**
+     * Set CSS class for <td> cell containing the element and its errors
+     *
+     * @param  string $cssClass
+     * @return ZnZendFormTable
+     */
+    public function setTdElementClass($cssClass)
+    {
+        $this->tdElementClass = $cssClass;
+        return $this;
+    }
+
+    /**
+     * Get rendering format for <td> cell containing the element and its errors
+     *
+     * @var string
+     */
+    public function getTdElementFormat()
+    {
+        return $this->tdElementFormat;
+    }
+
+    /**
+     * Set rendering format for <td> cell containing the element and its errors
+     *
+     * @param  string $format
+     * @return ZnZendFormTable
+     */
+    public function setTdElementFormat($format)
+    {
+        $this->tdElementFormat = $format;
+        return $this;
     }
 
     /**
@@ -214,53 +285,5 @@ class ZnZendFormTable extends FormCollection
         );
 
         return $markup;
-    }
-
-    /**
-     * Set CSS class for <table>
-     *
-     * @param  string $cssClass
-     * @return ZnZendFormTable
-     */
-    public function setTableClass($cssClass)
-    {
-        $this->tableClass = $cssClass;
-        return $this;
-    }
-
-    /**
-     * Set CSS class for <td> cell containing the element and its errors
-     *
-     * @param  string $cssClass
-     * @return ZnZendFormTable
-     */
-    public function setTdElementClass($cssClass)
-    {
-        $this->tdElementClass = $cssClass;
-        return $this;
-    }
-
-    /**
-     * Set CSS class for <td> cell containing the label
-     *
-     * @param  string $cssClass
-     * @return ZnZendFormTable
-     */
-    public function setTdLabelClass($cssClass)
-    {
-        $this->tdLabelClass = $cssClass;
-        return $this;
-    }
-
-    /**
-     * Set CSS class for <tr> row
-     *
-     * @param  string $cssClass
-     * @return ZnZendFormTable
-     */
-    public function setTrClass($cssClass)
-    {
-        $this->trClass = $cssClass;
-        return $this;
     }
 }
