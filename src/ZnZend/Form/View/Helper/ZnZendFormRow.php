@@ -8,6 +8,7 @@
 
 namespace ZnZend\Form\View\Helper;
 
+use Zend\Form\Element;
 use Zend\Form\ElementInterface;
 use Zend\Form\View\Helper\FormRow;
 use ZnZend\Form\Exception;
@@ -81,12 +82,18 @@ class ZnZendFormRow extends FormRow
      * Bulk of the code is from FormRow. The rendering format is applied at the end
      * If the label, element and errors are empty, the format is ignored and an empty string is returned
      *
+     * Special case for Element\Hidden and Element\Csrf: Pass back to formRow()
+     *
      * @param  ElementInterface $element
      * @throws Exception\DomainException
      * @return string
      */
     public function render(ElementInterface $element)
     {
+        if ($element instanceof Element\Hidden || $element instanceof Element\Csrf) {
+            return parent::render($element);
+        }
+
         $escapeHtmlHelper    = $this->getEscapeHtmlHelper();
         $labelHelper         = $this->getLabelHelper();
         $elementHelper       = $this->getElementHelper();
