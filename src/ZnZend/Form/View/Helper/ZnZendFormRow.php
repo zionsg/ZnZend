@@ -14,6 +14,9 @@ use ZnZend\Form\Exception;
 
 /**
  * Extension of FormRow view helper to allow rendering format to be customized
+ *
+ * Avaliable placeholders for rendering format:
+ *   %labelOpen%, %label%, %lableClose, %element%, %value%, %errors%
  */
 class ZnZendFormRow extends FormRow
 {
@@ -68,6 +71,7 @@ class ZnZendFormRow extends FormRow
         $elementErrorsHelper = $this->getElementErrorsHelper();
 
         $label           = $element->getLabel();
+        $value           = $element->getValue();
         $inputErrorClass = $this->getInputErrorClass();
         $elementErrors   = $elementErrorsHelper->render($element);
 
@@ -137,8 +141,8 @@ class ZnZendFormRow extends FormRow
 
         // Apply render format
         $markup = str_replace(
-            array('%labelOpen%', '%label%', '%labelClose%', '%element%', '%errors%'),
-            array($labelOpen, $label, $labelClose, $elementString, $elementErrors),
+            array('%labelOpen%', '%label%', '%labelClose%', '%element%', '%value%', '%errors%'),
+            array($labelOpen, $label, $labelClose, $elementString, $value, $elementErrors),
             $this->getRenderFormat()
         );
 
