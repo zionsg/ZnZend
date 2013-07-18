@@ -54,6 +54,28 @@ class ZnZendFormRow extends FormRow
     }
 
     /**
+     * Set rendering format
+     *
+     * Placeholders that can be used in format string:
+     *   %id%         => 'id' attribute for element
+     *   %labelOpen%  => Opening tag for label
+     *   %label%      => $element->getLabel()
+     *   %labelClose% => Closing tag for label
+     *   %element%    => Output from formElement helper
+     *   %value%      => $element->getValue()
+     *   %valueNl2br% => nl2br($element->getValue())
+     *   %errors%     => Output from formElementErrors helper
+     *
+     * @param  string  $renderFormat
+     * @return ZnZendFormRow
+     */
+    public function setRenderFormat($renderFormat)
+    {
+        $this->renderFormat = $renderFormat;
+        return $this;
+    }
+
+    /**
      * Utility form helper that renders a label (if it exists), an element and errors
      *
      * Bulk of the code is from FormRow. The rendering format is applied at the end
@@ -70,6 +92,7 @@ class ZnZendFormRow extends FormRow
         $elementHelper       = $this->getElementHelper();
         $elementErrorsHelper = $this->getElementErrorsHelper();
 
+        $id              = $this->getId($element);
         $label           = $element->getLabel();
         $value           = $element->getValue();
         $inputErrorClass = $this->getInputErrorClass();
@@ -99,6 +122,7 @@ class ZnZendFormRow extends FormRow
             if (empty($labelAttributes)) {
                 $labelAttributes = $this->labelAttributes;
             }
+            $labelAttributes['for'] = $id;
 
             // Multicheckbox elements have to be handled differently as the HTML standard does not allow nested
             // labels. The semantic way is to group them inside a fieldset
@@ -141,30 +165,11 @@ class ZnZendFormRow extends FormRow
 
         // Apply render format
         $markup = str_replace(
-            array('%labelOpen%', '%label%', '%labelClose%', '%element%', '%value%', '%errors%'),
-            array($labelOpen, $label, $labelClose, $elementString, $value, $elementErrors),
+            array('%id%', '%labelOpen%', '%label%', '%labelClose%', '%element%', '%value%', '%valueNl2br%', '%errors%'),
+            array($id, $labelOpen, $label, $labelClose, $elementString, $value, nl2br($value), $elementErrors),
             $this->getRenderFormat()
         );
 
         return $markup;
-    }
-
-    /**
-     * Set rendering format
-     *
-     * Placeholders that can be used in format string:
-     *   %labelOpen%
-     *   %label%
-     *   %labelClose%
-     *   %element%
-     *   %errors%
-     *
-     * @param  string  $renderFormat
-     * @return ZnZendFormRow
-     */
-    public function setRenderFormat($renderFormat)
-    {
-        $this->renderFormat = $renderFormat;
-        return $this;
     }
 }
