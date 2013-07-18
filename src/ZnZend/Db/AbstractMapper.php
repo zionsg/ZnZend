@@ -8,7 +8,6 @@
 
 namespace ZnZend\Db;
 
-use ReflectionClass;
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\ResultSet\ResultSetInterface;
 use Zend\Db\Sql\Select;
@@ -27,7 +26,7 @@ use ZnZend\Paginator\Adapter\DbSelect;
  * Base class for table gateways
  *
  * Properties that must be set: $table, $resultSetClass
- * Properties that should be set if applicable: $activeRowState, $deletedRowState
+ * Properties that should be set if applicable: $primaryKey, $activeRowState, $deletedRowState
  *
  * Modifications to AbstractTableGateway:
  *   - Ability to use global/static db adapter
@@ -40,13 +39,6 @@ use ZnZend\Paginator\Adapter\DbSelect;
  */
 abstract class AbstractMapper extends AbstractTableGateway implements MapperInterface
 {
-    /**
-     * Constants for referring to row state
-     */
-    const ACTIVE_ROWS  = 'active';
-    const DELETED_ROWS = 'deleted';
-    const ALL_ROWS     = 'all';
-
     /**
      * Records populated via non-database source
      *
@@ -65,6 +57,13 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     protected $resultSetClass;
 
     /**
+     * Name of primary key column(s) - set by user or find()
+     *
+     * @var string|array
+     */
+    protected $primaryKey;
+
+    /**
      * Column-value pair used to determine active row state - set by user
      *
      * @example array('usr_isdeleted' => 0)
@@ -79,13 +78,6 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * @var     array
      */
     protected $deletedRowState = array();
-
-    /**
-     * Name of primary key column(s) - set by find() not user
-     *
-     * @var string|array
-     */
-    protected $primaryKey;
 
     /**
      * Current row state
@@ -116,68 +108,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         $this->initialize();
     }
 
-    /**
-     * Defined by AbstractTableGateway; Get Feature\FeatureSet
-     *
-     * Modified to instantiate feature on first call
-     *
-     * @return Feature\FeatureSet
-     */
-    public function getFeatureSet()
-    {
-        if (!$this->featureSet instanceof Feature\FeatureSet) {
-            $this->featureSet = new Feature\FeatureSet();
-        }
-        return $this->featureSet;
-    }
-
     /*** IMPORTANT FUNCTIONS ***/
-
-    /**
-     * Defined by MapperInterface; Populate mapper with records from non-database source
-     *
-     * @param  array $records
-     * @return AbstractMapper
-     */
-    public function setRecords($records)
-    {
-        if (!is_array($records)) {
-            throw new Exception\InvalidArgumentException('Array expected');
-        }
-
-        $this->records = $records;
-    }
-
-    /**
-     * Defined by MapperInterface; Check whether the mapper and its entity support
-     * row states (active, deleted, all)
-     *
-     * Ideally, no records should ever be deleted from the database and should have
-     * a field to mark it as deleted instead - this is what row state refers to.
-     *
-     * @return bool
-     */
-    public function hasRowState()
-    {
-        $hasActiveRowState  = is_array($this->activeRowState) && !empty($this->activeRowState);
-        $hasDeletedRowState = is_array($this->deletedRowState) && !empty($this->deletedRowState);
-        return ($hasActiveRowState && $hasDeletedRowState);
-    }
-
-    /**
-     * Defined by MapperInterface; Set row state
-     *
-     * Rows returned from query results will conform to the current specified row state
-     *
-     * @param  string $rowState Options: AbstractMapper::ACTIVE_ROWS, AbstractMapper::DELETED_ROWS,
-     *                          AbstractMapper::ALL_ROWS
-     * @return AbstractMapper For fluent interface
-     */
-    public function setRowState($rowState)
-    {
-        $this->rowState = $rowState;
-        return $this;
-    }
 
     /*
      * Get base Select with from, joins, columns added
@@ -240,6 +171,210 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         return $paginator;
     }
 
+    /*** ADDITIONAL PUBLIC FUNCTIONS ***/
+
+    /**
+     * Insert a new row and update if a duplicate record exists
+     *
+     * This is an implementation of "INSERT ... ON DUPLICATE KEY UPDATE" in MySQL.
+     * The equivalent from SQL-99, "MERGE INTO ...", is not supported in MySQL.
+     *
+     * @param  array $set
+     * @return int
+     */
+    public function insertOnDuplicate($set)
+    {
+        $set = $this->filterColumns($set);
+
+        $dbAdapter = $this->adapter;
+        $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
+        $fp = function ($name) use ($dbAdapter) { return $dbAdapter->driver->formatParameterName($name); };
+
+        $keys = array_keys($set);
+        $columns = array_map($qi, $keys);
+        $parameters = array_map($fp, array_values($keys));
+
+        $primaryKey = $this->getPrimaryKey();
+        $updateValues = array();
+        foreach ($keys as $index => $key) {
+            $column = $columns[$index];
+            if ($primaryKey == $key) {
+                $updateValues[] = $column . ' = LAST_INSERT_ID(' . $column . ')';
+                continue;
+            }
+
+            $updateValues[] = $column . ' = VALUES(' . $column . ')';
+        }
+
+        $sql = sprintf(
+            'INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s',
+            $qi($this->table),
+            implode(',', $columns),
+            implode(',', $parameters),
+            implode(',', $updateValues)
+        );
+        $result = $dbAdapter->query($sql, $set);
+
+        return (int) $result->getGeneratedValue();
+    }
+
+    /*** AUXILIARY FUNCTIONS ***/
+
+    /**
+     * Get primary key column(s)
+     *
+     * @return string|array
+     */
+    protected function getPrimaryKey()
+    {
+        if (empty($this->primaryKey)) {
+            $columns = $this->adapter->query(
+                'SELECT column_name FROM information_schema.columns '
+                . "WHERE table_schema = ? AND table_name = ? AND column_key = 'PRI'",
+                array($this->adapter->getCurrentSchema(), $this->table)
+            );
+            $keys = array();
+            foreach ($columns as $column) {
+                $keys[] = $column->column_name;
+            }
+            $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
+        }
+
+        return $this->primaryKey;
+    }
+
+    /**
+     * Filter out invalid columns in array
+     *
+     * Used for sanitizing data passed in from forms
+     * Care needs to be taken for columns already prefixed with the table name
+     * (so as to prevent ambiguity error when table is self-joined in select())
+     *
+     * @param  array|ArraySerializableInterface $data Column-value pairs
+     * @throws Exception\InvalidArgumentException
+     * @return array
+     */
+    protected function filterColumns($data)
+    {
+        if ($data instanceof ArraySerializableInterface) {
+            $data = $data->getArrayCopy();
+        }
+
+        if (!is_array($data)) {
+            throw new Exception\InvalidArgumentException(
+                'Array or object implementing Zend\Stdlib\ArraySerializableInterface expected'
+            );
+        }
+
+        if (empty($data)) {
+            return $data;
+        }
+
+        // remove invalid keys from $data
+        // array_intersect() not used as keys with empty strings or boolean false are removed
+        $tableCols = array_flip($this->getColumns());  // need to flip
+        foreach ($data as $key => $value) {
+            // isset() faster than array_key_exists()
+            $column = str_replace("{$this->table}.", '', $key);
+            if (!isset($tableCols[$column])) {
+                unset($data[$key]);
+            }
+        }
+
+        return $data;
+    }
+
+    /*** FUNCTIONS DEFINED BY AbstractTableGateway ***/
+
+    /**
+     * Defined by AbstractTableGateway; Get Feature\FeatureSet
+     *
+     * Modified to instantiate feature on first call
+     *
+     * @return Feature\FeatureSet
+     */
+    public function getFeatureSet()
+    {
+        if (!$this->featureSet instanceof Feature\FeatureSet) {
+            $this->featureSet = new Feature\FeatureSet();
+        }
+        return $this->featureSet;
+    }
+
+    /**
+     * Defined in AbstractTableGateway; Get columns
+     *
+     * Fetch columns if not populated. Feature\MetadataFeature is not used as it is very slow.
+     *
+     * @return array
+     */
+    public function getColumns()
+    {
+        if (empty($this->columns)) {
+            $columns = $this->adapter->query(
+                'SELECT column_name FROM information_schema.columns '
+                . 'WHERE table_schema = ? AND table_name = ?',
+                array($this->adapter->getCurrentSchema(), $this->table)
+            );
+            $this->columns = array();
+            foreach ($columns as $column) {
+                $this->columns[] = $column->column_name;
+            }
+        }
+
+        return $this->columns;
+    }
+
+    /**
+     * Defined by AbstractTableGateway; Insert
+     *
+     * @param  array $set
+     * @return int
+     */
+    public function insert($set)
+    {
+        return parent::insert($this->filterColumns($set));
+    }
+
+    /**
+     * Defined by AbstractTableGateway; Update
+     *
+     * If an entity is passed in for $where, it is assumed that the
+     * update is for that entity. This is useful, eg. in the controller,
+     * where the user does not and should not know the column name or how to
+     * construct a where clause.
+     *
+     * @param  array $set
+     * @param  string|array|closure|EntityInterface $where
+     * @return int
+     */
+    public function update($set, $where = null)
+    {
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
+        return parent::update($this->filterColumns($set), $where);
+    }
+
+    /**
+     * Defined by AbstractTableGateway; Delete
+     *
+     * If an entity is passed in for $where, it is assumed that the
+     * entity is to be deleted. This is useful, eg. in the controller,
+     * where the user does not and should not know the column name or how to
+     * construct a where clause.
+     *
+     * @param  string|array|closure|EntityInterface $where
+     * @return int
+     */
+    public function delete($where)
+    {
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
+        return parent::delete($where);
+    }
+
     /**
      * Defined in AbstractTableGateway; Get select result prototype
      *
@@ -288,18 +423,101 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         return $this->resultSetPrototype;
     }
 
+    /*** FUNCTIONS DEFINED BY MapperInterface ***/
+
     /**
-     * Get list of class constants which can be used to populate a dropdown list
+     * Defined by MapperInterface; Populate mapper with records from non-database source
+     *
+     * @param  array $records
+     * @return AbstractMapper
+     */
+    public function setRecords($records)
+    {
+        if (!is_array($records)) {
+            throw new Exception\InvalidArgumentException('Array expected');
+        }
+
+        $this->records = $records;
+    }
+
+    /**
+     * Defined by MapperInterface; Get available row states as value-option pairs
+     * which can be used to populate a dropdown list
      *
      * @return array
      */
-    public static function getConstants()
+    public static function getRowStates()
     {
-        $reflection = new ReflectionClass(__CLASS__);
-        return $reflection->getConstants();
+        $values = array(static::ACTIVE_ROWS, static::DELETED_ROWS, static::ALL_ROWS);
+        return array_combine($values, $values);
     }
 
-    /*** QUERY FUNCTIONS ***/
+    /**
+     * Defined by MapperInterface; Check whether the mapper and its entity support
+     * row states (active, deleted, all)
+     *
+     * Ideally, no records should ever be deleted from the database and should have
+     * a field to mark it as deleted instead - this is what row state refers to.
+     *
+     * @return bool
+     */
+    public function hasRowState()
+    {
+        $hasActiveRowState  = is_array($this->activeRowState) && !empty($this->activeRowState);
+        $hasDeletedRowState = is_array($this->deletedRowState) && !empty($this->deletedRowState);
+        return ($hasActiveRowState && $hasDeletedRowState);
+    }
+
+    /**
+     * Defined by MapperInterface; Set row state
+     *
+     * Rows returned from query results will conform to the current specified row state
+     *
+     * @param  string $rowState Options: AbstractMapper::ACTIVE_ROWS, AbstractMapper::DELETED_ROWS,
+     *                          AbstractMapper::ALL_ROWS
+     * @return AbstractMapper For fluent interface
+     */
+    public function setRowState($rowState)
+    {
+        $this->rowState = $rowState;
+        return $this;
+    }
+
+    /**
+     * Defined by MapperInterface; Mark records as active
+     *
+     * @param  string|array|closure|EntityInterface $where
+     * @return bool|int Return false if row state not supported
+     */
+    public function markActive($where)
+    {
+        if (!$this->hasRowState()) {
+            return false;
+        }
+
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
+        return parent::update($this->activeRowState, $where);
+    }
+
+    /**
+     * Defined by MapperInterface; Mark records as deleted
+     *
+     * @param  string|array|closure|EntityInterface $where
+     * @return bool|int Return false if row state not supported
+     */
+    public function markDeleted($where)
+    {
+        if (!$this->hasRowState()) {
+            return false;
+        }
+
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
+        return parent::update($this->deletedRowState, $where);
+    }
 
     /**
      * Defined by MapperInterface; Fetch all rows
@@ -323,235 +541,5 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         $select = $this->getBaseSelect();
         $select->where(array($this->getPrimaryKey() => $key));
         return $this->getResultSet($select, false);
-    }
-
-    /**
-     * Get columns
-     *
-     * @return array
-     */
-    public function getColumns()
-    {
-        // Feature\MetadataFeature is not used as it is very slow
-        if (empty($this->columns)) {
-            $columns = $this->adapter->query(
-                'SELECT column_name FROM information_schema.columns '
-                . 'WHERE table_schema = ? AND table_name = ?',
-                array($this->adapter->getCurrentSchema(), $this->table)
-            );
-            $this->columns = array();
-            foreach ($columns as $column) {
-                $this->columns[] = $column->column_name;
-            }
-        }
-
-        return $this->columns;
-    }
-
-    /**
-     * Get primary key
-     *
-     * @return string|array
-     */
-    public function getPrimaryKey()
-    {
-        if (empty($this->primaryKey)) {
-            $columns = $this->adapter->query(
-                'SELECT column_name FROM information_schema.columns '
-                . "WHERE table_schema = ? AND table_name = ? AND column_key = 'PRI'",
-                array($this->adapter->getCurrentSchema(), $this->table)
-            );
-            $keys = array();
-            foreach ($columns as $column) {
-                $keys[] = $column->column_name;
-            }
-            $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
-        }
-
-        return $this->primaryKey;
-    }
-
-    /*** CRUD OPERATIONS ***/
-
-    /**
-     * Filter out invalid columns in array
-     *
-     * Used for sanitizing data passed in from forms
-     * Care needs to be taken for columns already prefixed with the table name
-     * (so as to prevent ambiguity error when table is self-joined in select())
-     *
-     * @param  array|ArraySerializableInterface $data Column-value pairs
-     * @throws Exception\InvalidArgumentException
-     * @return array
-     */
-    public function filterColumns($data)
-    {
-        if ($data instanceof ArraySerializableInterface) {
-            $data = $data->getArrayCopy();
-        }
-
-        if (!is_array($data)) {
-            throw new Exception\InvalidArgumentException(
-                'Array or object implementing Zend\Stdlib\ArraySerializableInterface expected'
-            );
-        }
-
-        if (empty($data)) {
-            return $data;
-        }
-
-        // remove invalid keys from $data
-        // array_intersect() not used as keys with empty strings or boolean false are removed
-        $tableCols = array_flip($this->getColumns());  // need to flip
-        foreach ($data as $key => $value) {
-            // isset() faster than array_key_exists()
-            $column = str_replace("{$this->table}.", '', $key);
-            if (!isset($tableCols[$column])) {
-                unset($data[$key]);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * Defined by TableGatewayInterface; Insert
-     *
-     * @param  array $set
-     * @return int
-     */
-    public function insert($set)
-    {
-        return parent::insert($this->filterColumns($set));
-    }
-
-    /**
-     * Defined by TableGatewayInterface; Update
-     *
-     * If an entity is passed in for $where, it is assumed that the
-     * update is for that entity. This is useful, eg. in the controller,
-     * where the user does not and should not know the column name or how to
-     * construct a where clause.
-     *
-     * @param  array $set
-     * @param  string|array|closure|EntityInterface $where
-     * @return int
-     */
-    public function update($set, $where = null)
-    {
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
-        }
-        return parent::update($this->filterColumns($set), $where);
-    }
-
-    /**
-     * Defined by TableGatewayInterface; Delete
-     *
-     * If an entity is passed in for $where, it is assumed that the
-     * entity is to be deleted. This is useful, eg. in the controller,
-     * where the user does not and should not know the column name or how to
-     * construct a where clause.
-     *
-     * @param  string|array|closure|EntityInterface $where
-     * @return int
-     */
-    public function delete($where)
-    {
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
-        }
-        return parent::delete($where);
-    }
-
-    /**
-     * Defined by MapperInterface; Mark records as active
-     *
-     * If an entity is passed in for $where, it is assumed that the
-     * entity is to be marked as active. This is useful, eg. in the controller,
-     * where the user does not and should not know the column name or how to
-     * construct a where clause.
-     *
-     * @param  string|array|closure|EntityInterface $where
-     * @return bool|int Return false if row state not supported
-     */
-    public function markActive($where)
-    {
-        if (!$this->hasRowState()) {
-            return false;
-        }
-
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
-        }
-        return parent::update($this->activeRowState, $where);
-    }
-
-    /**
-     * Defined by MapperInterface; Mark records as deleted
-     *
-     * If an entity is passed in for $where, it is assumed that the
-     * entity is to be marked as deleted. This is useful, eg. in the controller,
-     * where the user does not and should not know the column name or how to
-     * construct a where clause.
-     *
-     * @param  string|array|closure|EntityInterface $where
-     * @return bool|int Return false if row state not supported
-     */
-    public function markDeleted($where)
-    {
-        if (!$this->hasRowState()) {
-            return false;
-        }
-
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
-        }
-        return parent::update($this->deletedRowState, $where);
-    }
-
-    /**
-     * Insert a new row and update if a duplicate record exists
-     *
-     * This is an implementation of "INSERT ... ON DUPLICATE KEY UPDATE" in MySQL.
-     * The equivalent from SQL-99, "MERGE INTO ...", is not supported in MySQL.
-     *
-     * @param  array $set
-     * @return int
-     */
-    public function insertOnDuplicate($set)
-    {
-        $set = $this->filterColumns($set);
-
-        $dbAdapter = $this->adapter;
-        $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
-        $fp = function ($name) use ($dbAdapter) { return $dbAdapter->driver->formatParameterName($name); };
-
-        $keys = array_keys($set);
-        $columns = array_map($qi, $keys);
-        $parameters = array_map($fp, array_values($keys));
-
-        $primaryKey = $this->getPrimaryKey();
-        $updateValues = array();
-        foreach ($keys as $index => $key) {
-            $column = $columns[$index];
-            if ($primaryKey == $key) {
-                $updateValues[] = $column . ' = LAST_INSERT_ID(' . $column . ')';
-                continue;
-            }
-
-            $updateValues[] = $column . ' = VALUES(' . $column . ')';
-        }
-
-        $sql = sprintf(
-            'INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s',
-            $qi($this->table),
-            implode(',', $columns),
-            implode(',', $parameters),
-            implode(',', $updateValues)
-        );
-        $result = $dbAdapter->query($sql, $set);
-
-        return (int) $result->getGeneratedValue();
     }
 }
