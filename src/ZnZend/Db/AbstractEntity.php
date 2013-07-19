@@ -274,11 +274,12 @@ abstract class AbstractEntity implements EntityInterface
         }
         trigger_error(
             sprintf(
-                'Undefined property: %s::%s in %s on line %s',
-                $trace[0]['class'] . '()',
+                'Undefined property "%s" via %s::%s() in %s on line %s',
                 $property,
-                $trace[0]['file'],
-                $trace[0]['line']
+                get_class($trace[1]['object']),
+                $trace[1]['function'],
+                $trace[1]['file'],
+                $trace[1]['line']
             ),
             E_USER_NOTICE
         );
