@@ -19,6 +19,7 @@ return array(
             'znZendFormatTimeRange'   => 'ZnZend\View\Helper\ZnZendFormatTimeRange',
             'znZendResizeImage'       => 'ZnZend\View\Helper\ZnZendResizeImage',
             // Form view helpers
+            'znZendFormElementValue'    => 'ZnZend\Form\View\Helper\ZnZendFormElementValue',
             'znZendFormRow'             => 'ZnZend\Form\View\Helper\ZnZendFormRow',
             'znZendFormTable'           => 'ZnZend\Form\View\Helper\ZnZendFormTable',
             'znZendFormCaptchaQuestion' => 'ZnZend\Form\View\Helper\Captcha\Question',
