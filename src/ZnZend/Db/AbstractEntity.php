@@ -47,6 +47,22 @@ abstract class AbstractEntity implements EntityInterface
     protected $id;
 
     /**
+     * Singular noun for entity - to be set by extending classes
+     *
+     * @Annotation\Exclude()
+     * @var string
+     */
+    protected $singularNoun = 'entity';
+
+    /**
+     * Plural noun for entity - to be set by extending classes
+     *
+     * @Annotation\Exclude()
+     * @var string
+     */
+    protected $pluralNoun = 'entities';
+
+    /**
      * Array mapping getters to columns - to be set by extending class
      *
      * Various parts of this class assume that for a getter getX() or isX(),
@@ -83,7 +99,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Value when entity is treated as a string
+     * Defined by EntityInterface; Value when entity is treated as a string
      *
      * This is vital if a getter such as getCreator() returns an EntityInterface (instead of string)
      * and it is used in log text or in a view script. Should default to getName().
@@ -93,6 +109,52 @@ abstract class AbstractEntity implements EntityInterface
     public function __toString()
     {
         return $this->getName();
+    }
+
+    /**
+     * Defined by EntityInterface; Get singular noun for entity (lowercase)
+     *
+     * @example 'person'
+     * @return  string
+     */
+    public function getSingularNoun()
+    {
+        return $this->singularNoun;
+    }
+
+    /**
+     * Defined by EntityInterface; Set singular noun for entity (lowercase)
+     *
+     * @param  string $value
+     * @return AbstractEntity
+     */
+    public function setSingularNoun($value)
+    {
+        $this->singularNoun = strtolower($value);
+        return $this;
+    }
+
+    /**
+     * Defined by EntityInterface; Get plural noun for entity (lowercase)
+     *
+     * @example 'people'
+     * @return  string
+     */
+    public function getPluralNoun()
+    {
+        return $this->pluralNoun;
+    }
+
+    /**
+     * Defined by EntityInterface; Set plural noun for entity (lowercase)
+     *
+     * @param  string $value
+     * @return AbstractEntity
+     */
+    public function setPluralNoun($value)
+    {
+        $this->pluralNoun = strtolower($value);
+        return $this;
     }
 
     /**
@@ -159,7 +221,7 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Defined by ResourceInterface; Returns the string identifier of the Resource
+     * Defined by ResourceInterface via EntityInterface; Returns the string identifier of the Resource
      *
      * By default, the resource id is derived from the class name.
      * Eg: ZnZend\Db\AbstractEntity becomes znzend.db.abstractentity
