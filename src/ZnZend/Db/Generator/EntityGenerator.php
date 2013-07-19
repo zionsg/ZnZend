@@ -96,7 +96,7 @@ class EntityGenerator
 
             // Get column info for each table
             $columns = $dbAdapter->query(
-                'SELECT column_name, data_type FROM information_schema.columns '
+                'SELECT column_name, column_key, data_type FROM information_schema.columns '
                 . 'WHERE table_schema = ? AND table_name = ?',
                 array($databaseName, $tableName)
             );
@@ -108,6 +108,7 @@ class EntityGenerator
             $types = array();
             foreach ($columns as $column) {
                 $columnName = $column->column_name;
+                $isPrimary  = ('PRI' == $column->column_key);
                 $sqlType    = $column->data_type;
                 $phpType    = self::getPhpType($sqlType);
                 $getterName = $columnToGetterFunc($tableName, $columnName);
@@ -117,32 +118,38 @@ class EntityGenerator
                     strcspn($getterName ?: $setterName, 'ABCDEFGHJIJKLMNOPQRSTUVWXYZ')
                 );
 
+                $tags = array(new Tag(array(
+                    'name' => '@Annotation\Exclude()',
+                )));
+                if (!$isPrimary) {
+                    $tags = array(
+                        new Tag(array(
+                            'name' => '@Annotation\Name("' . $columnName . '")',
+                        )),
+                        new Tag(array(
+                            'name' => '@Annotation\Filter({"name":"StringTrim"})',
+                        )),
+                        new Tag(array(
+                            'name' => '@Annotation\Required(false)',
+                        )),
+                        new Tag(array(
+                            'name' => '@Annotation\Type("Zend\Form\Element\Text")',
+                        )),
+                        new Tag(array(
+                            'name' => '@Annotation\Attributes({"placeholder": "' . $label . '"})',
+                        )),
+                        new Tag(array(
+                            'name' => '@Annotation\Options({"label": "' . $label . '"})',
+                        )),
+                    );
+                }
                 $properties[] = PropertyGenerator::fromArray(array(
                     'name'       => $columnName,
                     'visibility' => 'protected',
                     'docblock'   => DocBlockGenerator::fromArray(array(
                         'shortDescription' => null,
                         'longDescription'  => null,
-                        'tags'             => array(
-                            new Tag(array(
-                                'name' => '@Annotation\Name("' . $columnName . '")',
-                            )),
-                            new Tag(array(
-                                'name' => '@Annotation\Filter({"name":"StringTrim"})',
-                            )),
-                            new Tag(array(
-                                'name' => '@Annotation\Required(false)',
-                            )),
-                            new Tag(array(
-                                'name' => '@Annotation\Type("Zend\Form\Element\Text")',
-                            )),
-                            new Tag(array(
-                                'name' => '@Annotation\Attributes({"placeholder": "' . $label . '"})',
-                            )),
-                            new Tag(array(
-                                'name' => '@Annotation\Options({"label": "' . $label . '"})',
-                            )),
-                        ),
+                        'tags'             => $tags,
                     )),
                 ));
 
