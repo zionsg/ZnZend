@@ -222,8 +222,9 @@ class EntityGenerator
                                   )),
                               ),
                           )));
+
             if ($mapGettersColumns) {
-                $properties[]= PropertyGenerator::fromArray(array(
+                array_unshift($properties, PropertyGenerator::fromArray(array(
                     'name'         => '_mapGettersColumns',
                     'visibility'   => 'protected',
                     'static'       => true,
@@ -241,8 +242,49 @@ class EntityGenerator
                             )),
                         ),
                     ))
-                ));
+                )));
             }
+
+            array_unshift(
+                $properties,
+                PropertyGenerator::fromArray(array(
+                    'name'         => 'singularNoun',
+                    'visibility'   => 'protected',
+                    'defaultValue' => strtolower($entityName),
+                    'docblock'     => DocBlockGenerator::fromArray(array(
+                        'shortDescription' => null,
+                        'longDescription'  => null,
+                        'tags'             => array(
+                            new Tag(array(
+                                'name' => '@Annotation\Exclude()',
+                            )),
+                            new Tag(array(
+                                'name' => '@var',
+                                'description' => 'string',
+                            )),
+                        ),
+                    ))
+                )),
+                PropertyGenerator::fromArray(array(
+                    'name'         => 'pluralNoun',
+                    'visibility'   => 'protected',
+                    'defaultValue' => strtolower($entityName) . 's',
+                    'docblock'     => DocBlockGenerator::fromArray(array(
+                        'shortDescription' => null,
+                        'longDescription'  => null,
+                        'tags'             => array(
+                            new Tag(array(
+                                'name' => '@Annotation\Exclude()',
+                            )),
+                            new Tag(array(
+                                'name' => '@var',
+                                'description' => 'string',
+                            )),
+                        ),
+                    ))
+                ))
+            );
+
             if ($properties) {
                 $entityClass->addProperties($properties);
             }
