@@ -127,9 +127,6 @@ class EntityGenerator
                             'name' => '@Annotation\Name("' . $columnName . '")',
                         )),
                         new Tag(array(
-                            'name' => '@Annotation\Filter({"name":"StringTrim"})',
-                        )),
-                        new Tag(array(
                             'name' => '@Annotation\Required(false)',
                         )),
                         new Tag(array(
@@ -140,6 +137,9 @@ class EntityGenerator
                         )),
                         new Tag(array(
                             'name' => '@Annotation\Options({"label": "' . $label . '"})',
+                        )),
+                        new Tag(array(
+                            'name' => '@Annotation\Filter({"name":"StringTrim"})',
                         )),
                     );
                 }
