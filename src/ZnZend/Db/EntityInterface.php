@@ -48,6 +48,38 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function __toString();
 
     /**
+     * Get singular noun for entity (lowercase)
+     *
+     * @example 'person'
+     * @return  string
+     */
+    public function getSingularNoun();
+
+    /**
+     * Set singular noun for entity (lowercase)
+     *
+     * @param  string $value
+     * @return EntityInterface
+     */
+    public function setSingularNoun($value);
+
+    /**
+     * Get plural noun for entity (lowercase)
+     *
+     * @example 'people'
+     * @return  string
+     */
+    public function getPluralNoun();
+
+    /**
+     * Set plural noun for entity (lowercase)
+     *
+     * @param  string $value
+     * @return EntityInterface
+     */
+    public function setPluralNoun($value);
+
+    /**
      * Get record id
      *
      * @return null|int
