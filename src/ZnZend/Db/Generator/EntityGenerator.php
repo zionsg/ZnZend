@@ -96,7 +96,9 @@ class EntityGenerator
 
             // Get column info for each table
             $columns = $dbAdapter->query(
-                'SELECT column_name, column_key, data_type FROM information_schema.columns '
+                'SELECT column_name, column_key, data_type, '
+                . 'character_maximum_length, numeric_precision, column_default '
+                . 'FROM information_schema.columns '
                 . 'WHERE table_schema = ? AND table_name = ?',
                 array($databaseName, $tableName)
             );
@@ -109,6 +111,8 @@ class EntityGenerator
             foreach ($columns as $column) {
                 $columnName = $column->column_name;
                 $isPrimary  = ('PRI' == $column->column_key);
+                $isNumeric  = ($column->numeric_precision !== null);
+                $defaultValue = $column->column_default;
                 $sqlType    = $column->data_type;
                 $phpType    = self::getPhpType($sqlType);
                 $getterName = $columnToGetterFunc($tableName, $columnName);
@@ -119,7 +123,7 @@ class EntityGenerator
                 );
 
                 $tags = array(new Tag(array(
-                    'name' => '@Annotation\Exclude()',
+                    'name' => '@Annotation\Exclude()', // no form input needed for primary keys
                 )));
                 if (!$isPrimary) {
                     $tags = array(
@@ -130,23 +134,38 @@ class EntityGenerator
                             'name' => '@Annotation\Required(false)',
                         )),
                         new Tag(array(
-                            'name' => '@Annotation\Type("Zend\Form\Element\Text")',
+                            'name' => sprintf(
+                                '@Annotation\Type("Zend\Form\Element\%s")',
+                                ('text' == substr($sqlType, -4) ? 'Textarea' : 'Text')
+                            ),
                         )),
                         new Tag(array(
-                            'name' => '@Annotation\Attributes({"placeholder": "' . $label . '"})',
+                            'name' => sprintf(
+                                '@Annotation\Attributes({"placeholder":"' . $label . '"%s})',
+                                ($sqlType != 'varchar' ? '' : ', "maxlength":' . $column->character_maximum_length)
+                            ),
                         )),
                         new Tag(array(
-                            'name' => '@Annotation\Options({"label": "' . $label . '"})',
+                            'name' => '@Annotation\Options({"label":"' . $label . '"})',
                         )),
                         new Tag(array(
                             'name' => '@Annotation\Filter({"name":"StringTrim"})',
                         )),
                     );
+                    if ($isNumeric) { // numeric field
+                        $tags[] = new Tag(array(
+                            'name' => '@Annotation\Validator({"name":"Digits"})',
+                        ));
+                    }
+                }
+                if ($isNumeric) {
+                    $defaultValue = ('int' == substr($sqlType, -3)) ? (int) $defaultValue : (float) $defaultValue;
                 }
                 $properties[] = PropertyGenerator::fromArray(array(
-                    'name'       => $columnName,
-                    'visibility' => 'protected',
-                    'docblock'   => DocBlockGenerator::fromArray(array(
+                    'name'         => $columnName,
+                    'visibility'   => 'protected',
+                    'defaultValue' => $defaultValue,
+                    'docblock'     => DocBlockGenerator::fromArray(array(
                         'shortDescription' => null,
                         'longDescription'  => null,
                         'tags'             => $tags,
