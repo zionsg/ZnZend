@@ -35,6 +35,7 @@ use ZnZend\Paginator\Adapter\DbSelect;
  *   - Row state (active, deleted, all) is taken into consideration when querying
  *   - markActive() and markDeleted() added for marking records
  *   - insert() and update() modified to filter out keys in user data that do not map to columns in table
+ *   - insert() returns last insert value instead of affected rows, as like ZF1
  *   - allows populating of records from non-database source
  */
 abstract class AbstractMapper extends AbstractTableGateway implements MapperInterface
@@ -328,12 +329,15 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     /**
      * Defined by AbstractTableGateway; Insert
      *
+     * This deviates from ZF2's returning of affected rows and returns the last insert value as like in ZF1.
+     *
      * @param  array $set
      * @return int
      */
     public function insert($set)
     {
-        return parent::insert($this->filterColumns($set));
+        $affectedRows = parent::insert($this->filterColumns($set));
+        return $this->getLastInsertValue();
     }
 
     /**
@@ -346,7 +350,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      *
      * @param  array $set
      * @param  string|array|closure|EntityInterface $where
-     * @return int
+     * @return int Affected rows
      */
     public function update($set, $where = null)
     {
@@ -365,7 +369,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * construct a where clause.
      *
      * @param  string|array|closure|EntityInterface $where
-     * @return int
+     * @return int Affected rows
      */
     public function delete($where)
     {
