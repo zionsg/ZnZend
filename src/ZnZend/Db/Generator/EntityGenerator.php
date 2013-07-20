@@ -112,7 +112,7 @@ class EntityGenerator
                 $columnName = $column->column_name;
                 $isPrimary  = ('PRI' == $column->column_key);
                 $isNumeric  = ($column->numeric_precision !== null);
-                $defaultValue = $column->column_default;
+                $defaultValue = ($isPrimary ? null : $column->column_default);
                 $sqlType    = $column->data_type;
                 $phpType    = self::getPhpType($sqlType);
                 $getterName = $columnToGetterFunc($tableName, $columnName);
