@@ -5,7 +5,8 @@ rendering forms in table format. As of Zend Framework 2.2.0, the `formRow` helpe
 partials, which removed the need for the custom form view helpers.
 
 This is an example of how ZF2's own `formRow` and `formCollection` view helpers can be used to
-render a form in table format. The form class used is ZnZend\Form\Form as the hasErrors() method is used.
+render a form in table format. The form class used is ZnZend\Form\Form which supports custom form-level
+error messages.
 
 ```php
 // Sample login form
