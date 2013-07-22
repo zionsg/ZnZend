@@ -73,8 +73,7 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 
 ## Form View Helpers
 * `znZendFormCaptchaQuestion` - Render captcha element using ZnZend\Captcha\Question adapter
-* `znZendFormRow` - Extension to FormRow view helper to allow rendering format to be customized
-* `znZendFormTable` - Render form as 2-column table
+* `znZendFormElementValue` - Render value of element without input for viewing only
 
 ## View Helpers
 * `znZendColumnizeEntities` - Output entities in columns
