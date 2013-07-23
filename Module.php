@@ -8,25 +8,30 @@
 
 namespace ZnZend;
 
-use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
-use Zend\Mvc\MvcEvent;
-
 class Module
 {
     /**
      * Set global/static db adapter for feature-enabled TableGateways such as ZnZend\Model\AbstractMapper
+     *
+     * Code below is for example only. It is up to the user to set it as the service manager key for the
+     * database adapter may be different.
      */
-    public function onBootstrap(MvcEvent $e)
-    {
-        $sm = $e->getApplication()->getServiceManager();
-        if ($sm->has('Zend\Db\Adapter\Adapter')) {
-            GlobalAdapterFeature::setStaticAdapter($sm->get('Zend\Db\Adapter\Adapter'));
-        }
-    }
+    // public function onBootstrap(\Zend\Mvc\MvcEvent $e)
+    // {
+        // $sm = $e->getApplication()->getServiceManager();
+        // if ($sm->has('Zend\Db\Adapter\Adapter')) {
+            // \Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter(
+                // $sm->get('Zend\Db\Adapter\Adapter')
+            // );
+        // }
+    // }
 
     public function getAutoloaderConfig()
     {
         return array(
+            'Zend\Loader\ClassMapAutoloader' => array(
+                __DIR__ . '/autoload_classmap.php',
+            ),
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
