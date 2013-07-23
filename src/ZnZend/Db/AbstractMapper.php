@@ -329,15 +329,12 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     /**
      * Defined by AbstractTableGateway; Insert
      *
-     * This deviates from ZF2's returning of affected rows and returns the last insert value as like in ZF1.
-     *
      * @param  array $set
      * @return int
      */
     public function insert($set)
     {
-        $affectedRows = parent::insert($this->filterColumns($set));
-        return $this->getLastInsertValue();
+        return parent::insert($this->filterColumns($set));
     }
 
     /**
