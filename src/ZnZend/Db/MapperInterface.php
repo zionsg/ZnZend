@@ -8,6 +8,7 @@
 
 namespace ZnZend\Db;
 
+use Zend\Form;
 use Zend\Paginator\Paginator;
 use ZnZend\Db\EntityInterface;
 
@@ -97,7 +98,7 @@ interface MapperInterface
     /**
      * Fetch all rows
      *
-     * @return Paginator
+     * @return null|Paginator
      */
     public function fetchAll();
 
@@ -105,7 +106,36 @@ interface MapperInterface
      * Find row by primary key
      *
      * @param  mixed $key The value for the primary key
-     * @return EntityInterface
+     * @return null|EntityInterface
      */
     public function find($key);
+
+    /**
+     * Insert
+     *
+     * @param  array $set
+     * @return int   No. of affected rows as in ZF2 (different from ZF1)
+     */
+    public function insert($set);
+
+    /**
+     * Get last insert value
+     *
+     * @return int
+     */
+    public function getLastInsertValue();
+
+    /**
+     * Update
+     *
+     * If an entity is passed in for $where, it is assumed that the
+     * update is for that entity. This is useful, eg. in the controller,
+     * where the user does not and should not know the column name or how to
+     * construct a where clause.
+     *
+     * @param  array $set
+     * @param  null|string|array|closure|EntityInterface $where
+     * @return int No. of affected rows
+     */
+    public function update($set, $where = null);
 }
