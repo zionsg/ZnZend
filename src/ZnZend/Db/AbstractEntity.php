@@ -69,23 +69,20 @@ abstract class AbstractEntity implements EntityInterface
      * the corresponding setter will be setX().
      *
      * @Annotation\Exclude()
-     * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
+     * @example array(
+     *              'getId' => 'person_id', // maps to property
+     *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)"), // maps to SQL expression
+     *              'isDeleted' => '!enabled', // simple negation is allowed
+     *          )
      * @var array
      */
     protected static $_mapGettersColumns = array(
         // The mappings below are for the getters defined in EntityInterface
         // and are provided for easy copying when coding extending classes
-        'getId'          => 'id',
-        'getName'        => 'name',
-        'getDescription' => 'description',
-        'getThumbnail'   => 'thumbnail',
-        'getPriority'    => 'priority',
-        'getCreated'     => 'created',
-        'getCreator'     => 'creator',
-        'getUpdated'     => 'updated',
-        'getUpdator'     => 'updator',
-        'isHidden'       => 'ishidden',
-        'isDeleted'      => 'isdeleted',
+        'getId'     => 'id',
+        'getName'   => 'name',
+        'isHidden'  => 'ishidden',
+        'isDeleted' => 'isdeleted',
     );
 
     /**
@@ -265,8 +262,14 @@ abstract class AbstractEntity implements EntityInterface
             }
         }
 
+        // Handle simple negation of property
+        $negate = false;
+        if ('!' == substr($property, 0, 1)) {
+            $negate = true;
+            $property = substr($property, 1);
+        }
         if (property_exists($this, $property)) {
-            return $this->$property;
+            return ($negate ? !$this->$property : $this->$property);
         }
 
         if (empty($trace)) {
@@ -380,169 +383,6 @@ abstract class AbstractEntity implements EntityInterface
      * @return AbstractEntity
      */
     public function setName($value)
-    {
-        return $this->set($value);
-    }
-
-    /**
-     * Defined by EntityInterface; Get description
-     *
-     * @return null|string
-     */
-    public function getDescription()
-    {
-        return $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set description
-     *
-     * @param  null|string $value
-     * @return AbstractEntity
-     */
-    public function setDescription($value)
-    {
-        return $this->set($value);
-    }
-
-    /**
-     * Defined by EntityInterface; Get filename of thumbnail image for entity
-     *
-     * @return null|string
-     */
-    public function getThumbnail()
-    {
-        return $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set filename of thumbnail image for entity
-     *
-     * @param  null|string $value
-     * @return AbstractEntity
-     */
-    public function setThumbnail($value)
-    {
-        return $this->set($value);
-    }
-
-    /**
-     * Defined by EntityInterface; Get priority
-     *
-     * When listing entities, smaller numbers typically come first.
-     *
-     * @return null|int
-     */
-    public function getPriority()
-    {
-        return $this->get();
-    }
-
-    /**
-     * Set priority
-     *
-     * When listing entities, smaller numbers typically come first.
-     *
-     * @param  null|int $value
-     * @return AbstractEntity
-     */
-    public function setPriority($value)
-    {
-        return $this->set($value, 'int');
-    }
-
-    /**
-     * Defined by EntityInterface; Get timestamp when entity was created
-     *
-     * @return null|DateTime
-     */
-    public function getCreated()
-    {
-        return $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set timestamp when entity was created
-     *
-     * Set to null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
-     *
-     * @param  null|string|DateTime $value String must be parsable by DateTime
-     * @return AbstractEntity
-     */
-    public function setCreated($value)
-    {
-        return $this->set($value, 'DateTime');
-    }
-
-    /**
-     * Defined by EntityInterface; Get user who created the entity
-     *
-     * A simple string can be returned (eg. userid) or preferrably, an object
-     * which implements EntityInterface.
-     *
-     * @return null|string|EntityInterface
-     */
-    public function getCreator()
-    {
-        return $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set user who created the entity
-     *
-     * @param  null|string|EntityInterface $value
-     * @return AbstractEntity
-     */
-    public function setCreator($value)
-    {
-        return $this->set($value);
-    }
-
-    /**
-     * Defined by EntityInterface; Get timestamp when entity was last updated
-     *
-     * Return null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
-     *
-     * @return null|DateTime
-     */
-    public function getUpdated()
-    {
-        return $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set timestamp when entity was last updated
-     *
-     * Set to null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
-     *
-     * @param  null|string|DateTime $value String must be parsable by DateTime
-     * @return AbstractEntity
-     */
-    public function setUpdated($value)
-    {
-        return $this->set($value, 'DateTime');
-    }
-
-    /**
-     * Defined by EntityInterface; Get user who last updated the entity
-     *
-     * A simple string can be returned (eg. userid) or preferrably, an object
-     * which implements EntityInterface.
-     *
-     * @return null|string|EntityInterface
-     */
-    public function getUpdator()
-    {
-        return $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set user who last updated the entity
-     *
-     * @param  null|string|EntityInterface $value
-     * @return AbstractEntity
-     */
-    public function setUpdator($value)
     {
         return $this->set($value);
     }
