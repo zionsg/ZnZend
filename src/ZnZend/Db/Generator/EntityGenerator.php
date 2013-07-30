@@ -104,7 +104,7 @@ class EntityGenerator
             );
 
             // Create getter and setters for each column and map them
-            $mapGettersColumns = array();
+            $mapGettersColumns = array('getId' => null, 'getName' => null, 'isHidden' => null, 'isDeleted' => null);
             $properties = array();
             $methods = array();
             $types = array();
