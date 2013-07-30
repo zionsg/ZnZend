@@ -14,10 +14,8 @@ use Zend\Stdlib\ArraySerializableInterface;
 /**
  * Interface for entities corresponding to rows in database tables
  *
- * Of all the methods, the most vital are getId(), getName(), isDeleted() and mapGetterColumns(),
- * with the first two used generally in logs and generic view scripts.
- * The other methods and interfaces are to facilitate generic treatment of entities
- * in a Content Management System.
+ * This facilitates generic treatment of entities in a Content Management System,
+ * logging and generic view scripts.
  */
 interface EntityInterface extends ArraySerializableInterface, ResourceInterface
 {
@@ -32,7 +30,14 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * the names of the getters used for each <td> column in the view script and update the Select
      * object accordingly, without having to know the actual column names.
      *
-     * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
+     * As the array may be flipped to get the reverse mappings, both key and value should be unique
+     * and must be strings.
+     *
+     * @example array(
+     *              'getId' => 'person_id', // maps to property
+     *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)"), // maps to SQL expression
+     *              'isDeleted' => '!enabled', // simple negation is allowed
+     *          )
      * @return  array
      */
     public static function mapGettersColumns();
@@ -108,132 +113,6 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * @return EntityInterface
      */
     public function setName($value);
-
-    /**
-     * Get description
-     *
-     * @return null|string
-     */
-    public function getDescription();
-
-    /**
-     * Set description
-     *
-     * @param  null|string $value
-     * @return EntityInterface
-     */
-    public function setDescription($value);
-
-    /**
-     * Get filename of thumbnail image for entity
-     *
-     * Typical thumbnail fits in a box of 160 x 160 pixels, usually used when
-     * listing entities. Can refer to the logo of an establishment.
-     *
-     * @return null|string
-     */
-    public function getThumbnail();
-
-    /**
-     * Set filename of thumbnail image for entity
-     *
-     * @param  null|string $value
-     * @return EntityInterface
-     */
-    public function setThumbnail($value);
-
-    /**
-     * Get priority
-     *
-     * When listing entities, smaller numbers typically come first.
-     *
-     * @return null|int
-     */
-    public function getPriority();
-
-    /**
-     * Set priority
-     *
-     * When listing entities, smaller numbers typically come first.
-     *
-     * @param  null|int $value
-     * @return EntityInterface
-     */
-    public function setPriority($value);
-
-    /**
-     * Get timestamp when entity was created
-     *
-     * Return null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
-     *
-     * @return null|DateTime
-     */
-    public function getCreated();
-
-    /**
-     * Set timestamp when entity was created
-     *
-     * Set to null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
-     *
-     * @param  null|string|DateTime $value String must be parsable by DateTime
-     * @return EntityInterface
-     */
-    public function setCreated($value);
-
-    /**
-     * Get user who created the entity
-     *
-     * A simple string can be returned (eg. userid) or preferrably, an object
-     * which implements EntityInterface.
-     *
-     * @return null|string|EntityInterface
-     */
-    public function getCreator();
-
-    /**
-     * Set user who created the entity
-     *
-     * @param  null|string|EntityInterface $value
-     * @return EntityInterface
-     */
-    public function setCreator($value);
-
-    /**
-     * Get timestamp when entity was last updated
-     *
-     * Return null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
-     *
-     * @return null|DateTime
-     */
-    public function getUpdated();
-
-    /**
-     * Set timestamp when entity was last updated
-     *
-     * Set to null if value is default DATETIME value of '0000-00-00 00:00:00' in SQL.
-     *
-     * @param  null|string|DateTime $value String must be parsable by DateTime
-     * @return EntityInterface
-     */
-    public function setUpdated($value);
-
-    /**
-     * Get user who last updated the entity
-     *
-     * A simple string can be returned (eg. userid) or preferrably, an object
-     * which implements EntityInterface.
-     *
-     * @return null|string|EntityInterface
-     */
-    public function getUpdator();
-
-    /**
-     * Set user who last updated the entity
-     *
-     * @param  null|string|EntityInterface $value
-     * @return EntityInterface
-     */
-    public function setUpdator($value);
 
     /**
      * Check whether entity is marked as hidden
