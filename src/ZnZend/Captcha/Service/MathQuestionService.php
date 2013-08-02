@@ -45,7 +45,7 @@ class MathQuestionService implements QuestionServiceInterface
     /**
      * Defined by QuestionServiceInterface; Generate new set of question and answer
      *
-     * @return MathQuestionService
+     * @return QuestionServiceInterface
      */
     public function generate()
     {

@@ -23,7 +23,7 @@ use ZnZend\Db\Exception;
  * Generate entity classes for tables in a database based on AbstractEntity
  *
  * This only generates the initial classes and does not do all the work for you.
- * The entity name, $_mapGettersColumns, getters and setters for each column are generated
+ * The entity name, $_mapGettersColumns, setters and getters for each column are generated
  * using simplistic naming rules. Eg: For a `useragent` column, the generated getter
  * will be named 'getUseragent()' and not 'getUserAgent()'.
  */
@@ -58,10 +58,10 @@ class EntityGenerator
      *
      * @param string   $filePath            Path to write generated files
      * @param string   $namespace           Namespace for entity and table gateway classes
-     * @param callable $columnToGetterFunc  Optional callback that takes in (string $tableName, string $columnName)
-     *                                      and returns getter name
      * @param callable $columnToSetterFunc  Optional callback that takes in (string $tableName, string $columnName)
      *                                      and returns setter name
+     * @param callable $columnToGetterFunc  Optional callback that takes in (string $tableName, string $columnName)
+     *                                      and returns getter name
      * @param DocBlockGenerator $fileDocBlock Optional docblock for all files
      * @throws Exception\InvalidArgumentException When path is not writable
      * @return void
@@ -70,18 +70,18 @@ class EntityGenerator
         $filePath,
         \Zend\Db\Adapter\Adapter $dbAdapter,
         $namespace,
-        $columnToGetterFunc = null,
         $columnToSetterFunc = null,
+        $columnToGetterFunc = null,
         DocBlockGenerator $fileDocBlock = null
     ) {
         if (!is_writable($filePath)) {
             throw new Exception\InvalidArgumentException("{$filePath} is not writable");
         }
-        if (!is_callable($columnToGetterFunc)) {
-            $columnToGetterFunc = self::columnToGetterFunc();
-        }
         if (!is_callable($columnToSetterFunc)) {
             $columnToSetterFunc = self::columnToSetterFunc();
+        }
+        if (!is_callable($columnToGetterFunc)) {
+            $columnToGetterFunc = self::columnToGetterFunc();
         }
 
         // Iterate thru tables
@@ -115,8 +115,8 @@ class EntityGenerator
                 $defaultValue = ($isPrimary ? null : $column->column_default);
                 $sqlType    = $column->data_type;
                 $phpType    = self::getPhpType($sqlType);
-                $getterName = $columnToGetterFunc($tableName, $columnName);
                 $setterName = $columnToSetterFunc($tableName, $columnName);
+                $getterName = $columnToGetterFunc($tableName, $columnName);
                 $label = substr(
                     $getterName ?: $setterName,
                     strcspn($getterName ?: $setterName, 'ABCDEFGHJIJKLMNOPQRSTUVWXYZ')
@@ -172,25 +172,6 @@ class EntityGenerator
                     )),
                 ));
 
-                if ($getterName) {
-                    $mapGettersColumns[$getterName] = $columnName;
-
-                    $desc = 'Get ' . lcfirst($label);
-                    $methods[] = MethodGenerator::fromArray(array(
-                        'name'       => $getterName,
-                        'body'       => 'return $this->get();',
-                        'docblock'   => DocBlockGenerator::fromArray(array(
-                            'shortDescription' => $desc,
-                            'longDescription'  => null,
-                            'tags'             => array(
-                                new ReturnTag(array(
-                                    'datatype'  => self::getPhpType($sqlType),
-                                )),
-                            ),
-                        )),
-                    ));
-                }
-
                 if ($setterName) {
                     $desc = 'Set ' . lcfirst($label);
                     $methods[] = MethodGenerator::fromArray(array(
@@ -211,6 +192,25 @@ class EntityGenerator
                                 )),
                                 new ReturnTag(array(
                                     'datatype'  => $entityName,
+                                )),
+                            ),
+                        )),
+                    ));
+                }
+
+                if ($getterName) {
+                    $mapGettersColumns[$getterName] = $columnName;
+
+                    $desc = 'Get ' . lcfirst($label);
+                    $methods[] = MethodGenerator::fromArray(array(
+                        'name'       => $getterName,
+                        'body'       => 'return $this->get();',
+                        'docblock'   => DocBlockGenerator::fromArray(array(
+                            'shortDescription' => $desc,
+                            'longDescription'  => null,
+                            'tags'             => array(
+                                new ReturnTag(array(
+                                    'datatype'  => self::getPhpType($sqlType),
                                 )),
                             ),
                         )),
@@ -334,27 +334,6 @@ class EntityGenerator
     }
 
     /**
-     * Get default callback for generating getter name from column name
-     *
-     * 'name' and 'person_name' becomes 'getName'
-     * 'isdeleted' and 'person_isdeleted' becomes 'isDeleted'
-     *
-     * @return callable
-     */
-    protected static function columnToGetterFunc()
-    {
-        return function ($tableName, $columnName) {
-            $pattern = '/^.*[^a-zA-Z0-9]+(.+)$/';
-            $matches = array();
-            $normalizedName = (preg_match($pattern, $columnName, $matches) ? $matches[1] : $columnName);
-            if (0 === stripos($normalizedName, 'is')) {
-                return 'is' . ucfirst(substr($normalizedName, 2));
-            }
-            return 'get' . ucfirst($normalizedName);
-        };
-    }
-
-    /**
      * Get default callback for generating setter name from column name
      *
      * 'name' and 'person_name' becomes 'setName'
@@ -372,6 +351,27 @@ class EntityGenerator
                 return 'set' . ucfirst(substr($normalizedName, 2));
             }
             return 'set' . ucfirst($normalizedName);
+        };
+    }
+
+    /**
+     * Get default callback for generating getter name from column name
+     *
+     * 'name' and 'person_name' becomes 'getName'
+     * 'isdeleted' and 'person_isdeleted' becomes 'isDeleted'
+     *
+     * @return callable
+     */
+    protected static function columnToGetterFunc()
+    {
+        return function ($tableName, $columnName) {
+            $pattern = '/^.*[^a-zA-Z0-9]+(.+)$/';
+            $matches = array();
+            $normalizedName = (preg_match($pattern, $columnName, $matches) ? $matches[1] : $columnName);
+            if (0 === stripos($normalizedName, 'is')) {
+                return 'is' . ucfirst(substr($normalizedName, 2));
+            }
+            return 'get' . ucfirst($normalizedName);
         };
     }
 

@@ -53,14 +53,6 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function __toString();
 
     /**
-     * Get singular noun for entity (lowercase)
-     *
-     * @example 'person'
-     * @return  string
-     */
-    public function getSingularNoun();
-
-    /**
      * Set singular noun for entity (lowercase)
      *
      * @param  string $value
@@ -69,12 +61,12 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function setSingularNoun($value);
 
     /**
-     * Get plural noun for entity (lowercase)
+     * Get singular noun for entity (lowercase)
      *
-     * @example 'people'
+     * @example 'person'
      * @return  string
      */
-    public function getPluralNoun();
+    public function getSingularNoun();
 
     /**
      * Set plural noun for entity (lowercase)
@@ -85,11 +77,12 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function setPluralNoun($value);
 
     /**
-     * Get record id
+     * Get plural noun for entity (lowercase)
      *
-     * @return null|int
+     * @example 'people'
+     * @return  string
      */
-    public function getId();
+    public function getPluralNoun();
 
     /**
      * Set record id
@@ -100,11 +93,11 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function setId($value);
 
     /**
-     * Get name
+     * Get record id
      *
-     * @return null|string
+     * @return null|int
      */
-    public function getName();
+    public function getId();
 
     /**
      * Set name
@@ -115,6 +108,21 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function setName($value);
 
     /**
+     * Get name
+     *
+     * @return null|string
+     */
+    public function getName();
+
+    /**
+     * Set hidden status of entity
+     *
+     * @param  mixed $value Value is not cast to boolean to reflect actual value in database
+     * @return EntityInterface
+     */
+    public function setHidden($value);
+
+    /**
      * Check whether entity is marked as hidden
      *
      * @return bool
@@ -122,12 +130,12 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function isHidden();
 
     /**
-     * Set hidden status of entity
+     * Set deleted status of entity
      *
-     * @param  bool $value
+     * @param  mixed $value Value is not cast to boolean to reflect actual value in database
      * @return EntityInterface
      */
-    public function setHidden($value);
+    public function setDeleted($value);
 
     /**
      * Check whether entity is marked as deleted
@@ -138,12 +146,4 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * @return bool
      */
     public function isDeleted();
-
-    /**
-     * Set deleted status of entity
-     *
-     * @param  bool $value
-     * @return EntityInterface
-     */
-    public function setDeleted($value);
 }

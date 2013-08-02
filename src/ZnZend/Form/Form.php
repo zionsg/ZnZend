@@ -106,31 +106,20 @@ class Form extends ZendForm implements ResourceInterface
     }
 
     /**
-     * Retrieve stored param
+     * Add params
      *
-     * Not named get() due to FieldSet::get()
+     * If a key exists, the new value will override the existing value.
      *
-     * @param  string $name    Name of param to retrieve
-     * @param  mixed  $default Optional default value if param does not exist
-     * @return null|mixed
+     * @param  array $params Key-value pairs
+     * @return Form
      */
-    public function getParam($name, $default = null)
+    public function addParams(array $params = array())
     {
-        if (array_key_exists($name, $this->params)) {
-            return $this->params[$name];
-        }
-
-        return $default;
-    }
-
-    /**
-     * Retrieve all stored params
-     *
-     * @return array
-     */
-    public function getParams()
-    {
-        return $this->params;
+        $this->params = array_merge(
+            $this->params,
+            $params
+        );
+        return $this;
     }
 
     /**
@@ -149,45 +138,43 @@ class Form extends ZendForm implements ResourceInterface
     }
 
     /**
-     * Add params
+     * Retrieve all stored params
      *
-     * If a key exists, the new value will override the existing value.
-     *
-     * @param  array $params Key-value pairs
-     * @return Form
+     * @return array
      */
-    public function addParams(array $params = array())
+    public function getParams()
     {
-        $this->params = array_merge(
-            $this->params,
-            $params
-        );
-        return $this;
+        return $this->params;
     }
 
     /**
-     * Checks if the form has errors
+     * Retrieve stored param
      *
-     * @return bool
+     * Not named get() due to FieldSet::get()
+     *
+     * @param  string $name    Name of param to retrieve
+     * @param  mixed  $default Optional default value if param does not exist
+     * @return null|mixed
      */
-    public function hasErrors()
+    public function getParam($name, $default = null)
     {
-        if ($this->hasValidated) {
-            return $this->isValid;
+        if (array_key_exists($name, $this->params)) {
+            return $this->params[$name];
         }
-        return (!empty($this->errorMessages));
+
+        return $default;
     }
 
     /**
-     * Add a custom error message to return in the event of failed validation
+     * Same as addErrorMessages(), but clears custom error message stack first
      *
-     * @param  string $message
+     * @param  array $messages
      * @return Form
      */
-    public function addErrorMessage($message)
+    public function setErrorMessages(array $messages)
     {
-        $this->errorMessages[] = (string) $message;
-        return $this;
+        $this->clearErrorMessages();
+        return $this->addErrorMessages($messages);
     }
 
     /**
@@ -205,15 +192,15 @@ class Form extends ZendForm implements ResourceInterface
     }
 
     /**
-     * Same as addErrorMessages(), but clears custom error message stack first
+     * Add a custom error message to return in the event of failed validation
      *
-     * @param  array $messages
+     * @param  string $message
      * @return Form
      */
-    public function setErrorMessages(array $messages)
+    public function addErrorMessage($message)
     {
-        $this->clearErrorMessages();
-        return $this->addErrorMessages($messages);
+        $this->errorMessages[] = (string) $message;
+        return $this;
     }
 
     /**
@@ -235,6 +222,19 @@ class Form extends ZendForm implements ResourceInterface
     {
         $this->errorMessages = array();
         return $this;
+    }
+
+    /**
+     * Checks if the form has errors
+     *
+     * @return bool
+     */
+    public function hasErrors()
+    {
+        if ($this->hasValidated) {
+            return $this->isValid;
+        }
+        return (!empty($this->errorMessages));
     }
 
     /**

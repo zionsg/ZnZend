@@ -62,14 +62,16 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 * `ZnZend\Permissions\Acl\Acl` - Modified addResource() to add a resource and its parents recursively
 * `ZnZend\Permissions\Acl\Privilege` - A standardized set of constants for Acl privileges
 
+## Captcha
+* `ZnZend\Captcha\Question` - Captcha adapter for custom questions and answers
+* `ZnZend\Captcha\Service\QuestionServiceInterface` - An interface for services providing questions for captcha
+* `ZnZend\Captcha\Service\MathQuestionService` - A service which provides simple arithmetic questions for captcha
+
 ## Controller Plugins
 * `znZendDataTable` - Update Paginator (DbSelect) with params sent from jQuery DataTables plugin
 * `znZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `znZendPageStore` - Persist data for current page across reloads of the same page
 * `znZendTimestamp` - Return timestamp formatted to standard length and converted to base 36
-
-## Captcha Adapters
-* `ZnZend\Captcha\Question` - Captcha adapter for custom questions and answers
 
 ## Form View Helpers
 * `znZendFormCaptchaQuestion` - Render captcha element using ZnZend\Captcha\Question adapter

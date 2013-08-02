@@ -430,7 +430,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * Defined by MapperInterface; Populate mapper with records from non-database source
      *
      * @param  array $records
-     * @return AbstractMapper
+     * @return MapperInterface
      */
     public function setRecords($records)
     {
@@ -476,7 +476,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      *
      * @param  string $rowState Options: AbstractMapper::ACTIVE_ROWS, AbstractMapper::DELETED_ROWS,
      *                          AbstractMapper::ALL_ROWS
-     * @return AbstractMapper For fluent interface
+     * @return MapperInterface
      */
     public function setRowState($rowState)
     {

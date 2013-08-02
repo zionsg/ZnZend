@@ -35,11 +35,11 @@ use ZnZend\Db\Exception;
 abstract class AbstractEntity implements EntityInterface
 {
     /**
-     * NOTE: 5 things to do for each entity property: protected, Annotation, getter, setter, $_mapGettersColumns
+     * NOTE: 5 things to do for each entity property: protected, Annotation, setter, getter, $_mapGettersColumns
      *
-     * $id is for example only, and fulfils the 5 things above - getter is getId() and setter is setId().
-     * Internal variables should be prefixed with an underscore, eg. $_mapGettersColumns, to differentiate
-     * between them and entity properties.
+     * $id is for example only, and fulfils the 5 things above - setter is setId() and getter is getId().
+     * Internal variables should be prefixed with an underscore and Annotation\Exclude(),
+     * eg. $_mapGettersColumns, to differentiate between them and entity properties.
      *
      * @Annotation\Exclude()
      * @var int
@@ -52,7 +52,7 @@ abstract class AbstractEntity implements EntityInterface
      * @Annotation\Exclude()
      * @var string
      */
-    protected $singularNoun = 'entity';
+    protected $_singularNoun = 'entity';
 
     /**
      * Plural noun for entity - to be set by extending classes
@@ -60,7 +60,7 @@ abstract class AbstractEntity implements EntityInterface
      * @Annotation\Exclude()
      * @var string
      */
-    protected $pluralNoun = 'entities';
+    protected $_pluralNoun = 'entities';
 
     /**
      * Array mapping getters to columns - to be set by extending class
@@ -106,52 +106,6 @@ abstract class AbstractEntity implements EntityInterface
     public function __toString()
     {
         return $this->getName();
-    }
-
-    /**
-     * Defined by EntityInterface; Get singular noun for entity (lowercase)
-     *
-     * @example 'person'
-     * @return  string
-     */
-    public function getSingularNoun()
-    {
-        return $this->singularNoun;
-    }
-
-    /**
-     * Defined by EntityInterface; Set singular noun for entity (lowercase)
-     *
-     * @param  string $value
-     * @return AbstractEntity
-     */
-    public function setSingularNoun($value)
-    {
-        $this->singularNoun = strtolower($value);
-        return $this;
-    }
-
-    /**
-     * Defined by EntityInterface; Get plural noun for entity (lowercase)
-     *
-     * @example 'people'
-     * @return  string
-     */
-    public function getPluralNoun()
-    {
-        return $this->pluralNoun;
-    }
-
-    /**
-     * Defined by EntityInterface; Set plural noun for entity (lowercase)
-     *
-     * @param  string $value
-     * @return AbstractEntity
-     */
-    public function setPluralNoun($value)
-    {
-        $this->pluralNoun = strtolower($value);
-        return $this;
     }
 
     /**
@@ -242,52 +196,138 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Generic internal getter for entity properties
+     * Defined by EntityInterface; Set singular noun for entity (lowercase)
      *
-     * @param  null|string $property Optional property to retrieve. If not specified,
-     *                               $_mapGettersColumns is checked for the name of the calling
-     *                               function to get the mapped property.
-     * @param  null|mixed  $default  Optional default value if key or property does not exist
-     * @return mixed
-     * @internal E_USER_NOTICE is triggered if property does not exist
+     * @param  string $value
+     * @return EntityInterface
      */
-    protected function get($property = null, $default = null)
+    public function setSingularNoun($value)
     {
-        if (null === $property) {
-            $trace = debug_backtrace();
-            $callerFunction = $trace[1]['function'];
-            $map = static::$_mapGettersColumns;
-            if (array_key_exists($callerFunction, $map)) {
-                $property = $map[$callerFunction];
-            }
-        }
+        $this->_singularNoun = strtolower($value);
+        return $this;
+    }
 
-        // Handle simple negation of property
-        $negate = false;
-        if ('!' == substr($property, 0, 1)) {
-            $negate = true;
-            $property = substr($property, 1);
-        }
-        if (property_exists($this, $property)) {
-            return ($negate ? !$this->$property : $this->$property);
-        }
+    /**
+     * Defined by EntityInterface; Get singular noun for entity (lowercase)
+     *
+     * @example 'person'
+     * @return  string
+     */
+    public function getSingularNoun()
+    {
+        return $this->_singularNoun;
+    }
 
-        if (empty($trace)) {
-            $trace = debug_backtrace();
-        }
-        trigger_error(
-            sprintf(
-                'Undefined property "%s" via %s::%s() in %s on line %s',
-                $property,
-                get_class($trace[1]['object']),
-                $trace[1]['function'],
-                $trace[1]['file'],
-                $trace[1]['line']
-            ),
-            E_USER_NOTICE
-        );
+    /**
+     * Defined by EntityInterface; Set plural noun for entity (lowercase)
+     *
+     * @param  string $value
+     * @return EntityInterface
+     */
+    public function setPluralNoun($value)
+    {
+        $this->_pluralNoun = strtolower($value);
+        return $this;
+    }
 
-        return $default;
+    /**
+     * Defined by EntityInterface; Get plural noun for entity (lowercase)
+     *
+     * @example 'people'
+     * @return  string
+     */
+    public function getPluralNoun()
+    {
+        return $this->_pluralNoun;
+    }
+
+    /**
+     * Defined by EntityInterface; Set record id
+     *
+     * @param  null|int $value
+     * @return EntityInterface
+     */
+    public function setId($value)
+    {
+        // Alternative: $this->set($value, 'int', 'id') where 'id' is the column name
+        return $this->set($value, 'int');
+    }
+
+    /**
+     * Defined by EntityInterface; Get record id
+     *
+     * @return null|int
+     */
+    public function getId()
+    {
+        // Alternative: $this->get('id') where 'id' is the column name
+        return $this->get();
+    }
+
+    /**
+     * Defined by EntityInterface; Set name
+     *
+     * @param  null|string $value
+     * @return EntityInterface
+     */
+    public function setName($value)
+    {
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Get name
+     *
+     * @return null|string
+     */
+    public function getName()
+    {
+        return $this->get();
+    }
+
+    /**
+     * Defined by EntityInterface; Set hidden status of entity
+     *
+     * @param  mixed $value Value is not cast to boolean to reflect actual value in database
+     * @return EntityInterface
+     */
+    public function setHidden($value)
+    {
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Check whether entity is marked as hidden
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return (bool) $this->get();
+    }
+
+    /**
+     * Defined by EntityInterface; Set deleted status of entity
+     *
+     * @param  mixed $value Value is not cast to boolean to reflect actual value in database
+     * @return EntityInterface
+     */
+    public function setDeleted($value)
+    {
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Check whether entity is marked as deleted
+     *
+     * Ideally, no records should ever be deleted from the database and
+     * should have a field to mark it as deleted instead.
+     *
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return (bool) $this->get();
     }
 
     /**
@@ -344,91 +384,51 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Defined by EntityInterface; Get record id
+     * Generic internal getter for entity properties
      *
-     * @return null|int
+     * @param  null|string $property Optional property to retrieve. If not specified,
+     *                               $_mapGettersColumns is checked for the name of the calling
+     *                               function to get the mapped property.
+     * @param  null|mixed  $default  Optional default value if key or property does not exist
+     * @return mixed
+     * @internal E_USER_NOTICE is triggered if property does not exist
      */
-    public function getId()
+    protected function get($property = null, $default = null)
     {
-        // Alternative: $this->get('id') where 'id' is the column name
-        return $this->get();
-    }
+        if (null === $property) {
+            $trace = debug_backtrace();
+            $callerFunction = $trace[1]['function'];
+            $map = static::$_mapGettersColumns;
+            if (array_key_exists($callerFunction, $map)) {
+                $property = $map[$callerFunction];
+            }
+        }
 
-    /**
-     * Defined by EntityInterface; Set record id
-     *
-     * @param  null|int $value
-     * @return AbstractEntity
-     */
-    public function setId($value)
-    {
-        // Alternative: $this->set($value, 'int', 'id') where 'id' is the column name
-        return $this->set($value, 'int');
-    }
+        // Handle simple negation of property
+        $negate = false;
+        if ('!' == substr($property, 0, 1)) {
+            $negate = true;
+            $property = substr($property, 1);
+        }
+        if (property_exists($this, $property)) {
+            return ($negate ? !$this->$property : $this->$property);
+        }
 
-    /**
-     * Defined by EntityInterface; Get name
-     *
-     * @return null|string
-     */
-    public function getName()
-    {
-        return $this->get();
-    }
+        if (empty($trace)) {
+            $trace = debug_backtrace();
+        }
+        trigger_error(
+            sprintf(
+                'Undefined property "%s" via %s::%s() in %s on line %s',
+                $property,
+                get_class($trace[1]['object']),
+                $trace[1]['function'],
+                $trace[1]['file'],
+                $trace[1]['line']
+            ),
+            E_USER_NOTICE
+        );
 
-    /**
-     * Defined by EntityInterface; Set name
-     *
-     * @param  null|string $value
-     * @return AbstractEntity
-     */
-    public function setName($value)
-    {
-        return $this->set($value);
-    }
-
-    /**
-     * Defined by EntityInterface; Check whether entity is marked as hidden
-     *
-     * @return bool
-     */
-    public function isHidden()
-    {
-        return (bool) $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set hidden status of entity
-     *
-     * @param  bool $value
-     * @return AbstractEntity
-     */
-    public function setHidden($value)
-    {
-        return $this->set($value, 'bool');
-    }
-
-    /**
-     * Defined by EntityInterface; Check whether entity is marked as deleted
-     *
-     * Ideally, no records should ever be deleted from the database and
-     * should have a field to mark it as deleted instead.
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return (bool) $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set deleted status of entity
-     *
-     * @param  bool $value
-     * @return AbstractEntity
-     */
-    public function setDeleted($value)
-    {
-        return $this->set($value, 'bool');
+        return $default;
     }
 }
