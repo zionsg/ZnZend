@@ -267,7 +267,7 @@ class EntityGenerator
             array_unshift(
                 $properties,
                 PropertyGenerator::fromArray(array(
-                    'name'         => 'singularNoun',
+                    'name'         => '_singularNoun',
                     'visibility'   => 'protected',
                     'defaultValue' => strtolower($entityName),
                     'docblock'     => DocBlockGenerator::fromArray(array(
@@ -285,7 +285,7 @@ class EntityGenerator
                     ))
                 )),
                 PropertyGenerator::fromArray(array(
-                    'name'         => 'pluralNoun',
+                    'name'         => '_pluralNoun',
                     'visibility'   => 'protected',
                     'defaultValue' => strtolower($entityName) . 's',
                     'docblock'     => DocBlockGenerator::fromArray(array(
