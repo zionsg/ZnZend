@@ -9,6 +9,8 @@ return array(
     'ZnZend\Captcha\Exception\InvalidArgumentException'               => __DIR__ . '/src/ZnZend/Captcha/Exception/InvalidArgumentException.php',
     'ZnZend\Captcha\Exception\NoFontProvidedException'                => __DIR__ . '/src/ZnZend/Captcha/Exception/NoFontProvidedException.php',
     'ZnZend\Captcha\Exception\RuntimeException'                       => __DIR__ . '/src/ZnZend/Captcha/Exception/RuntimeException.php',
+    'ZnZend\Captcha\Service\QuestionServiceInterface'                 => __DIR__ . '/src/ZnZend/Captcha/Service/QuestionServiceInterface.php',
+    'ZnZend\Captcha\Service\MathQuestionService'                      => __DIR__ . '/src/ZnZend/Captcha/Service/MathQuestionService.php',
     'ZnZend\Db\AbstractEntity'                                        => __DIR__ . '/src/ZnZend/Db/AbstractEntity.php',
     'ZnZend\Db\AbstractMapper'                                        => __DIR__ . '/src/ZnZend/Db/AbstractMapper.php',
     'ZnZend\Db\EntityInterface'                                       => __DIR__ . '/src/ZnZend/Db/EntityInterface.php',
