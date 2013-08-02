@@ -13,6 +13,9 @@ use Zend\Form\View\Helper\Captcha\AbstractWord;
 use ZnZend\Captcha\Question as CaptchaAdapter;
 use ZnZend\Form\Exception;
 
+/**
+ * Helper for ZnZend\Captcha\Question adapter
+ */
 class Question extends AbstractWord
 {
     /**
@@ -36,7 +39,7 @@ class Question extends AbstractWord
         $captcha->generate();
 
         $imgAttributes = array(
-            'src' => $captcha->getInlineImage(),
+            'src' => $captcha->getImage(),
         );
 
         if ($element->hasAttribute('id')) {
