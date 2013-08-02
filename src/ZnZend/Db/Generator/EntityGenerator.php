@@ -158,7 +158,7 @@ class EntityGenerator
                         ));
                     }
                 }
-                if ($isNumeric) {
+                if ($isNumeric && !$isPrimary) {
                     $defaultValue = ('int' == substr($sqlType, -3)) ? (int) $defaultValue : (float) $defaultValue;
                 }
                 $properties[] = PropertyGenerator::fromArray(array(

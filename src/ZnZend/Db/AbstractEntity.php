@@ -41,6 +41,9 @@ abstract class AbstractEntity implements EntityInterface
      * Internal variables should be prefixed with an underscore and Annotation\Exclude(),
      * eg. $_mapGettersColumns, to differentiate between them and entity properties.
      *
+     * The primary key column is usually set to null with Annotation\Exclude() as the value is generated
+     * by the database.
+     *
      * @Annotation\Exclude()
      * @var int
      */
