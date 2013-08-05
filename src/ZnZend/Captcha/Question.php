@@ -81,6 +81,8 @@ class Question extends AbstractWord
      *
      * @param  array|\Traversable $options
      * @throws Exception\ExtensionNotLoadedException
+     * @throws Exception\NoFontProvidedException
+     * @throws Exception\NoServiceProvidedException
      */
     public function __construct($options = null)
     {
@@ -98,6 +100,10 @@ class Question extends AbstractWord
 
         if (!isset($options['font']) || !file_exists($options['font'])) {
             throw new Exception\NoFontProvidedException('Question CAPTCHA requires font');
+        }
+
+        if (!isset($options['service'])) {
+            throw new Exception\NoServiceProvidedException('Question CAPTCHA requires service to generate questions');
         }
 
         parent::__construct($options);
