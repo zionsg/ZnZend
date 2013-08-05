@@ -63,6 +63,8 @@ class MathQuestionService implements QuestionServiceInterface
 
         $this->question = $question;
         $this->answer = $answer;
+
+        return $this;
     }
 
     /**
@@ -76,14 +78,13 @@ class MathQuestionService implements QuestionServiceInterface
     }
 
     /**
-     * Defined by QuestionServiceInterface; Verify user input with current answer
+     * Defined by QuestionServiceInterface; Get answer to current question
      *
-     * @param  mixed $value
-     * @return bool
+     * @return string
      */
-    public function verify($value)
+    public function getAnswer()
     {
-        return ($value == $this->answer);
+        return $this->answer;
     }
 
     protected function separateThousands($num)
