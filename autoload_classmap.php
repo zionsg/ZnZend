@@ -44,7 +44,6 @@ return array(
     'ZnZend\View\Exception\InvalidArgumentException'                  => __DIR__ . '/src/ZnZend/View/Exception/InvalidArgumentException.php',
     'ZnZend\View\Helper\ZnZendColumnizeEntities'                      => __DIR__ . '/src/ZnZend/View/Helper/ZnZendColumnizeEntities.php',
     'ZnZend\View\Helper\ZnZendExcerpt'                                => __DIR__ . '/src/ZnZend/View/Helper/ZnZendExcerpt.php',
-    'ZnZend\View\Helper\ZnZendFlashMessages'                          => __DIR__ . '/src/ZnZend/View/Helper/ZnZendFlashMessages.php',
     'ZnZend\View\Helper\ZnZendFormatBytes'                            => __DIR__ . '/src/ZnZend/View/Helper/ZnZendFormatBytes.php',
     'ZnZend\View\Helper\ZnZendFormatDateRange'                        => __DIR__ . '/src/ZnZend/View/Helper/ZnZendFormatDateRange.php',
     'ZnZend\View\Helper\ZnZendFormatTimeRange'                        => __DIR__ . '/src/ZnZend/View/Helper/ZnZendFormatTimeRange.php',
