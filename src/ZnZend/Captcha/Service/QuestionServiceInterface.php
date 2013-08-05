@@ -28,13 +28,9 @@ interface QuestionServiceInterface
     public function getQuestion();
 
     /**
-     * Verify user input with current answer
+     * Get answer to current question
      *
-     * This is preferred over a getAnswer() method as the developer would not
-     * need to know the implementation details in order to compare the answers.
-     *
-     * @param  mixed $value
-     * @return bool
+     * @return string
      */
-    public function verify($value);
+    public function getAnswer();
 }
