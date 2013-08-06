@@ -49,6 +49,13 @@ class Question extends AbstractWord
     protected $answer;
 
     /**
+     * Inline image generated for question
+     *
+     * @var string
+     */
+    protected $image;
+
+    /**
      * Fully qualified path to image font file - must be set
      *
      * @var string
@@ -138,7 +145,6 @@ class Question extends AbstractWord
 
         $this->setQuestion($service->getQuestion());
         $this->setAnswer($service->getAnswer());
-        $this->setImage($this->generateImage());
 
         return $id;
     }
@@ -217,9 +223,7 @@ class Question extends AbstractWord
      */
     protected function setImage($image)
     {
-        $session        = $this->getSession();
-        $session->image = $image;
-        $this->image    = $image;
+        $this->image = $image;
         return $this;
     }
 
@@ -231,8 +235,7 @@ class Question extends AbstractWord
     public function getImage()
     {
         if (empty($this->image)) {
-            $session     = $this->getSession();
-            $this->image = $session->image;
+            $this->image = $this->generateImage();
         }
         return $this->image;
     }
