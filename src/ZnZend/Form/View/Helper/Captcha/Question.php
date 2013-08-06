@@ -21,6 +21,14 @@ class Question extends AbstractWord
     /**
      * Render the captcha
      *
+     * Allows setting of captcha position and separator via element options
+     * as there is no other way to set it when using the formRow view helper.
+     * Eg: echo $this->formRow()->render(
+     *         $form->get('captcha')->setOptions(array(
+     *             'captchaPosition' => 'append', // append input to captcha
+     *             'separator' => '<br>',
+     *     )));
+     *
      * @param  ElementInterface          $element
      * @throws Exception\DomainException
      * @return string
@@ -53,8 +61,8 @@ class Question extends AbstractWord
             $closingBracket
         );
 
-        $position     = $this->getCaptchaPosition();
-        $separator    = $this->getSeparator();
+        $position     = $element->getOption('captchaPosition') ?: $this->getCaptchaPosition();
+        $separator    = $element->getOption('separator') ?: $this->getSeparator();
         $captchaInput = $this->renderCaptchaInputs($element);
 
         $pattern = '%s%s%s';
