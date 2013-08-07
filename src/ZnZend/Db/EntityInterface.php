@@ -53,6 +53,19 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public static function mapGettersColumns();
 
     /**
+     * Get name of getter mapped to property
+     *
+     * Scenario: Property name of credit card number retrieved from $element->getName() in form,
+     * but user only has permission to view part of the number. The form view helper has no way
+     * of knowing how to return the value. The getter allows a boolean flag to mask or unmask
+     * the value but the getter name is not known, hence this function.
+     *
+     * @param  string $property Name of property
+     * @return null|string Return null if getter not found
+     */
+    public function getPropertyGetter($property);
+
+    /**
      * Get resource id for entity property
      *
      * If the name of the property is unknown, it may be retrieved indirectly via
@@ -62,18 +75,6 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * @return null|string Return null if property does not exist
      */
     public function getPropertyResourceId($property);
-
-    /**
-     * Get resource id for entity property using getter to identify property
-     *
-     * This allows a view script to get the specific resource id for the property
-     * without having to know the actual property name, which is likely to be named
-     * after the database column.
-     *
-     * @param  string $propertyGetter Name of getter used to retrieve property
-     * @return null|string Return null if property does not exist
-     */
-    public function getPropertyResourceIdFromGetter($propertyGetter);
 
     /**
      * Set singular noun for entity (lowercase)
