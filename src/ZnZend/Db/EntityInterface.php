@@ -55,6 +55,17 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     /**
      * Get resource id for entity property
      *
+     * If the name of the property is unknown, it may be retrieved indirectly via
+     * $element->getName() provided the form fields are named after the properties.
+     *
+     * @param  string $property Name of property
+     * @return null|string Return null if property does not exist
+     */
+    public function getPropertyResourceId($property);
+
+    /**
+     * Get resource id for entity property using getter to identify property
+     *
      * This allows a view script to get the specific resource id for the property
      * without having to know the actual property name, which is likely to be named
      * after the database column.
@@ -62,7 +73,7 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * @param  string $propertyGetter Name of getter used to retrieve property
      * @return null|string Return null if property does not exist
      */
-    public function getPropertyResourceId($propertyGetter);
+    public function getPropertyResourceIdFromGetter($propertyGetter);
 
     /**
      * Set singular noun for entity (lowercase)
