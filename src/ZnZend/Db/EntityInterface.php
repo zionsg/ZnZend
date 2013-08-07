@@ -20,6 +20,16 @@ use Zend\Stdlib\ArraySerializableInterface;
 interface EntityInterface extends ArraySerializableInterface, ResourceInterface
 {
     /**
+     * Value when entity is treated as a string
+     *
+     * This is vital if a getter such as getUpdator() returns an EntityInterface (instead of string)
+     * and it is used in log text or in a view script. Should default to getName().
+     *
+     * @return string
+     */
+    public function __toString();
+
+    /**
      * Map getters to column names in table
      *
      * Getters are preferred over public properties as the latter would likely be named
@@ -43,14 +53,16 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public static function mapGettersColumns();
 
     /**
-     * Value when entity is treated as a string
+     * Get resource id for entity property
      *
-     * This is vital if a getter such as getCreator() returns an EntityInterface (instead of string)
-     * and it is used in log text or in a view script. Should default to getName().
+     * This allows a view script to get the specific resource id for the property
+     * without having to know the actual property name, which is likely to be named
+     * after the database column.
      *
-     * @return string
+     * @param  string $propertyGetter Name of getter used to retrieve property
+     * @return null|string Return null if property does not exist
      */
-    public function __toString();
+    public function getPropertyResourceId($propertyGetter);
 
     /**
      * Set singular noun for entity (lowercase)
