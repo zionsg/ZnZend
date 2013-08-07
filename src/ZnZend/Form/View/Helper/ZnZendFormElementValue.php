@@ -172,8 +172,7 @@ class ZnZendFormElementValue extends AbstractHelper
         }
 
         if ('select' == $type) {
-            $helper = $renderer->plugin('form_select');
-            return $helper($element);
+            return $value;
         }
 
         if ('submit' == $type) {
