@@ -199,6 +199,30 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
+     * Get resource id for entity property
+     *
+     * Property getter must be registered in $_mapGettersColumns.
+     *
+     * @example getPropertyResourceId('getId') returns znzend.db.abstractentity.id
+     * @param   string $propertyGetter Name of getter used to retrieve property
+     * @return  null|string
+     */
+    public function getPropertyResourceId($propertyGetter)
+    {
+        $map = static::$_mapGettersColumns;
+        if (empty($map[$propertyGetter])) {
+            return null;
+        }
+
+        $property = $map[$propertyGetter];
+        if (!property_exists($this, $property)) {
+            return null;
+        }
+
+        return $this->getResourceId() . '.' . $property;
+    }
+
+    /**
      * Defined by EntityInterface; Set singular noun for entity (lowercase)
      *
      * @param  string $value
