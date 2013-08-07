@@ -22,7 +22,8 @@ use ZnZend\Form\Exception;
  *   - init() method created for adding of elements in extending classes
  *   - CSRF element is added by default
  *   - Allows setting and getting of custom form-level error messages like in ZF1
- *   - Implements ResourceInterface allowing it to return resource id for itself or its elements
+ *   - Implements ResourceInterface allowing it to return resource id for itself
+ *   - getElementResourceId() for getting resource id for an element or fieldset
  *   - Allows setting of parent resource id which will be prefixed to its own resource id
  */
 class Form extends ZendForm implements ResourceInterface
@@ -240,14 +241,9 @@ class Form extends ZendForm implements ResourceInterface
     /**
      * Defined by ResourceInterface; returns the string identifier of the Resource
      *
-     * Method signature modified to get resource ids for form elements as it is
-     * not feasible to create a custom class for each form element just to implement
-     * ResourceInterface. Also, a form element is tied to the form, hence better to put here.
-     *
-     * @param  string $elementOrFieldset Optional name of form element or fieldset to get resource id for
      * @return string Defaults to class name in lowercase
      */
-    public function getResourceId($elementOrFieldset = '')
+    public function getResourceId()
     {
         if (null === $this->resourceId) {
             $this->resourceId = strtolower(str_replace("\\", '_', get_class($this)));
@@ -256,11 +252,22 @@ class Form extends ZendForm implements ResourceInterface
         $resourceId = (empty($this->parentResourceId) ? '' : $this->parentResourceId . '.')
                     . $this->resourceId;
 
-        if (empty($elementOrFieldset) || !$this->has($elementOrFieldset)) {
-            return $resourceId;
-        }
+        return $resourceId;
+    }
 
-        return $resourceId . '.' . strtolower($elementOrFieldset);
+    /**
+     * Get resource id for element
+     *
+     * @example getElementResourceId('name') returns znzend_form_form.name
+     * @param   string $elementOrFieldset Name of form element or fieldset to get resource id for
+     * @return  null|string Return null if element does not exist
+     */
+    public function getElementResourceId($elementOrFieldset)
+    {
+        if (!$this->has($elementOrFieldset)) {
+            return null;
+        }
+        return $this->getResourceId() . '.' . strtolower($elementOrFieldset);
     }
 
     /**
