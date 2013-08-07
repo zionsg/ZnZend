@@ -327,37 +327,6 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     }
 
     /**
-     * Defined by AbstractTableGateway; Insert
-     *
-     * @param  array $set
-     * @return int
-     */
-    public function insert($set)
-    {
-        return parent::insert($this->filterColumns($set));
-    }
-
-    /**
-     * Defined by AbstractTableGateway; Update
-     *
-     * If an entity is passed in for $where, it is assumed that the
-     * update is for that entity. This is useful, eg. in the controller,
-     * where the user does not and should not know the column name or how to
-     * construct a where clause.
-     *
-     * @param  array $set
-     * @param  string|array|closure|EntityInterface $where
-     * @return int Affected rows
-     */
-    public function update($set, $where = null)
-    {
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
-        }
-        return parent::update($this->filterColumns($set), $where);
-    }
-
-    /**
      * Defined by AbstractTableGateway; Delete
      *
      * If an entity is passed in for $where, it is assumed that the
@@ -542,5 +511,43 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         $select = $this->getBaseSelect();
         $select->where(array($this->getPrimaryKey() => $key));
         return $this->getResultSet($select, false);
+    }
+
+    /**
+     * Defined by MapperInterface; Insert
+     *
+     * @param  array|EntityInterface $set
+     * @return int
+     */
+    public function insert($set)
+    {
+        if ($set instanceof EntityInterface) {
+            $set = $set->getArrayCopy();
+        }
+        return parent::insert($this->filterColumns($set));
+    }
+
+    /**
+     * Defined by MapperInterface; Update
+     *
+     * If an entity is passed in for $where, it is assumed that the
+     * update is for that entity. This is useful, eg. in the controller,
+     * where the user does not and should not know the column name or how to
+     * construct a where clause.
+     *
+     * @param  array $set
+     * @param  string|array|closure|EntityInterface $where
+     * @return int Affected rows
+     */
+    public function update($set, $where = null)
+    {
+        if ($set instanceof EntityInterface) {
+            $set = $set->getArrayCopy();
+        }
+        if ($where instanceof EntityInterface) {
+            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        }
+
+        return parent::update($this->filterColumns($set), $where);
     }
 }
