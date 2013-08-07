@@ -14,6 +14,9 @@ use ZnZend\Db\EntityInterface;
 
 /**
  * Interface for entity mappers corresponding to database tables
+ *
+ * Some methods are brought in from \Zend\Db\TableGatewayInterface to ensure availability
+ * while reducing bloat at the same time.
  */
 interface MapperInterface
 {
@@ -113,8 +116,8 @@ interface MapperInterface
     /**
      * Insert
      *
-     * @param  array $set
-     * @return int   No. of affected rows as in ZF2 (different from ZF1)
+     * @param  array|EntityInterface $set
+     * @return int No. of affected rows as in ZF2 (different from ZF1)
      */
     public function insert($set);
 
@@ -133,7 +136,7 @@ interface MapperInterface
      * where the user does not and should not know the column name or how to
      * construct a where clause.
      *
-     * @param  array $set
+     * @param  array|EntityInterface $set
      * @param  null|string|array|closure|EntityInterface $where
      * @return int No. of affected rows
      */
