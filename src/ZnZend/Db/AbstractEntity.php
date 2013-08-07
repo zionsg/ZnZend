@@ -201,25 +201,37 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Get resource id for entity property
      *
+     * @example getPropertyResourceIdFromGetter('id') returns znzend.db.abstractentity.id
+     * @example getPropertyResourceIdFromGetter($idFormElement->getName()) returns znzend.db.abstractentity.id
+     * @param   string $property Name of property
+     * @return  null|string Return null if property does not exist
+     */
+    public function getPropertyResourceId($property)
+    {
+        if (!property_exists($this, $property)) {
+            return null;
+        }
+
+        return $this->getResourceId() . '.' . $property;
+    }
+
+    /**
+     * Get resource id for entity property using getter to identify property
+     *
      * Property getter must be registered in $_mapGettersColumns.
      *
-     * @example getPropertyResourceId('getId') returns znzend.db.abstractentity.id
+     * @example getPropertyResourceIdFromGetter('getId') returns znzend.db.abstractentity.id
      * @param   string $propertyGetter Name of getter used to retrieve property
-     * @return  null|string
+     * @return  null|string Return null if property does not exist
      */
-    public function getPropertyResourceId($propertyGetter)
+    public function getPropertyResourceIdFromGetter($propertyGetter)
     {
         $map = static::$_mapGettersColumns;
         if (empty($map[$propertyGetter])) {
             return null;
         }
 
-        $property = $map[$propertyGetter];
-        if (!property_exists($this, $property)) {
-            return null;
-        }
-
-        return $this->getResourceId() . '.' . $property;
+        return $this->getPropertyResourceId($map[$propertyGetter]);
     }
 
     /**
