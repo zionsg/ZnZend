@@ -77,6 +77,24 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function getPropertyResourceId($property);
 
     /**
+     * Store authenticated identity (current logged in user)
+     *
+     * This is to facilitate populating of auditing columns such as the user who
+     * created or last modified the record.
+     *
+     * @param  string $identity
+     * @return EntityInterface
+     */
+    public function setAuthIdentity($identity);
+
+    /**
+     * Retrieve stored authenticated identity
+     *
+     * @return string
+     */
+    public function getAuthIdentity();
+
+    /**
      * Set singular noun for entity (lowercase)
      *
      * @param  string $value

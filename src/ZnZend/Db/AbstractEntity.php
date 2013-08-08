@@ -50,6 +50,14 @@ abstract class AbstractEntity implements EntityInterface
     protected $id;
 
     /**
+     * Authenticated identity (current logged in user)
+     *
+     * @Annotation\Exclude()
+     * @var string
+     */
+    protected $_authIdentity;
+
+    /**
      * Singular noun for entity - to be set by extending classes
      *
      * @Annotation\Exclude()
@@ -127,6 +135,10 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function exchangeArray(array $data)
     {
+        if (empty($data)) {
+            return;
+        }
+
         $map = array_flip(static::$_mapGettersColumns);
         foreach ($data as $key => $value) {
             if (!array_key_exists($key, $map)) {
@@ -228,6 +240,28 @@ abstract class AbstractEntity implements EntityInterface
         }
 
         return $this->getResourceId() . '.' . $property;
+    }
+
+    /**
+     * Defined by EntityInterface; Store authenticated identity (current logged in user)
+     *
+     * @param  string $identity
+     * @return EntityInterface
+     */
+    public function setAuthIdentity($identity)
+    {
+        $this->_authIdentity = (string) $identity; // objects must implement __toString()
+        return $this;
+    }
+
+    /**
+     * Defined by EntityInterface; Retrieve stored authenticated identity
+     *
+     * @return string
+     */
+    public function getAuthIdentity()
+    {
+        return $this->_authIdentity;
     }
 
     /**
