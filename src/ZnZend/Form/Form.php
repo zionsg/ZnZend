@@ -18,7 +18,8 @@ use ZnZend\Form\Exception;
  * Base form class
  *
  * Additions to Zend_Form:
- *   - Params for dynamic elements can be injected via the constructor and retrieved with getParam()
+ *   - Params for dynamic elements can be injected via the constructor using 'params' key in options
+ *     and retrieved with getParam()
  *   - init() method created for adding of elements in extending classes
  *   - CSRF element is added by default
  *   - Allows setting and getting of custom form-level error messages like in ZF1
@@ -63,34 +64,33 @@ class Form extends ZendForm implements ResourceInterface
     /**
      * Constructor
      *
-     * Sample scenario for $params: An arbitrary number of text elements is to be created in
-     * the form based on some condition determined in the controller. $params can
-     * be used to pass in a set key with the value needed, eg. array('textElements' => 5).
+     * Sample scenario for 'params' key in options: An arbitrary number of text elements
+     * is to be created in the form based on some condition determined in the controller.
+     * This can be used to pass in a set key with the value needed, eg. 'params' => array('textElements' => 5).
      * Allowed file extensions and size limits can be passed in to file upload elements
-     * via $params also.
+     * via this also.
      *
-     * In view of the changed method signature, extending classes should add their
-     * elements in the init() method lest they get the method signature wrong or forget
+     * Extending classes should add their elements in the init() method lest they forget
      * to call the parent constructor.
      *
-     * @see    Form::__construct()
-     * @param  null|int|string $name   Optional name for form
-     * @param  array           $params Optional params for use with dynamic elements
+     * @param  null|int|string  $name    Optional name for the element
+     * @param  array            $options Optional options for the element
      */
-    public function __construct($name = null, array $params = array())
+    public function __construct($name = null, $options = array())
     {
-        parent::__construct($name);
+        parent::__construct($name, $options);
 
         $this->setAttribute('method', 'post')
              ->setAttribute('enctype', 'multipart/form-data') // for file uploads
              ->setInputFilter(new InputFilter()); // default InputFilter
 
         // Add CSRF element
-        $element = new Element\Csrf('token');
-        $this->add($element);
+        $this->add(new Element\Csrf('token'));
 
         // Store params
-        $this->params = $params;
+        if (isset($options['params'])) {
+            $this->addParams($params);
+        }
 
         // Add elements for extending classes
         $this->init();
