@@ -137,6 +137,10 @@ class Question extends AbstractWord
      */
     public function generate()
     {
+        if (!$this->keepSession) {
+            $this->session = null;
+        }
+
         $id = $this->generateRandomId();
         $this->setId($id);
 
