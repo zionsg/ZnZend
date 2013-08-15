@@ -59,6 +59,7 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 * `ZnZend\Db\AbstractMapper` - An abstract entity mapper class for database tables
 * `ZnZend\Db\Generator\EntityGenerator` - For generating entity classes from tables in a database
 * `ZnZend\Db\Generator\MapperGenerator` - For generating entity mapper classes from tables in a database
+* `ZnZend\Paginator\Adapter\DbSelect` - Additional methods to retrieve and update Select object
 * `ZnZend\Permissions\Acl\Acl` - Modified addResource() to add a resource and its parents recursively
 * `ZnZend\Permissions\Acl\Privilege` - A standardized set of constants for Acl privileges
 
