@@ -23,6 +23,9 @@ class TestForm extends Form
         $this->add(array(
             'name' => 'captcha',
             'type' => 'Zend\Form\Element\Captcha',
+            'attributes' => array(
+                'required' => true,
+            ),
             'options' => array(
                 'label' => 'Please verify you are human',
                 'captcha' => $adapter,
