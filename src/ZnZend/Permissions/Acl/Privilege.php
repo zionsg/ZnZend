@@ -38,6 +38,9 @@ class Privilege
      *
      * This privilege may be used in place of the "publish" privilege for blog posts,
      * by allowing/denying the editing of a "published" flag field.
+     *
+     * For sensitive fields such as credit card numbers, allowing of this privilege
+     * will imply viewing of the actual unmasked value (so as to edit it).
      */
     const EDIT = 'edit';
 
@@ -75,6 +78,7 @@ class Privilege
      * For accessing/viewing of contents or details
      *
      * Applies to a single page, form field or fieldset.
+     * Can be used interchangeably with VIEWLIVE.
      */
     const VIEW = 'view';
 
