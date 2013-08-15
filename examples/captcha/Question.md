@@ -29,7 +29,7 @@ class TestForm extends Form
             'options' => array(
                 'label' => 'Please verify you are human',
                 'captcha' => $adapter,
-                'separator' => '<br />',
+                'separator' => '<br />', // this will add <br /> between image and input when rendering
             ),
         ));
 
@@ -46,9 +46,12 @@ class TestForm extends Form
 <?php
 $form->prepare();
 echo $this->form()->openTag($form);
+echo $this->formRow($form->get('token')); // ZnZend\Form\Form adds a CSRF token by default
 
-echo $this->formLabel($form->get('captcha')) . '<br />';
-echo $this->formElement($form->get('captcha')) . '<br />';
+$element = $form->get('captcha');
+echo $this->formLabel($element) . '<br />';
+echo $this->formElement($element) . '<br />';
+echo $this->formElementErrors($element);
 
 echo $this->formRow($form->get('submit'));
 echo $this->form()->closeTag();
