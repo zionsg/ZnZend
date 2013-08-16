@@ -24,13 +24,17 @@ class ZnZendIdentity extends ZendIdentityPlugin
     /**
      * Retrieve the current identity, if any.
      *
-     * Proxies to getIdentity().
+     * Proxies to getIdentity() with the option to set the authentication service.
      *
+     * @param  AuthenticationService $authService
      * @return null|IdentityInterface
      * @throws Exception\RuntimeException
      */
-    public function __invoke()
+    public function __invoke(AuthenticationService $authService = null)
     {
+        if ($authService !== null) {
+            $this->setAuthenticationService($authService);
+        }
         return $this->getIdentity();
     }
 
