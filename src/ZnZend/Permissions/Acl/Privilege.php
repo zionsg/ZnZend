@@ -13,7 +13,7 @@ use ReflectionClass;
 /**
  * Class providing a standardized set of constants for Acl privileges
  *
- * Set is currently kept small at 10 constants, with the names kept within 8 characters each.
+ * Set is currently kept small at less than 10 constants, with the names kept within 8 characters each.
  * These privileges are usually used in a Content Management System (CMS).
  *
  * In general, lower-ranked roles should NOT be allowed to view/edit/delete the records of
@@ -75,21 +75,12 @@ class Privilege
     const LISTDEAD = 'listdead';
 
     /**
-     * For accessing/viewing of contents or details
+     * For viewing of active records or accessing/viewing of contents/details
      *
-     * Applies to a single page, form field or fieldset.
-     * Can be used interchangeably with VIEWLIVE.
+     * Applies to a single record, page, form field or fieldset.
+     * This covers the scope of a VIEWLIVE constant which is not implemented to prevent confusion.
      */
     const VIEW = 'view';
-
-    /**
-     * For viewing of active records
-     *
-     * Applies to a single record.
-     *
-     * Name has "LIVE" in it for consistency with LISTLIVE constant.
-     */
-    const VIEWLIVE = 'viewlive';
 
     /**
      * For viewing of inactive/deleted records
