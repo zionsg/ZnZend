@@ -57,7 +57,7 @@ class GenericRole extends ZendGenericRole implements RoleInterface
             return 0;
         }
 
-        return ($roleRank < $otherRoleRank) ? -1 : 1;
+        return ($roleRank < $otherRoleRank) ? 1 : -1;
     }
 
     /**
