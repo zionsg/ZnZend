@@ -51,25 +51,34 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 2. Examples can be found in the `examples` directory
 3. Tests can be run in browser using `test/phpunit_browser.php` (see inline docblock)
 
-## Classes
-* `ZnZend\Form\AbstractForm` - Base form class with additional features
+## Interfaces
+* `ZnZend\Authentication\IdentityInterface` - Interface for identity stored in authentication service
 * `ZnZend\Db\EntityInterface` - An entity interface for database rows
-* `ZnZend\Db\AbstractEntity` - An abstract entity class for database rows
 * `ZnZend\Db\MapperInterface` - An entity mapper interface for database tables
+* `ZnZend\Captcha\Service\QuestionServiceInterface` - An interface for services providing questions for captcha
+* `ZnZend\Permissions\Acl\Role\RoleInterface` - Adds additional methods for comparing 2 roles
+
+## Classes
+* `ZnZend\Authentication\Identity` - Class for identity stored in authentication service
+* `ZnZend\Form\AbstractForm` - Base form class with additional features
+* `ZnZend\Db\AbstractEntity` - An abstract entity class for database rows
 * `ZnZend\Db\AbstractMapper` - An abstract entity mapper class for database tables
 * `ZnZend\Db\Generator\EntityGenerator` - For generating entity classes from tables in a database
 * `ZnZend\Db\Generator\MapperGenerator` - For generating entity mapper classes from tables in a database
 * `ZnZend\Paginator\Adapter\DbSelect` - Additional methods to retrieve and update Select object
 * `ZnZend\Permissions\Acl\Acl` - Modified addResource() to add a resource and its parents recursively
 * `ZnZend\Permissions\Acl\Privilege` - A standardized set of constants for Acl privileges
+* `ZnZend\Permissions\Acl\Role\GenericRole` - Generic role that defaults to 'guest'
+                                              and where smaller numbers indicate higher role rank
 
 ## Captcha
 * `ZnZend\Captcha\Question` - Captcha adapter for custom questions and answers
-* `ZnZend\Captcha\Service\QuestionServiceInterface` - An interface for services providing questions for captcha
 * `ZnZend\Captcha\Service\MathQuestionService` - A service which provides simple arithmetic questions for captcha
 
 ## Controller Plugins
 * `znZendDataTable` - Update Paginator (DbSelect) with params sent from jQuery DataTables plugin
+* `znZendIdentity`  - Fetch the authenticated identity as an instance of IdentityInterface
+                      and its role as an instance of RoleInterface
 * `znZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `znZendPageStore` - Persist data for current page across reloads of the same page
 * `znZendTimestamp` - Return timestamp formatted to standard length and converted to base 36
