@@ -78,7 +78,10 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 ## Controller Plugins
 * `znZendDataTable` - Update Paginator (DbSelect) with params sent from jQuery DataTables plugin
 * `znZendIdentity`  - Fetch the authenticated identity as an instance of IdentityInterface
-                      and its role as an instance of RoleInterface
+                      and its role as an instance of RoleInterface. When invoked, its factory will look for a service
+                      by the name `ZnZend\Authentication\AuthenticationService` in the `ServiceManager`, similar
+                      to the Zend Identity controller plugin. The service does not exist but defaults to
+                      `Zend\Authentication\AuthenticationService`
 * `znZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `znZendPageStore` - Persist data for current page across reloads of the same page
 * `znZendTimestamp` - Return timestamp formatted to standard length and converted to base 36

@@ -33,6 +33,7 @@ return array(
     'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams'                => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendMvcParams.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore'                => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendPageStore.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendTimestamp'                => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendTimestamp.php',
+    'ZnZend\Mvc\Controller\Plugin\Service\ZnZendIdentityFactory'  => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/Service/ZnZendIdentityFactory.php',
     'ZnZend\Mvc\Exception\ExceptionInterface'                     => __DIR__ . '/src/ZnZend/Mvc/Exception/ExceptionInterface.php',
     'ZnZend\Mvc\Exception\InvalidArgumentException'               => __DIR__ . '/src/ZnZend/Mvc/Exception/InvalidArgumentException.php',
     'ZnZend\Mvc\Exception\RuntimeException'                       => __DIR__ . '/src/ZnZend/Mvc/Exception/RuntimeException.php',

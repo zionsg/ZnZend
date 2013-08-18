@@ -1,9 +1,19 @@
 <?php
 return array(
+    'service_manager' => array(
+        'invokables' => array(
+            // @see ZnZend\Mvc\Controller\Plugin\Service\ZnZendIdentityFactory
+            'ZnZend\Authentication\AuthenticationService' => 'Zend\Authentication\AuthenticationService',
+        ),
+    ),
+
     'controller_plugins' => array(
+        'factories'  => array(
+            'znZendIdentity' => 'ZnZend\Mvc\Controller\Plugin\Service\ZnZendIdentityFactory',
+        ),
+
         'invokables' => array(
             'znZendDataTables' => 'ZnZend\Mvc\Controller\Plugin\ZnZendDataTables',
-            'znZendIdentity'   => 'ZnZend\Mvc\Controller\Plugin\ZnZendIdentity',
             'znZendMvcParams'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams',
             'znZendPageStore'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore',
             'znZendTimestamp'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendTimestamp',

@@ -18,6 +18,11 @@ use ZnZend\Permissions\Acl\Role\GenericRole;
 /**
  * Controller plugin to fetch the authenticated identity as an instance of IdentityInterface
  * and its role as an instance of RoleInterface
+ *
+ * When invoked, its factory Service\ZnZendIdentityFactory will look for a service
+ * by the name `ZnZend\Authentication\AuthenticationService` in the `ServiceManager`, similar
+ * to the Zend Identity controller plugin. The service does not exist but defaults to
+ * `Zend\Authentication\AuthenticationService`.
  */
 class ZnZendIdentity extends ZendIdentityPlugin
 {
