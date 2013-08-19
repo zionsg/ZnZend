@@ -83,11 +83,6 @@ class Form extends ZendForm implements ResourceInterface
         $this->setInputFilter(new InputFilter()) // set default InputFilter
              ->add(new Element\Csrf('token'));   // add CSRF element
 
-        // Store params
-        if (isset($options['params'])) {
-            $this->addParams($options['params']);
-        }
-
         // Add elements for extending classes
         $this->init();
 
@@ -100,6 +95,37 @@ class Form extends ZendForm implements ResourceInterface
      */
     public function init()
     {
+    }
+
+    /**
+     * Defined by \Zend\Form\ElementInterface; Set options for form. Accepted options are:
+     * - params: array of key-value pairs for use with dynamic elements
+     *
+     * @param  array|Traversable $options
+     * @return Element|ElementInterface
+     * @throws Exception\InvalidArgumentException
+     */
+    public function setOptions($options)
+    {
+        parent::setOptions($options);
+
+        if (isset($options['params'])) {
+            $this->setParams($options['params']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set params
+     *
+     * @param  array $params Key-value pairs
+     * @return Form
+     */
+    public function setParams(array $params = array())
+    {
+        $this->params = $params;
+        return $this;
     }
 
     /**
