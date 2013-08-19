@@ -80,12 +80,8 @@ class Form extends ZendForm implements ResourceInterface
     {
         parent::__construct($name, $options);
 
-        $this->setAttribute('method', 'post')
-             ->setAttribute('enctype', 'multipart/form-data') // for file uploads
-             ->setInputFilter(new InputFilter()); // default InputFilter
-
-        // Add CSRF element
-        $this->add(new Element\Csrf('token'));
+        $this->setInputFilter(new InputFilter()) // set default InputFilter
+             ->add(new Element\Csrf('token'));   // add CSRF element
 
         // Store params
         if (isset($options['params'])) {
