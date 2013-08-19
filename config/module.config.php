@@ -1,9 +1,13 @@
 <?php
 return array(
+    // Both the alias and invokable are required for ZnZend\Mvc\Controller\Plugin\Service\ZnZendIdentityFactory to work
     'service_manager' => array(
-        'invokables' => array(
-            // @see ZnZend\Mvc\Controller\Plugin\Service\ZnZendIdentityFactory
+        'aliases' => array(
             'ZnZend\Authentication\AuthenticationService' => 'Zend\Authentication\AuthenticationService',
+        ),
+
+        'invokables' => array(
+            'Zend\Authentication\AuthenticationService' => 'Zend\Authentication\AuthenticationService',
         ),
     ),
 
