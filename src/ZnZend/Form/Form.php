@@ -85,7 +85,7 @@ class Form extends ZendForm implements ResourceInterface
 
         // Store params
         if (isset($options['params'])) {
-            $this->addParams($params);
+            $this->addParams($options['params']);
         }
 
         // Add elements for extending classes
