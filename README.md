@@ -6,8 +6,8 @@ Zend Framework 2 module containing helpers and base classes for my projects at i
 
 ## Introduction
 
-This is a Zend Framework 2 module containing revamps of
-the helpers and base classes I used for my Zend Framework 1 projects.
+This is a Zend Framework 2 module containing revamps of the helpers and classes I used for my Zend Framework 1 projects.
+This is more of a general-purpose module unlike ZfcUser and is meant to quickstart my ZF2 projects.
 
 ## Requirements
 
@@ -85,6 +85,9 @@ the helpers and base classes I used for my Zend Framework 1 projects.
 * `znZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `znZendPageStore` - Persist data for current page across reloads of the same page
 * `znZendTimestamp` - Return timestamp formatted to standard length and converted to base 36
+
+## Filters
+* `ZnZend\Filter\File\RenameUploadWithCallback` - Allows use of custom callback to rename file uploads
 
 ## Form View Helpers
 * `znZendFormCaptchaQuestion` - Render captcha element using ZnZend\Captcha\Question adapter
