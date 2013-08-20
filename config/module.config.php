@@ -1,8 +1,11 @@
 <?php
+/**
+ * @see Zend\Mvc\Service\ModuleManagerFactory for all available keys
+ */
 return array(
-    // Both the alias and invokable are required for ZnZend\Mvc\Controller\Plugin\Service\ZnZendIdentityFactory to work
     'service_manager' => array(
         'aliases' => array(
+            // Both the alias and invokable are required for ZnZendIdentityFactory to work
             'ZnZend\Authentication\AuthenticationService' => 'Zend\Authentication\AuthenticationService',
         ),
 
