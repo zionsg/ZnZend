@@ -8,6 +8,9 @@
 
 namespace ZnZend;
 
+/**
+ * @see Zend\Mvc\Service\ModuleManagerFactory for all available config methods
+ */
 class Module
 {
     /**
