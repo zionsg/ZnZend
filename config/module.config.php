@@ -1,6 +1,8 @@
 <?php
 /**
- * @see Zend\Mvc\Service\ModuleManagerFactory for all available keys
+ * @see Zend\Mvc\Service\ModuleManagerFactory for list of manager/section keys (ie. view_helpers, etc.)
+ * @see Zend\ModuleManager\Listener\ServiceListener::serviceConfigToArray() and
+ *      Zend\ServiceManager\Config for list of config keys for each service manager (ie. invokables, etc.)
  */
 return array(
     'service_manager' => array(
