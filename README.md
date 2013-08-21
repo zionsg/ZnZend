@@ -60,6 +60,7 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 
 ## Classes
 * `ZnZend\Authentication\Identity` - Class for identity stored in authentication service
+* `ZnZend\Crypt\Symmetric\OpenSsl` - Symmetric encryption using the OpenSSL extension
 * `ZnZend\Form\AbstractForm` - Base form class with additional features
 * `ZnZend\Db\AbstractEntity` - An abstract entity class for database rows
 * `ZnZend\Db\AbstractMapper` - An abstract entity mapper class for database tables
