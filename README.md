@@ -24,8 +24,11 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
     Zend\Loader\AutoloaderFactory::factory(array(
         'Zend\Loader\StandardAutoloader' => array(
             'autoregister_zf' => true,
-            'namespaces' => array(
+            'namespaces' => array( // register non-ZF2 libraries which use namespace
                 'Doctrine' => __DIR__ . '/vendor/doctrine',
+            ),
+            'prefixes' => array( // register non-ZF2 libraries which use vendor prefix (underscore)
+                // same format as 'namespaces'
             ),
         )
     ));
