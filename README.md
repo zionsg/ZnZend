@@ -24,10 +24,11 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
     Zend\Loader\AutoloaderFactory::factory(array(
         'Zend\Loader\StandardAutoloader' => array(
             'autoregister_zf' => true,
-            'namespaces' => array( // register non-ZF2 libraries which use namespace
-                'Doctrine' => __DIR__ . '/vendor/doctrine',
+            'namespaces' => array( // register libraries which use namespace
+                __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                'Doctrine'    => __DIR__ . '/vendor/doctrine',
             ),
-            'prefixes' => array( // register non-ZF2 libraries which use vendor prefix (underscore)
+            'prefixes' => array( // register libraries which use vendor prefix (underscore)
                 // same format as 'namespaces'
             ),
         )
@@ -37,10 +38,16 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
     public function getAutoloaderConfig()
     {
         return array(
+            'Zend\Loader\ClassMapAutoloader' => array(
+                __DIR__ . '/autoload_classmap.php',
+            ),
             'ZendLoaderStandardAutoloader' => array(
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                    'Doctrine' => __DIR__ . '/vendor/doctrine',
+                    'Doctrine'    => __DIR__ . '/vendor/doctrine',
+                ),
+                'prefixes' => array( // register libraries which use vendor prefix (underscore)
+                    // same format as 'namespaces'
                 ),
             ),
         );
