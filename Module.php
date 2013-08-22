@@ -15,7 +15,8 @@ use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\EventManager\EventInterface;
 
 /**
- * @see Zend\Mvc\Service\ModuleManagerFactory for all available config methods
+ * @see Zend\Mvc\Service\ModuleManagerFactory and Zend\ModuleManager\Feature\*Interface.php
+ *      for list of config methods
  */
 class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ConfigProviderInterface
 {
