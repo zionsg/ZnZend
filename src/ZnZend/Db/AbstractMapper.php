@@ -58,7 +58,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     protected $resultSetClass;
 
     /**
-     * Name of primary key column(s) - set by user or find()
+     * Name of primary key column(s) - set by user or populated when needed
      *
      * @var string|array
      */
