@@ -48,7 +48,7 @@ interface MapperInterface
     /**
      * Get available row states as value-option pairs which can be used to populate a dropdown list
      *
-     * @return  array
+     * @return array
      */
     public static function getRowStates();
 
@@ -106,12 +106,12 @@ interface MapperInterface
     public function fetchAll();
 
     /**
-     * Find row by primary key
+     * Fetch row by primary key
      *
      * @param  mixed $key The value for the primary key
      * @return null|EntityInterface
      */
-    public function find($key);
+    public function fetch($key);
 
     /**
      * Insert
