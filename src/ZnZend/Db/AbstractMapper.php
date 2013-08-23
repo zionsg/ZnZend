@@ -490,6 +490,19 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     }
 
     /**
+     * Defined by MapperInterface; Fetch row by primary key
+     *
+     * @param  string $key The value for the primary key
+     * @return EntityInterface
+     */
+    public function fetch($key)
+    {
+        $select = $this->getBaseSelect();
+        $select->where(array($this->getPrimaryKey() => $key));
+        return $this->getResultSet($select, false);
+    }
+
+    /**
      * Defined by MapperInterface; Fetch all rows
      *
      * @return Paginator
@@ -498,19 +511,6 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     {
         $select = $this->getBaseSelect();
         return $this->getResultSet($select);
-    }
-
-    /**
-     * Defined by MapperInterface; Find row by primary key
-     *
-     * @param  string $key The value for the primary key
-     * @return EntityInterface
-     */
-    public function find($key)
-    {
-        $select = $this->getBaseSelect();
-        $select->where(array($this->getPrimaryKey() => $key));
-        return $this->getResultSet($select, false);
     }
 
     /**
