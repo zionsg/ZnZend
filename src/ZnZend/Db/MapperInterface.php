@@ -114,19 +114,12 @@ interface MapperInterface
     public function fetchAll();
 
     /**
-     * Insert
+     * Create
      *
      * @param  array|EntityInterface $set
-     * @return int No. of affected rows as in ZF2 (different from ZF1)
+     * @return null|EntityInterface Return null if unable to create
      */
-    public function insert($set);
-
-    /**
-     * Get last insert value
-     *
-     * @return int
-     */
-    public function getLastInsertValue();
+    public function create($set);
 
     /**
      * Update
@@ -138,7 +131,8 @@ interface MapperInterface
      *
      * @param  array|EntityInterface $set
      * @param  null|string|array|closure|EntityInterface $where
-     * @return int No. of affected rows
+     * @return int No. of affected rows. Not practical to return EntityInterface
+     *             as the update could be for multiple rows.
      */
     public function update($set, $where = null);
 }
