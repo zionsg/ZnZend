@@ -35,7 +35,6 @@ use ZnZend\Paginator\Adapter\DbSelect;
  *   - Row state (active, deleted, all) is taken into consideration when querying
  *   - markActive() and markDeleted() added for marking records
  *   - insert() and update() modified to filter out keys in user data that do not map to columns in table
- *   - insert() returns last insert value instead of affected rows, as like ZF1
  *   - allows populating of records from non-database source
  */
 abstract class AbstractMapper extends AbstractTableGateway implements MapperInterface
