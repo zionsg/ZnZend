@@ -99,19 +99,19 @@ interface MapperInterface
     public function markDeleted($where);
 
     /**
-     * Fetch all rows
-     *
-     * @return null|Paginator
-     */
-    public function fetchAll();
-
-    /**
      * Fetch row by primary key
      *
      * @param  mixed $key The value for the primary key
      * @return null|EntityInterface
      */
     public function fetch($key);
+
+    /**
+     * Fetch all rows
+     *
+     * @return null|Paginator
+     */
+    public function fetchAll();
 
     /**
      * Insert
