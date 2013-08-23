@@ -548,7 +548,9 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
             return null;
         }
 
-        return new $this->resultSetClass($set);
+        $entity = new $this->resultSetClass($set);
+        $entity->setId($this->getLastInsertValue()); // this is important!
+        return $entity;
     }
 
     /**
