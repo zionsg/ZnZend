@@ -552,7 +552,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     }
 
     /**
-     * Defined by MapperInterface; Update
+     * Defined by MapperInterface and AbstractTableGateway; Update
      *
      * If an entity is passed in for $where, it is assumed that the
      * update is for that entity. This is useful, eg. in the controller,
