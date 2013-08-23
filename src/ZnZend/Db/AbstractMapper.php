@@ -327,7 +327,25 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     }
 
     /**
+     * Defined by AbstractTableGateway; Insert
+     *
+     * Modified to handle EntityInterface.
+     *
+     * @param  array|EntityInterface $set
+     * @return int Affected rows, not last insert id as in ZF1
+     */
+    public function insert($set)
+    {
+        if ($set instanceof EntityInterface) {
+            $set = $set->getArrayCopy();
+        }
+        return parent::insert($this->filterColumns($set));
+    }
+
+    /**
      * Defined by AbstractTableGateway; Delete
+     *
+     * Modified to handle EntityInterface.
      *
      * If an entity is passed in for $where, it is assumed that the
      * entity is to be deleted. This is useful, eg. in the controller,
@@ -514,17 +532,23 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     }
 
     /**
-     * Defined by MapperInterface; Insert
+     * Create
      *
      * @param  array|EntityInterface $set
-     * @return int
+     * @return EntityInterface
      */
-    public function insert($set)
+    public function create($set)
     {
         if ($set instanceof EntityInterface) {
             $set = $set->getArrayCopy();
         }
-        return parent::insert($this->filterColumns($set));
+
+        $affectedRows = $this->insert($set); // insert() will throw Exception if $set is not an array
+        if (!$affectedRows) {
+            return null;
+        }
+
+        return new $this->resultSetClass($set);
     }
 
     /**
