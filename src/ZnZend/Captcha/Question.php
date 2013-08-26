@@ -210,7 +210,7 @@ class Question extends AbstractWord
      *
      * @return string
      */
-    protected function getAnswer()
+    public function getAnswer()
     {
         if (empty($this->answer)) {
             $session      = $this->getSession();
