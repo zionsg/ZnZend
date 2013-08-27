@@ -39,6 +39,7 @@ return array(
     'ZnZend\Mvc\Controller\Plugin\ZnZendIdentity'                 => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendIdentity.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams'                => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendMvcParams.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore'                => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendPageStore.php',
+    'ZnZend\Mvc\Controller\Plugin\ZnZendRestJson'                 => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendRestJson.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendTimestamp'                => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendTimestamp.php',
     'ZnZend\Mvc\Controller\Plugin\Service\ZnZendIdentityFactory'  => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/Service/ZnZendIdentityFactory.php',
     'ZnZend\Mvc\Exception\ExceptionInterface'                     => __DIR__ . '/src/ZnZend/Mvc/Exception/ExceptionInterface.php',
