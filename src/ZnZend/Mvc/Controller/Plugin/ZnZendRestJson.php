@@ -77,7 +77,7 @@ class ZnZendRestJson extends AbstractPlugin
         $client = new Client();
         $client->setUri($uri)
                ->setMethod($method)
-               ->setEncType(Client::ENC_FORMDATA); // this must be set for setParameterPost to work
+               ->setEncType(Client::ENC_FORMDATA); // this must be set for setParameterPost() to work
         // $client->setAdapter(new Client\Adapter\Curl());
 
         if ($data) {
