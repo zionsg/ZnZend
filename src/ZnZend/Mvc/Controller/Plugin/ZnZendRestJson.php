@@ -75,11 +75,10 @@ class ZnZendRestJson extends AbstractPlugin
     public function __invoke($uri, $method = Request::METHOD_GET, array $data = array(), array $headers = array())
     {
         $client = new Client();
+        $client->setUri($uri)
+               ->setMethod($method)
+               ->setEncType(Client::ENC_FORMDATA); // this must be set for setParameterPost to work
         // $client->setAdapter(new Client\Adapter\Curl());
-
-        $request = new Request();
-        $request->setUri($uri);
-        $request->setMethod($method);
 
         if ($data) {
             if (Request::METHOD_GET == $method) {
@@ -89,14 +88,14 @@ class ZnZendRestJson extends AbstractPlugin
             }
         }
 
-        $requestHeaders = $request->getHeaders();
+        $requestHeaders = $client->getRequest()->getHeaders();
         $headerString = 'Accept: application/json';
         $requestHeaders->addHeaderLine($headerString);
         foreach ($headers as $header) {
             $requestHeaders->addHeaderLine($header);
         }
 
-        $this->response = $client->dispatch($request);
+        $this->response = $client->send();
         // getContent() gives problems when a base64 encoded string is embedded, such as an inline image
         $this->result = $this->response->getBody();
 
