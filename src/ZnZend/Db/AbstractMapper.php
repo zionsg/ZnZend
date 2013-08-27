@@ -531,7 +531,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     }
 
     /**
-     * Create
+     * Defined by MapperInterface; Create
      *
      * @param  array|EntityInterface $set
      * @return EntityInterface
