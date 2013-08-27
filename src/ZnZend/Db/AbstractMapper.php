@@ -23,7 +23,7 @@ use ZnZend\Db\MapperInterface;
 use ZnZend\Paginator\Adapter\DbSelect;
 
 /**
- * Base class for table gateways
+ * Base class for mappers / table gateways
  *
  * Properties that must be set: $table, $resultSetClass
  * Properties that should be set if applicable: $primaryKey, $activeRowState, $deletedRowState
@@ -179,10 +179,11 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * This is an implementation of "INSERT ... ON DUPLICATE KEY UPDATE" in MySQL.
      * The equivalent from SQL-99, "MERGE INTO ...", is not supported in MySQL.
      *
-     * @param  array $set
+     * @param  array|EntityInterface $set
+     * @param  array $updateSet Optional column-value pairs to use for update instead of insert values from $set
      * @return int
      */
-    public function insertOnDuplicate($set)
+    public function insertOnDuplicate($set, array $updateSet = array())
     {
         $set = $this->filterColumns($set);
 
@@ -190,26 +191,27 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
         $fp = function ($name) use ($dbAdapter) { return $dbAdapter->driver->formatParameterName($name); };
 
-        $keys = array_keys($set);
-        $columns = array_map($qi, $keys);
-        $parameters = array_map($fp, array_values($keys));
+        $columns = array_keys($set);
+        $quotedColumns = array_map($qi, $columns);
+        $parameters = array_map($fp, array_values($columns));
 
         $primaryKey = $this->getPrimaryKey();
         $updateValues = array();
-        foreach ($keys as $index => $key) {
-            $column = $columns[$index];
-            if ($primaryKey == $key) {
-                $updateValues[] = $column . ' = LAST_INSERT_ID(' . $column . ')';
+        foreach ($columns as $index => $column) {
+            $quotedColumn = $quotedColumns[$index];
+            if ($primaryKey == $column) {
+                $updateValues[] = $quotedColumn . ' = LAST_INSERT_ID(' . $quotedColumn . ')';
                 continue;
             }
 
-            $updateValues[] = $column . ' = VALUES(' . $column . ')';
+            $value = (array_key_exists($column, $updateSet) ? $updateSet[$column] : "VALUES({$quotedColumn})");
+            $updateValues[] = $quotedColumn . ' = ' . $value;
         }
 
         $sql = sprintf(
             'INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s',
             $qi($this->table),
-            implode(',', $columns),
+            implode(',', $quotedColumns),
             implode(',', $parameters),
             implode(',', $updateValues)
         );
