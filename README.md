@@ -95,6 +95,7 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
                       `Zend\Authentication\AuthenticationService`
 * `znZendMvcParams` - Get name of module, controller and action as like in ZF1
 * `znZendPageStore` - Persist data for current page across reloads of the same page
+* `znZendRestJson`  - Consume REST web service which returns JSON result
 * `znZendTimestamp` - Return timestamp formatted to standard length and converted to base 36
 
 ## Filters
