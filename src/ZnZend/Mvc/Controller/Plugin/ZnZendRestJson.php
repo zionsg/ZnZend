@@ -66,19 +66,25 @@ class ZnZendRestJson extends AbstractPlugin
      *
      * This will return itself - results are to be retrieved via the other methods.
      *
-     * @param  string $uri     Uri for the web API
-     * @param  string $method  Optional HTTP method
-     * @param  array  $data    Optional data to be sent with request
-     * @param  array  $headers Optional headers to be sent with request
+     * @param  string $uri           Uri for the web API
+     * @param  string $method        Optional HTTP method
+     * @param  array  $data          Optional data to be sent with request
+     * @param  array  $headers       Optional headers to be sent with request
+     * @param  array  $clientOptions Optional options to pass to Client
      * @return ZnZendRest
      */
-    public function __invoke($uri, $method = Request::METHOD_GET, array $data = array(), array $headers = array())
-    {
+    public function __invoke(
+        $uri,
+        $method = Request::METHOD_GET,
+        array $data = array(),
+        array $headers = array(),
+        array $clientOptions = array()
+    ) {
         $client = new Client();
         $client->setUri($uri)
                ->setMethod($method)
-               ->setEncType(Client::ENC_FORMDATA); // this must be set for setParameterPost() to work
-        // $client->setAdapter(new Client\Adapter\Curl());
+               ->setEncType(Client::ENC_FORMDATA) // this must be set for setParameterPost() to work
+               ->setOptions($clientOptions);
 
         if ($data) {
             if (Request::METHOD_GET == $method) {
