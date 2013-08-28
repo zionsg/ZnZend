@@ -29,10 +29,14 @@ class GenericRole extends ZendGenericRole implements RoleInterface
      * Defaults to 'guest'.
      *
      * @param string $roleId
+     * @param int    $roleRank Role rank should only be set via constructor and not setter
      */
-    public function __construct($roleId = 'guest')
+    public function __construct($roleId = 'guest', $roleRank = null)
     {
         parent::__construct($roleId);
+        if ($roleRank !== null && is_numeric($roleRank)) {
+            $this->roleRank = (int) $roleRank;
+        }
     }
 
     /**
