@@ -67,7 +67,8 @@ interface MapperInterface
      *
      * Rows returned from query results will conform to the current specified row state
      *
-     * @param  mixed $rowState Flags to indicate 1 of 3 states: active, deleted, all
+     * @param  mixed $rowState Options: MapperInterface::ACTIVE_ROWS, MapperInterface::DELETED_ROWS,
+     *                         MapperInterface::ALL_ROWS
      * @return MapperInterface
      */
     public function setRowState($rowState);
