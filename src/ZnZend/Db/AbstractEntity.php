@@ -158,6 +158,8 @@ abstract class AbstractEntity implements EntityInterface
      * Defined by ArraySerializableInterface via EntityInterface; Get entity properties as an array
      *
      * This uses $_mapGettersColumns and calls all the getters to populate the array.
+     * By default, properties prefixed with an underscore will be omitted.
+     *
      * All values are cast to string for use in forms and database calls.
      * If the value is DateTime, $value->format('c') is used to return the ISO 8601 timestamp.
      * If the value is an object, $value->__toString() must be defined.
@@ -173,7 +175,8 @@ abstract class AbstractEntity implements EntityInterface
         $result = array();
         $map = static::$_mapGettersColumns;
         foreach ($map as $getter => $column) {
-            if (!property_exists($this, $column)) {
+            // Skip if column is not a property (eg. an SQL expression) or is prefixed with an underscore
+            if (!property_exists($this, $column) || '_' == substr($column, 0, 1)) {
                 continue; // in case the column is an SQL expression
             }
             $value = $this->$getter();
