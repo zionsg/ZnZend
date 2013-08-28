@@ -70,7 +70,7 @@ class ZnZendRestJson extends AbstractPlugin
      * @param  string $method        Optional HTTP method
      * @param  array  $data          Optional data to be sent with request
      * @param  array  $headers       Optional headers to be sent with request
-     * @param  array  $clientOptions Optional options to pass to Client
+     * @param  array  $clientOptions Optional options to pass to Client, eg. array('sslverifypeer' => false) for HTTPS
      * @return ZnZendRest
      */
     public function __invoke(
@@ -106,7 +106,7 @@ class ZnZendRestJson extends AbstractPlugin
         $this->result = $this->response->getBody();
 
         try {
-            $this->json = Json::decode($this->result);
+            $this->json = Json::decode($this->result, Json::TYPE_OBJECT);
         } catch (\Exception $e) {
             $this->jsonErrorCode = json_last_error();
             $this->jsonErrorMessage = $e->getMessage();
