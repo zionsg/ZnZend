@@ -462,8 +462,8 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      *
      * Rows returned from query results will conform to the current specified row state
      *
-     * @param  string $rowState Options: AbstractMapper::ACTIVE_ROWS, AbstractMapper::DELETED_ROWS,
-     *                          AbstractMapper::ALL_ROWS
+     * @param  string $rowState Options: self::ACTIVE_ROWS, self::DELETED_ROWS,
+     *                          self::ALL_ROWS
      * @return MapperInterface
      */
     public function setRowState($rowState)
