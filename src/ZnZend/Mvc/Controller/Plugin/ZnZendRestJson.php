@@ -104,6 +104,7 @@ class ZnZendRestJson extends AbstractPlugin
         $this->response = $client->send();
         // getContent() gives problems when a base64 encoded string is embedded, such as an inline image
         $this->result = $this->response->getBody();
+        $this->isValid = $this->response->isOk();
 
         try {
             $this->json = Json::decode($this->result, Json::TYPE_OBJECT);
@@ -113,7 +114,6 @@ class ZnZendRestJson extends AbstractPlugin
             $this->isValid = false;
         }
 
-        $this->isValid = true;
         return $this;
     }
 
