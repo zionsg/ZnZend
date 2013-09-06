@@ -71,7 +71,7 @@ class ZnZendRestJson extends AbstractPlugin
      * @param  array  $data          Optional data to be sent with request
      * @param  array  $headers       Optional headers to be sent with request
      * @param  array  $clientOptions Optional options to pass to Client, eg. array('sslverifypeer' => false) for HTTPS
-     * @return ZnZendRest
+     * @return self
      */
     public function __invoke(
         $uri,
