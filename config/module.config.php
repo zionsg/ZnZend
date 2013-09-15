@@ -38,6 +38,7 @@ return array(
             'znZendFormatDateRange'   => 'ZnZend\View\Helper\ZnZendFormatDateRange',
             'znZendFormatTimeRange'   => 'ZnZend\View\Helper\ZnZendFormatTimeRange',
             'znZendResizeImage'       => 'ZnZend\View\Helper\ZnZendResizeImage',
+            'znZendSpanEntities'      => 'ZnZend\View\Helper\ZnZendSpanEntities',
             // Form view helpers
             'znZendFormElementValue'    => 'ZnZend\Form\View\Helper\ZnZendFormElementValue',
             'znZendFormCaptchaQuestion' => 'ZnZend\Form\View\Helper\Captcha\Question',
