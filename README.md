@@ -106,9 +106,11 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 * `znZendFormElementValue` - Render value of element without input for viewing only
 
 ## View Helpers
-* `znZendColumnizeEntities` - Output entities in columns
+* `znZendColumnizeEntities` - Output entities in columns using &lt;table&gt;
 * `znZendExcerpt` - Extract excerpt from text
 * `znZendFormatBytes` - Format bytes to human-readable form
 * `znZendFormatDateRange` - Format a date range
 * `znZendFormatTimeRange` - Format a time range
 * `znZendResizeImage` - Make resized copy of image and return path for use in HTML &lt;img&gt;
+* `znZendSpanEntities` - Output collection of entities in columns based on Twitter Bootstrap 2
+                         "row-fluid" and "span*" classes
