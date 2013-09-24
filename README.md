@@ -107,6 +107,7 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 
 ## View Helpers
 * `znZendColumnizeEntities` - Output entities in columns using &lt;table&gt;
+* `znZendContrastColor` - Choose color that provides sufficient constrast when combined with specified color
 * `znZendExcerpt` - Extract excerpt from text
 * `znZendFormatBytes` - Format bytes to human-readable form
 * `znZendFormatDateRange` - Format a date range
