@@ -33,6 +33,7 @@ return array(
     'view_helpers' => array(
         'invokables' => array(
             'znZendColumnizeEntities' => 'ZnZend\View\Helper\ZnZendColumnizeEntities',
+            'znZendContrastColor'     => 'ZnZend\View\Helper\ZnZendContrastColor',
             'znZendExcerpt'           => 'ZnZend\View\Helper\ZnZendExcerpt',
             'znZendFormatBytes'       => 'ZnZend\View\Helper\ZnZendFormatBytes',
             'znZendFormatDateRange'   => 'ZnZend\View\Helper\ZnZendFormatDateRange',
