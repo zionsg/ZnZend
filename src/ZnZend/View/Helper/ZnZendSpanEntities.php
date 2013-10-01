@@ -288,7 +288,7 @@ class ZnZendSpanEntities extends AbstractHelper
 
                 } // end entity output
 
-                $output .= $entityOutput . PHP_EOL . '</div><br class="visible-phone" />' . PHP_EOL;
+                $output .= $entityOutput . PHP_EOL . '<br class="visible-phone" /></div>' . PHP_EOL;
                 $entitiesProcessed++;
             } // end for cols
 
