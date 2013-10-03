@@ -39,7 +39,6 @@ class ZnZendTimestamp extends AbstractPlugin
         // 4 is derived from default PHP value of 14 for 'precision' and PHP_INT_MAX on 32-bit platform
         $precision = (int) ini_get('precision');
         $decimalDigits = max(4, $precision - strlen(PHP_INT_MAX));
-        $format = '%0' . ($precision + 1) . ".{$decimalDigits}f";
 
         $formattedTimestamp = sprintf(
             '%0' . ($precision + 1) . ".{$decimalDigits}f",
@@ -54,7 +53,7 @@ class ZnZendTimestamp extends AbstractPlugin
         // Eg. Converting 1371437694.2509, 1371437694.2510, 1371437694.3000 will yield different lengths
         // as they are seen as 13714376942509, 1371437694251 and 13714376943 when passed as floats
         $formattedTimestamp = str_replace('.', '', $formattedTimestamp);
-        $maxTimestamp = PHP_INT_MAX . '.' . str_repeat('0', $decimalDigits);
+        $maxTimestamp = PHP_INT_MAX . str_repeat('0', $decimalDigits);
         $base36PadLen = strlen(base_convert($maxTimestamp, 10, 36));
 
         $base36 = str_pad(base_convert($formattedTimestamp, 10, 36), $base36PadLen, '0', STR_PAD_LEFT);
