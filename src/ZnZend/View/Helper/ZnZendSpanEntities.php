@@ -239,13 +239,15 @@ class ZnZendSpanEntities extends AbstractHelper
                                 $height = $maxThumbnailHeight;
                             }
 
+                            // must use style to define width and height as
+                            // <img width="" height="" /> is ignored at times by IE in responsive layouts
                             $thumbnailOutput = sprintf(
-                                '%s<img class="%s" align="center" src="%s" %s %s />' . PHP_EOL . '%s',
+                                '%s<img class="%s" src="%s" style="%s %s" />' . PHP_EOL . '%s',
                                 $urlOutputBegin,
                                 $thumbnailClass,
                                 $thumbnailPath . $thumbnail,
-                                ($maxThumbnailWidth == 0 ? '' : "width=\"{$width}\""),
-                                ($maxThumbnailHeight == 0 ? '' : "height=\"{$height}\""),
+                                ($maxThumbnailWidth == 0 ? '' : "width:{$width}px;"),
+                                ($maxThumbnailHeight == 0 ? '' : "height:{$height}px;"),
                                 $urlOutputEnd
                             );
                         } // end if thumbnail file exists
@@ -256,13 +258,13 @@ class ZnZendSpanEntities extends AbstractHelper
                             // to allow thumbnailBoxClass to set its own alignment
                             $thumbnailOutput = sprintf(
                                 '<table class="%s" cellspacing="0" cellpadding="0">' . PHP_EOL
-                                . '<tr><td %s %s>' . PHP_EOL
+                                . '<tr><td style="%s %s">' . PHP_EOL
                                 . '%s'
                                 . '</td></tr>' . PHP_EOL
                                 . '</table>' . PHP_EOL,
                                 $thumbnailBoxClass,
-                                ($maxThumbnailWidth == 0 ? '' : "width=\"{$maxThumbnailWidth}\""),
-                                ($maxThumbnailHeight == 0 ? '' : "height=\"{$maxThumbnailHeight}\""),
+                                ($maxThumbnailWidth == 0 ? '' : "width:{$maxThumbnailWidth}px;"),
+                                ($maxThumbnailHeight == 0 ? '' : "height:{$maxThumbnailHeight}px;"),
                                 $thumbnailOutput
                             );
                         }
