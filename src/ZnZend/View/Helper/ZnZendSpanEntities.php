@@ -85,9 +85,7 @@ class ZnZendSpanEntities extends AbstractHelper
      *                                       thumbnail filename
      *         'thumbnailPath'      string   Folder path relative to web root where thumbnail is stored
      *         'maxThumbnailHeight' int      DEFAULT=0. Maximum height constraint for thumbnail image
-     *                                       If set to 0, "height" attribute will be skipped in output
      *         'maxThumbnailWidth'  int      DEFAULT=0. Maximum width constraint for thumbnail image
-     *                                       If set to 0, "width" attribute will be skipped in output
      *         'webRoot'            string   Absolute path for web root. Used for retrieving thumbnail.
      *                                       If thumbnail is a remote image, eg. http://test.com/test.png,
      *                                       set webRoot to '' and thumbnailPath to 'http://test.com'
@@ -239,15 +237,22 @@ class ZnZendSpanEntities extends AbstractHelper
                                 $height = $maxThumbnailHeight;
                             }
 
-                            // must use style to define width and height as
-                            // <img width="" height="" /> is ignored at times by IE in responsive layouts
+                            // For responsive layouts, only 1 dimension (width, height) should be specified
+                            // else the image will look squashed when resizing the browser
+                            $dimension = '';
+                            if ($maxThumbnailWidth) {
+                                $dimension = "width:{$width}px;";
+                            } elseif ($maxThumbnailHeight) {
+                                $dimension = "height:{$height}px;";
+                            }
+
+                            // use style to define width and height as <img width="" height="" /> is ignored at times
                             $thumbnailOutput = sprintf(
-                                '%s<img class="%s" src="%s" style="%s %s" />' . PHP_EOL . '%s',
+                                '%s<img class="%s" src="%s" style="%s" />%s',
                                 $urlOutputBegin,
                                 $thumbnailClass,
                                 $thumbnailPath . $thumbnail,
-                                ($maxThumbnailWidth == 0 ? '' : "width:{$width}px;"),
-                                ($maxThumbnailHeight == 0 ? '' : "height:{$height}px;"),
+                                $dimension,
                                 $urlOutputEnd
                             );
                         } // end if thumbnail file exists
@@ -257,14 +262,11 @@ class ZnZendSpanEntities extends AbstractHelper
                             // align="center" and valign="middle" not hardcoded for <td>
                             // to allow thumbnailBoxClass to set its own alignment
                             $thumbnailOutput = sprintf(
-                                '<table class="%s" cellspacing="0" cellpadding="0">' . PHP_EOL
-                                . '<tr><td style="%s %s">' . PHP_EOL
+                                '<table class="%s"><tr><td style="%s">' . PHP_EOL
                                 . '%s'
-                                . '</td></tr>' . PHP_EOL
-                                . '</table>' . PHP_EOL,
+                                . '</td></tr></table>' . PHP_EOL,
                                 $thumbnailBoxClass,
-                                ($maxThumbnailWidth == 0 ? '' : "width:{$maxThumbnailWidth}px;"),
-                                ($maxThumbnailHeight == 0 ? '' : "height:{$maxThumbnailHeight}px;"),
+                                $dimension,
                                 $thumbnailOutput
                             );
                         }
@@ -290,11 +292,11 @@ class ZnZendSpanEntities extends AbstractHelper
 
                 } // end entity output
 
-                $output .= $entityOutput . PHP_EOL . '<br class="visible-phone" /></div>' . PHP_EOL;
+                $output .= $entityOutput . PHP_EOL . '<br /></div>' . PHP_EOL;
                 $entitiesProcessed++;
             } // end for cols
 
-            $output .= '</div><br class="hidden-phone" />' . PHP_EOL;
+            $output .= '</div>' . PHP_EOL;
         } // end for rows
 
         if ($drawContainer) {
