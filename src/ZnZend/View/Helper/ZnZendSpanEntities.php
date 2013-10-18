@@ -239,11 +239,20 @@ class ZnZendSpanEntities extends AbstractHelper
 
                             // For responsive layouts, only 1 dimension (width, height) should be specified
                             // else the image will look squashed when resizing the browser
+                            // If $dimension uses width, $boxDimension will use maxThumbnailheight (if specified)
+                            // so as to create box effect
                             $dimension = '';
+                            $boxDimension = '';
                             if ($maxThumbnailWidth) {
                                 $dimension = "width:{$width}px;";
+                                $boxDimension = $maxThumbnailHeight
+                                              ? "height:{$maxThumbnailHeight}px;"
+                                              : "width:{$maxThumbnailWidth}px;";
                             } elseif ($maxThumbnailHeight) {
                                 $dimension = "height:{$height}px;";
+                                $boxDimension = $maxThumbnailWidth
+                                              ? "width:{$maxThumbnailWidth}px;"
+                                              : "height:{$maxThumbnailHeight}px;";
                             }
 
                             // use style to define width and height as <img width="" height="" /> is ignored at times
@@ -266,7 +275,7 @@ class ZnZendSpanEntities extends AbstractHelper
                                 . '%s'
                                 . '</td></tr></table>' . PHP_EOL,
                                 $thumbnailBoxClass,
-                                $dimension,
+                                $boxDimension,
                                 $thumbnailOutput
                             );
                         }
