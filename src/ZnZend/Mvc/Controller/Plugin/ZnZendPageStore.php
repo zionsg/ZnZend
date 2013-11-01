@@ -21,12 +21,18 @@ use Zend\Session\SessionManager;
  *   A page lists all records from the database with pagination and has a search form
  *   When the search form is submitted, the page lists search results from the database with pagination
  *   When the user clicks page 2 of the pagination links, it shows page 2 of ALL records and not
- *   page 2 of the search results as the search form was not re-submitted
+ *   page 2 of the search results as the search form was not re-submitted.
  *
- * This plugin can be used by the search form to store the search query (submitted form data) in session
- * The stored data is cleared when the user navigates to another page to prevent caching
+ * This plugin can be used by the search form to store the search query (submitted form data) in session.
+ * The stored data is cleared ONLY when the user navigates to another page which uses the same plugin.
  *
- * Basic usage uses only setData() and getData()
+ * Basic usage in a controller action:
+ *   if ($this->getRequest()->isPost()) {
+ *       $formData = $this->getRequest()->getPost();
+ *       $this->znZendPageStore()->setData($formData['keyword']);
+ *   }
+ *   $keyword = $this->znZendPageStore()->getData();
+ *   $records = $model->findByKeyword($keyword);
  */
 class ZnZendPageStore extends AbstractPlugin
 {
