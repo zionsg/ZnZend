@@ -59,9 +59,11 @@ return array(
     'ZnZend\View\Exception\ExceptionInterface'                    => __DIR__ . '/src/ZnZend/View/Exception/ExceptionInterface.php',
     'ZnZend\View\Exception\InvalidArgumentException'              => __DIR__ . '/src/ZnZend/View/Exception/InvalidArgumentException.php',
     'ZnZend\View\Helper\ZnZendColumnizeEntities'                  => __DIR__ . '/src/ZnZend/View/Helper/ZnZendColumnizeEntities.php',
+    'ZnZend\View\Helper\ZnZendContrastColor'                      => __DIR__ . '/src/ZnZend/View/Helper/ZnZendContrastColor.php',
     'ZnZend\View\Helper\ZnZendExcerpt'                            => __DIR__ . '/src/ZnZend/View/Helper/ZnZendExcerpt.php',
     'ZnZend\View\Helper\ZnZendFormatBytes'                        => __DIR__ . '/src/ZnZend/View/Helper/ZnZendFormatBytes.php',
     'ZnZend\View\Helper\ZnZendFormatDateRange'                    => __DIR__ . '/src/ZnZend/View/Helper/ZnZendFormatDateRange.php',
     'ZnZend\View\Helper\ZnZendFormatTimeRange'                    => __DIR__ . '/src/ZnZend/View/Helper/ZnZendFormatTimeRange.php',
     'ZnZend\View\Helper\ZnZendResizeImage'                        => __DIR__ . '/src/ZnZend/View/Helper/ZnZendResizeImage.php',
+    'ZnZend\View\Helper\ZnZendSpanEntities'                       => __DIR__ . '/src/ZnZend/View/Helper/ZnZendSpanEntities.php',
 );
