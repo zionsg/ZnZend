@@ -425,7 +425,6 @@ class Question extends AbstractWord
      *
      * @return string
      * @throws Exception\NoFontProvidedException if no font was set
-     * @throws Exception\ImageNotLoadableException if start image cannot be loaded
      */
     protected function generateImage()
     {
