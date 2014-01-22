@@ -3,8 +3,18 @@
  * @see Zend\Mvc\Service\ModuleManagerFactory for list of manager keys (ie. view_helpers, etc.)
  * @see Zend\ModuleManager\Listener\ServiceListener::serviceConfigToArray() and
  *      Zend\ServiceManager\Config for list of config keys for each service manager (ie. invokables, etc.)
+ * @see ZnZend\Module::onBootstrap() for configuring of PHP settings via 'phpSettings' key
  */
+
+$isDevelopmentMode = ('127.0.0.1' == $_SERVER['REMOTE_ADDR']); // whether app is running in localhost development mode
 return array(
+    // PHP settings can be configured via this key (preferrably in /config/autoload/global.php)
+    'phpSettings' => array(
+        // 'display_startup_errors' => $isDevelopmentMode,
+        // 'display_errors'  => $isDevelopmentMode,
+        // 'error_reporting' => ($isDevelopmentMode ? E_ALL : E_ALL & ~E_NOTICE),
+    ),
+
     'service_manager' => array(
         'aliases' => array(
             // Both the alias and invokable are required for ZnZendIdentityFactory to work
