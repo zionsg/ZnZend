@@ -15,8 +15,7 @@ use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\EventManager\EventInterface;
 
 /**
- * @see Zend\Mvc\Service\ModuleManagerFactory and Zend\ModuleManager\Feature\*Interface.php
- *      for list of config methods
+ * @see Zend\Mvc\Service\ModuleManagerFactory and Zend\ModuleManager\Feature\*Interface.php for list of config methods
  */
 class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ConfigProviderInterface
 {
@@ -31,6 +30,13 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
     public function onBootstrap(EventInterface $e)
     {
         $sm = $e->getApplication()->getServiceManager();
+
+        // Allow configuration of PHP settings via 'phpSettings' key in config
+        $config = $sm->get('Config');
+        $phpSettings = isset($config['phpSettings']) ? $config['phpSettings'] : array();
+        foreach($phpSettings as $key => $value) {
+            ini_set($key, $value);
+        }
 
         // @see https://github.com/zendframework/zf2/issues/4879 for fix by alexshelkov
         // This is a temporary fix for the php5-intl dependency since ZF 2.2.2 for all view helpers.
