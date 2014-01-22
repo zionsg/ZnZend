@@ -6,7 +6,7 @@
  * @see ZnZend\Module::onBootstrap() for configuring of PHP settings via 'phpSettings' key
  */
 
-$isDevelopmentMode = ('127.0.0.1' == $_SERVER['REMOTE_ADDR']); // whether app is running in localhost development mode
+// $isDevelopmentMode = ('127.0.0.1' == $_SERVER['REMOTE_ADDR']); // whether app is running in localhost development mode
 return array(
     // PHP settings can be configured via this key (preferrably in /config/autoload/global.php)
     'phpSettings' => array(
