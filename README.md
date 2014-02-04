@@ -41,7 +41,7 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
             'Zend\Loader\ClassMapAutoloader' => array(
                 __DIR__ . '/autoload_classmap.php',
             ),
-            'ZendLoaderStandardAutoloader' => array(
+            'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                     'Doctrine'    => __DIR__ . '/vendor/doctrine',
