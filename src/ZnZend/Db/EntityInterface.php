@@ -15,7 +15,7 @@ use Zend\Stdlib\ArraySerializableInterface;
  * Interface for entities corresponding to rows in database tables
  *
  * This facilitates generic treatment of entities in a Content Management System,
- * logging and generic view scripts.
+ * logging and generic view scripts. Setters return EntityInterface to provide a fluent interface.
  */
 interface EntityInterface extends ArraySerializableInterface, ResourceInterface
 {
@@ -130,7 +130,7 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * Set record id
      *
      * @param  null|int $value
-     * @return EntityInterface For fluent interface
+     * @return EntityInterface
      */
     public function setId($value);
 
@@ -157,27 +157,11 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function getName();
 
     /**
-     * Set hidden status of entity
-     *
-     * @param  mixed $value Value is not cast to boolean to reflect actual value in database
-     * @return EntityInterface
-     */
-    public function setHidden($value);
-
-    /**
      * Check whether entity is marked as hidden
      *
      * @return bool
      */
     public function isHidden();
-
-    /**
-     * Set deleted status of entity
-     *
-     * @param  mixed $value Value is not cast to boolean to reflect actual value in database
-     * @return EntityInterface
-     */
-    public function setDeleted($value);
 
     /**
      * Check whether entity is marked as deleted
