@@ -87,16 +87,16 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 * `ZnZend\Captcha\Service\MathQuestionService` - A service which provides simple arithmetic questions for captcha
 
 ## Controller Plugins
-* `znZendDataTable` - Update Paginator (DbSelect) with params sent from jQuery DataTables plugin
-* `znZendIdentity`  - Fetch the authenticated identity as an instance of IdentityInterface
-                      and its role as an instance of RoleInterface. When invoked, its factory will look for a service
-                      by the name `ZnZend\Authentication\AuthenticationService` in the `ServiceManager`, similar
-                      to the Zend Identity controller plugin. The service does not exist but defaults to
-                      `Zend\Authentication\AuthenticationService`
-* `znZendMvcParams` - Get name of module, controller and action as like in ZF1
-* `znZendPageStore` - Persist data for current page across reloads of the same page
-* `znZendRestJson`  - Consume REST web service which returns JSON result
-* `znZendTimestamp` - Return timestamp formatted to standard length and converted to base 36
+* `znZendDataTables` - Update Paginator (DbSelect) with params sent from jQuery DataTables plugin
+* `znZendIdentity`   - Fetch the authenticated identity as an instance of IdentityInterface
+                       and its role as an instance of RoleInterface. When invoked, its factory will look for a service
+                       by the name `ZnZend\Authentication\AuthenticationService` in the `ServiceManager`, similar
+                       to the Zend Identity controller plugin. The service does not exist but defaults to
+                       `Zend\Authentication\AuthenticationService`
+* `znZendMvcParams`  - Get name of module, controller and action as like in ZF1
+* `znZendPageStore`  - Persist data for current page across reloads of the same page
+* `znZendRestJson`   - Consume REST web service which returns JSON result
+* `znZendTimestamp`  - Return timestamp formatted to standard length and converted to base 36
 
 ## Filters
 * `ZnZend\Filter\File\RenameUploadWithCallback` - Allows use of custom callback to rename file uploads
