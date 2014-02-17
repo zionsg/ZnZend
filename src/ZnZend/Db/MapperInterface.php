@@ -8,7 +8,6 @@
 
 namespace ZnZend\Db;
 
-use Zend\Form;
 use Zend\Paginator\Paginator;
 use ZnZend\Db\EntityInterface;
 
@@ -16,7 +15,7 @@ use ZnZend\Db\EntityInterface;
  * Interface for entity mappers corresponding to database tables
  *
  * Some methods are brought in from \Zend\Db\TableGatewayInterface to ensure availability
- * while reducing bloat at the same time.
+ * while reducing bloat at the same time. Setters return MapperInterface to provide fluent interface.
  */
 interface MapperInterface
 {
