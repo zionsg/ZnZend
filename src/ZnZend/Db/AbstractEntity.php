@@ -76,8 +76,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Array mapping getters to columns - to be set by extending class
      *
-     * Various parts of this class assume that for a getter getX() or isX(),
-     * the corresponding setter will be setX().
+     * This class assumes that for a property X, its getter is getX() and setter is setX().
      *
      * @Annotation\Exclude()
      * @example array(
@@ -95,6 +94,14 @@ abstract class AbstractEntity implements EntityInterface
         'isHidden'  => 'ishidden',
         'isDeleted' => 'isdeleted',
     );
+
+    /**
+     * Array mapping columns to getters - computed by mapColumnsGetters()
+     *
+     * @Annotation\Exclude()
+     * @var null|array Initialize to null as computed result might be an empty array
+     */
+    protected static $_mapColumnsGetters = null;
 
     /**
      * Constructor
@@ -123,7 +130,7 @@ abstract class AbstractEntity implements EntityInterface
      * Defined by ArraySerializableInterface via EntityInterface; Set entity properties from array
      *
      * This uses $_mapGettersColumns - a column must be mapped and have a setter
-     * for the corresponding key in $data to be set. In general, for getX() or isX(),
+     * for the corresponding key in $data to be set. In general, for getX(),
      * the corresponding setter is assumed to be setX().
      * Extending classes should override this if this is not desired.
      *
@@ -139,17 +146,19 @@ abstract class AbstractEntity implements EntityInterface
             return;
         }
 
-        $map = array_flip(static::$_mapGettersColumns);
+        $map = $this->mapColumnsGetters();
         foreach ($data as $key => $value) {
             if (!array_key_exists($key, $map)) {
                 continue;
             }
             $getter = $map[$key];
-            $setter = ('get' === substr($getter, 0, 3))
-                    ? substr_replace($getter, 'set', 0, 3)  // getX() becomes setX()
-                    : substr_replace($getter, 'set', 0, 2); // isX() becomes setX()
-            if (is_callable(array($this, $setter))) {
-                $this->$setter($value);
+            if (   'get' === substr($getter, 0, 3)
+                && strtoupper(substr($getter, 3, 1)) == substr($getter, 3, 1)
+            ) {
+                $setter = substr_replace($getter, 'set', 0, 3);
+                if (is_callable(array($this, $setter))) {
+                    $this->$setter($value);
+                }
             }
         }
     }
@@ -221,7 +230,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getPropertyGetter($property)
     {
-        $map = array_flip(static::$_mapGettersColumns);
+        $map = $this->mapColumnsGetters();
         if (empty($map[$property])) {
             return null;
         }
@@ -358,17 +367,6 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
-     * Defined by EntityInterface; Set hidden status of entity
-     *
-     * @param  mixed $value Value is not cast to boolean to reflect actual value in database
-     * @return EntityInterface
-     */
-    public function setHidden($value)
-    {
-        return $this->set($value);
-    }
-
-    /**
      * Defined by EntityInterface; Check whether entity is marked as hidden
      *
      * @return bool
@@ -376,17 +374,6 @@ abstract class AbstractEntity implements EntityInterface
     public function isHidden()
     {
         return (bool) $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Set deleted status of entity
-     *
-     * @param  mixed $value Value is not cast to boolean to reflect actual value in database
-     * @return EntityInterface
-     */
-    public function setDeleted($value)
-    {
-        return $this->set($value);
     }
 
     /**
@@ -403,6 +390,28 @@ abstract class AbstractEntity implements EntityInterface
     }
 
     /**
+     * Compute array for mapping columns to getters
+     *
+     * array_flip was used previously but would run into errors if null or boolean values
+     * were set in $_mapGettersColumns - array_flip can only flip strings and integers.
+     *
+     * @return array
+     */
+    protected function mapColumnsGetters()
+    {
+        if (null === static::$_mapColumnsGetters) {
+            $map = array();
+            foreach (static::$_mapGettersColumns as $getter => $column) {
+                if (is_string($column)) {
+                    $map[$column] = $getter;
+                }
+            }
+            static::$_mapColumnsGetters = $map;
+        }
+        return static::$_mapColumnsGetters;
+    }
+
+    /**
      * Generic internal setter for entity properties
      *
      * @param  null|mixed  $value    Value to set
@@ -413,8 +422,7 @@ abstract class AbstractEntity implements EntityInterface
      * @param  null|string $property Optional property to set $value to. If not specified,
      *                               $_mapGettersColumns is checked for the corresponding getter
      *                               of the calling function to get the mapped property.
-     *                               In general, for setX(), the corresponding getter is either
-     *                               getX() or isX().
+     *                               In general, for setX(), the corresponding getter is getX().
      * @throws Exception\InvalidArgumentException Property does not exist
      * @return AbstractEntity For fluent interface
      */
@@ -425,13 +433,9 @@ abstract class AbstractEntity implements EntityInterface
             $trace = debug_backtrace();
             $callerFunction = $trace[1]['function'];
             $map = static::$_mapGettersColumns;
-
             $getFunc = substr_replace($callerFunction, 'get', 0, 3);
-            $isFunc = substr_replace($callerFunction, 'is', 0, 3);
             if (array_key_exists($getFunc, $map)) {
                 $property = $map[$getFunc];
-            } elseif (array_key_exists($isFunc, $map)) {
-                $property = $map[$isFunc];
             }
         }
 
