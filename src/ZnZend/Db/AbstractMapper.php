@@ -276,7 +276,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         // array_intersect() not used as keys with empty strings or boolean false are removed
         $tableCols = array_flip($this->getColumns());  // need to flip
         foreach ($data as $key => $value) {
-            // isset() faster than array_key_exists()
+            // isset() faster than in_array() and array_key_exists()
             $column = str_replace("{$this->table}.", '', $key);
             if (!isset($tableCols[$column])) {
                 unset($data[$key]);
