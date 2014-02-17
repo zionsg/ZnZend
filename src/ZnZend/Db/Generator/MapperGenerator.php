@@ -12,6 +12,7 @@ use Zend\Code\Generator\FileGenerator;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\PropertyGenerator;
+use Zend\Db\Adapter\Adapter;
 use ZnZend\Db\AbstractMapper;
 use ZnZend\Db\Exception;
 
@@ -31,6 +32,7 @@ class MapperGenerator
      * The params are applied to all the tables.
      *
      * @param string   $filePath            Path to write generated files
+     * @param Adapter  $dbAdapter           Database adapter
      * @param string   $namespace           Namespace for entity and table gateway classes
      * @param callable $activeRowStateFunc  Optional callback that takes in (string $tableName, array $columnNames)
      *                                      and returns array('activeColumn' => 'activeValue') for
@@ -44,7 +46,7 @@ class MapperGenerator
      */
     public static function generate(
         $filePath,
-        \Zend\Db\Adapter\Adapter $dbAdapter,
+        Adapter $dbAdapter,
         $namespace,
         $activeRowStateFunc = null,
         $deletedRowStateFunc = null,
