@@ -17,6 +17,8 @@ use Zend\Code\Generator\ParameterGenerator;
 use Zend\Code\Generator\DocBlock\Tag;
 use Zend\Code\Generator\DocBlock\Tag\ParamTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
+use Zend\Db\Adapter\Adapter;
+use ZnZend\Db\AbstractEntity;
 use ZnZend\Db\Exception;
 
 /**
@@ -26,6 +28,11 @@ use ZnZend\Db\Exception;
  * The entity name, $_mapGettersColumns, setters and getters for each column are generated
  * using simplistic naming rules. Eg: For a `useragent` column, the generated getter
  * will be named 'getUseragent()' and not 'getUserAgent()'.
+ *
+ * Note: If a table has 2 columns with the same '_*' ending, eg. user_id and role_id,
+ * an error will occur as the default column to setter/getter naming functions,
+ * columnToSetterFunc() and columnToGetterFunc(), will create setId() and getId() for both columns,
+ * resulting in a conflict. In this case, custom naming callbacks should be passed to generate().
  */
 class EntityGenerator
 {
@@ -57,6 +64,7 @@ class EntityGenerator
      * The params are applied to all the entities.
      *
      * @param string   $filePath            Path to write generated files
+     * @param Adapter  $dbAdapter           Database adapter
      * @param string   $namespace           Namespace for entity and table gateway classes
      * @param callable $columnToSetterFunc  Optional callback that takes in (string $tableName, string $columnName)
      *                                      and returns setter name
@@ -68,7 +76,7 @@ class EntityGenerator
      */
     public static function generate(
         $filePath,
-        \Zend\Db\Adapter\Adapter $dbAdapter,
+        Adapter $dbAdapter,
         $namespace,
         $columnToSetterFunc = null,
         $columnToGetterFunc = null,
@@ -358,7 +366,7 @@ class EntityGenerator
      * Get default callback for generating getter name from column name
      *
      * 'name' and 'person_name' becomes 'getName'
-     * 'isdeleted' and 'person_isdeleted' becomes 'isDeleted'
+     * 'isdeleted' and 'person_isdeleted' becomes 'getIsdeleted'
      *
      * @return callable
      */
@@ -368,9 +376,6 @@ class EntityGenerator
             $pattern = '/^.*[^a-zA-Z0-9]+(.+)$/';
             $matches = array();
             $normalizedName = (preg_match($pattern, $columnName, $matches) ? $matches[1] : $columnName);
-            if (0 === stripos($normalizedName, 'is')) {
-                return 'is' . ucfirst(substr($normalizedName, 2));
-            }
             return 'get' . ucfirst($normalizedName);
         };
     }
