@@ -8,573 +8,503 @@
 
 namespace ZnZend\Db;
 
-use Zend\Db\ResultSet\HydratingResultSet;
-use Zend\Db\ResultSet\ResultSetInterface;
-use Zend\Db\Sql\Select;
-use Zend\Db\Sql\Where;
-use Zend\Db\TableGateway\AbstractTableGateway;
-use Zend\Db\TableGateway\Feature;
-use Zend\Paginator\Paginator;
+use DateTime;
+use Zend\Form\Annotation;
+use Zend\Permissions\Acl\Resource\ResourceInterface;
 use Zend\Stdlib\ArraySerializableInterface;
-use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
 use ZnZend\Db\EntityInterface;
 use ZnZend\Db\Exception;
-use ZnZend\Db\MapperInterface;
-use ZnZend\Paginator\Adapter\DbSelect;
 
 /**
- * Base class for mappers / table gateways
+ * Base class for entities corresponding to rows in database tables
  *
- * Properties that must be set: $table, $resultSetClass
- * Properties that should be set if applicable: $primaryKey, $activeRowState, $deletedRowState
+ * Methods from EntityInterface are implemented for defaults and should
+ * be overwritten by concrete classes if required.
  *
- * Modifications to AbstractTableGateway:
- *   - Ability to use global/static db adapter
- *   - Custom class for result set objects set via property $resultSetClass
- *   - Paginator is returned for result sets
- *   - Row state (active, deleted, all) is taken into consideration when querying
- *   - markActive() and markDeleted() added for marking records
- *   - insert() and update() modified to filter out keys in user data that do not map to columns in table
- *   - allows populating of records from non-database source
+ * Getters are preferred over public properties as the latter would likely be named
+ * after the actual database columns, which the user should not know about.
+ * Also, additional validation/other stuff can be added to the setter/getter without having
+ * to get everyone in the world to convert their code from $entity->foo = $x; to $entity->setFoo($x);
+ *
+ * Typically, type checking/casting is done once in setters and not repeated in getters.
+ *
+ * @Annotation\Name("Entity")
+ * @Annotation\Type("ZnZend\Form\Form")
+ * @Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")
  */
-abstract class AbstractMapper extends AbstractTableGateway implements MapperInterface
+abstract class AbstractEntity implements EntityInterface
 {
     /**
-     * Records populated via non-database source
+     * NOTE: 5 things to do for each entity property: protected, Annotation, setter, getter, $_mapGettersColumns
      *
-     * @var array
+     * $id is for example only, and fulfils the 5 things above - setter is setId() and getter is getId().
+     * Internal variables should be prefixed with an underscore and Annotation\Exclude(),
+     * eg. $_mapGettersColumns, to differentiate between them and entity properties.
+     *
+     * The primary key column is usually set to null with Annotation\Exclude() as the value is generated
+     * by the database.
+     *
+     * @Annotation\Exclude()
+     * @var int
      */
-    protected $records = array();
+    protected $id;
 
     /**
-     * Fully qualified name of class used for result set objects - set by user
+     * Authenticated identity (current logged in user)
      *
-     * Class must implement EntityInterface.
-     *
-     * @example \Application\Model\User
+     * @Annotation\Exclude()
      * @var string
      */
-    protected $resultSetClass;
+    protected $_authIdentity;
 
     /**
-     * Name of primary key column(s) - set by user or populated when needed
+     * Singular noun for entity - to be set by extending classes
      *
-     * @var string|array
+     * @Annotation\Exclude()
+     * @var string
      */
-    protected $primaryKey;
+    protected $_singularNoun = 'entity';
 
     /**
-     * Column-value pair used to determine active row state - set by user
+     * Plural noun for entity - to be set by extending classes
      *
-     * @example array('usr_isdeleted' => 0)
-     * @var     array
+     * @Annotation\Exclude()
+     * @var string
      */
-    protected $activeRowState = array();
+    protected $_pluralNoun = 'entities';
 
     /**
-     * Column-value pair used to determine deleted row state - set by user
+     * Array mapping getters to columns - to be set by extending class
      *
-     * @example array('usr_isdeleted' => 1)
-     * @var     array
+     * This class assumes that for a property X, its getter is getX() and setter is setX().
+     *
+     * @Annotation\Exclude()
+     * @example array(
+     *              'getId' => 'person_id', // maps to property
+     *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)"), // maps to SQL expression
+     *              'isDeleted' => '!enabled', // simple negation is allowed
+     *          )
+     * @var array
      */
-    protected $deletedRowState = array();
+    protected static $_mapGettersColumns = array(
+        // The mappings below are for the getters defined in EntityInterface
+        // and are provided for easy copying when coding extending classes
+        'getId'     => 'id',
+        'getName'   => 'name',
+        'isHidden'  => 'ishidden',
+        'isDeleted' => 'isdeleted',
+    );
 
     /**
-     * Current row state
+     * Array mapping columns to getters - computed by mapColumnsGetters()
      *
-     * @var string Options: AbstractMapper::ACTIVE_ROWS (default),
-     *             AbstractMapper::DELETED_ROWS, AbstractMapper::ALL_ROWS
+     * @Annotation\Exclude()
+     * @var null|array Initialize to null as computed result might be an empty array
      */
-    protected $rowState = self::ACTIVE_ROWS;
+    protected static $_mapColumnsGetters = null;
 
     /**
      * Constructor
      *
-     * Add ability to use a global/static adapter without having to inject it into a TableGateway instance.
-     *   Just add the following line to a bootstrap, eg. onBootstrap() in Module.php:
-     *       Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter($adapter);
-     *   The adapter is statically loaded when instantiating in a controller/model, eg: $table = new MyTableGateway();
+     * @param array $data Optional array to populate entity
      */
-    public function __construct()
+    public function __construct(array $data = array())
     {
-        // Add ability to use global/static adapter
-        $this->getFeatureSet()->addFeature(new Feature\GlobalAdapterFeature());
-
-        // Set result set prototype
-        $this->resultSetPrototype = $this->getResultSetPrototype();
-        $this->resultSetPrototype->buffer();
-
-        // Initialize
-        $this->initialize();
-    }
-
-    /*** IMPORTANT FUNCTIONS ***/
-
-    /*
-     * Get base Select with from, joins, columns added
-     *
-     * All other queries should build upon this so that the columns selected and joins are standardised
-     * Extending classes should call parent::getBaseSelect() and add on to the returned Select
-     * as this takes into account the row state.
-     *
-     * By default, only active records are selected.
-     * Use setRowState() to change behaviour before calling query function.
-     *
-     * @return Select
-     */
-    public function getBaseSelect()
-    {
-        $select = $this->sql->select();
-
-        if (!$this->hasRowState()) {
-            return $select;
-        }
-
-        // Any other value besides ACTIVE_ROWS and DELETED_ROWS will default to ALL_ROWS
-        if (self::ACTIVE_ROWS == $this->rowState && !empty($this->activeRowState)) {
-            $select->where($this->activeRowState);
-        } elseif (self::DELETED_ROWS == $this->rowState && !empty($this->deletedRowState)) {
-            $select->where($this->deletedRowState);
-        }
-
-        return $select;
+        $this->exchangeArray($data);
     }
 
     /**
-     * Return result set as Paginator or ResultSetInterface for select query
+     * Defined by EntityInterface; Value when entity is treated as a string
      *
-     * All query functions should use this as a common return point, even extending classes.
-     * The returned Paginator is set to page 1 with item count set to -1 so that the full result
-     * is returned by default when iterated over without use of pagination.
+     * This is vital if a getter such as getCreator() returns an EntityInterface (instead of string)
+     * and it is used in log text or in a view script. Should default to getName().
      *
-     * @param  Select $select
-     * @param  bool   $fetchAll Default = true. Whether to return all rows (as Paginator using ResultSetInterface)
-     *                          or only the 1st row (as ResultSetInterface).
-     * @param  ResultSetInterface $resultSetPrototype Optional alternate result set prototype to use.
-     * @return Paginator|ResultSetInterface
+     * @return string
      */
-    protected function getResultSet(Select $select, $fetchAll = true, ResultSetInterface $resultSetPrototype = null)
+    public function __toString()
     {
-        if (false === $fetchAll) { // $fetchAll defaults to true if null, hence ===
-            return $this->executeSelect($select)->current();
-        }
-
-        if (null === $resultSetPrototype) {
-            $resultSetPrototype = $this->getResultSetPrototype();
-        }
-
-        $paginator = new Paginator(
-            new DbSelect($select, $this->adapter, $resultSetPrototype)
-        );
-        $paginator->setItemCountPerPage(-1)->setCurrentPageNumber(1);
-
-        return $paginator;
+        return $this->getName();
     }
 
-    /*** ADDITIONAL PUBLIC FUNCTIONS ***/
-
     /**
-     * Insert a new row and update if a duplicate record exists
+     * Defined by ArraySerializableInterface via EntityInterface; Set entity properties from array
      *
-     * This is an implementation of "INSERT ... ON DUPLICATE KEY UPDATE" in MySQL.
-     * The equivalent from SQL-99, "MERGE INTO ...", is not supported in MySQL.
+     * This uses $_mapGettersColumns - a column must be mapped and have a setter
+     * for the corresponding key in $data to be set. In general, for getX(),
+     * the corresponding setter is assumed to be setX().
+     * Extending classes should override this if this is not desired.
      *
-     * @param  array|EntityInterface $set
-     * @param  array $updateSet Optional column-value pairs to use for update instead of insert values from $set
-     * @return int
+     * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::hydrate()
+     * typically in forms to populate an object.
+     *
+     * @param  array $data
+     * @return void
      */
-    public function insertOnDuplicate($set, array $updateSet = array())
+    public function exchangeArray(array $data)
     {
-        $set = $this->filterColumns($set);
+        if (empty($data)) {
+            return;
+        }
 
-        $dbAdapter = $this->adapter;
-        $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
-        $fp = function ($name) use ($dbAdapter) { return $dbAdapter->driver->formatParameterName($name); };
-
-        $columns = array_keys($set);
-        $quotedColumns = array_map($qi, $columns);
-        $parameters = array_map($fp, array_values($columns));
-
-        $primaryKey = $this->getPrimaryKey();
-        $updateValues = array();
-        foreach ($columns as $index => $column) {
-            $quotedColumn = $quotedColumns[$index];
-            if ($primaryKey == $column) {
-                $updateValues[] = $quotedColumn . ' = LAST_INSERT_ID(' . $quotedColumn . ')';
+        $map = $this->mapColumnsGetters();
+        foreach ($data as $key => $value) {
+            if (!array_key_exists($key, $map)) {
                 continue;
             }
-
-            $value = (array_key_exists($column, $updateSet) ? $updateSet[$column] : "VALUES({$quotedColumn})");
-            $updateValues[] = $quotedColumn . ' = ' . $value;
-        }
-
-        $sql = sprintf(
-            'INSERT INTO %s (%s) VALUES (%s) ON DUPLICATE KEY UPDATE %s',
-            $qi($this->table),
-            implode(',', $quotedColumns),
-            implode(',', $parameters),
-            implode(',', $updateValues)
-        );
-        $result = $dbAdapter->query($sql, $set);
-
-        return (int) $result->getGeneratedValue();
-    }
-
-    /*** AUXILIARY FUNCTIONS ***/
-
-    /**
-     * Get primary key column(s)
-     *
-     * @return string|array
-     */
-    protected function getPrimaryKey()
-    {
-        if (empty($this->primaryKey)) {
-            $columns = $this->adapter->query(
-                'SELECT column_name FROM information_schema.columns '
-                . "WHERE table_schema = ? AND table_name = ? AND column_key = 'PRI'",
-                array($this->adapter->getCurrentSchema(), $this->table)
-            );
-            $keys = array();
-            foreach ($columns as $column) {
-                $keys[] = $column->column_name;
-            }
-            $this->primaryKey = (1 == count($keys)) ? $keys[0] : $keys;
-        }
-
-        return $this->primaryKey;
-    }
-
-    /**
-     * Filter out invalid columns in array
-     *
-     * Used for sanitizing data passed in from forms
-     * Care needs to be taken for columns already prefixed with the table name
-     * (so as to prevent ambiguity error when table is self-joined in select())
-     *
-     * @param  array|ArraySerializableInterface $data Column-value pairs
-     * @throws Exception\InvalidArgumentException
-     * @return array
-     */
-    protected function filterColumns($data)
-    {
-        if ($data instanceof ArraySerializableInterface) {
-            $data = $data->getArrayCopy();
-        }
-
-        if (!is_array($data)) {
-            throw new Exception\InvalidArgumentException(
-                'Array or object implementing Zend\Stdlib\ArraySerializableInterface expected'
-            );
-        }
-
-        if (empty($data)) {
-            return $data;
-        }
-
-        // remove invalid keys from $data
-        // array_intersect() not used as keys with empty strings or boolean false are removed
-        $tableCols = array_flip($this->getColumns());  // need to flip
-        foreach ($data as $key => $value) {
-            // isset() faster than in_array() and array_key_exists()
-            $column = str_replace("{$this->table}.", '', $key);
-            if (!isset($tableCols[$column])) {
-                unset($data[$key]);
+            $getter = $map[$key];
+            if (   'get' === substr($getter, 0, 3)
+                && strtoupper(substr($getter, 3, 1)) == substr($getter, 3, 1)
+            ) {
+                $setter = substr_replace($getter, 'set', 0, 3);
+                if (is_callable(array($this, $setter))) {
+                    $this->$setter($value);
+                }
             }
         }
-
-        return $data;
-    }
-
-    /*** FUNCTIONS DEFINED BY AbstractTableGateway ***/
-
-    /**
-     * Defined by AbstractTableGateway; Get Feature\FeatureSet
-     *
-     * Modified to instantiate feature on first call
-     *
-     * @return Feature\FeatureSet
-     */
-    public function getFeatureSet()
-    {
-        if (!$this->featureSet instanceof Feature\FeatureSet) {
-            $this->featureSet = new Feature\FeatureSet();
-        }
-        return $this->featureSet;
     }
 
     /**
-     * Defined in AbstractTableGateway; Get columns
+     * Defined by ArraySerializableInterface via EntityInterface; Get entity properties as an array
      *
-     * Fetch columns if not populated. Feature\MetadataFeature is not used as it is very slow.
+     * This uses $_mapGettersColumns and calls all the getters to populate the array.
+     * By default, properties prefixed with an underscore will be omitted.
+     *
+     * All values are cast to string for use in forms and database calls.
+     * If the value is DateTime, $value->format('c') is used to return the ISO 8601 timestamp.
+     * If the value is an object, $value->__toString() must be defined.
+     * Extending classes should override this if this is not desired.
+     *
+     * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::extract()
+     * typically in forms to extract values from an object.
      *
      * @return array
      */
-    public function getColumns()
+    public function getArrayCopy()
     {
-        if (empty($this->columns)) {
-            $columns = $this->adapter->query(
-                'SELECT column_name FROM information_schema.columns '
-                . 'WHERE table_schema = ? AND table_name = ?',
-                array($this->adapter->getCurrentSchema(), $this->table)
-            );
-            $this->columns = array();
-            foreach ($columns as $column) {
-                $this->columns[] = $column->column_name;
+        $result = array();
+        $map = static::$_mapGettersColumns;
+        foreach ($map as $getter => $column) {
+            // Skip if column is not a property (eg. an SQL expression) or is prefixed with an underscore
+            if (!property_exists($this, $column) || '_' == substr($column, 0, 1)) {
+                continue; // in case the column is an SQL expression
             }
+            $value = $this->$getter();
+            if ($value instanceof DateTime) {
+                $value = $value->format('c');
+            }
+            $result[$column] = (string) $value;
         }
 
-        return $this->columns;
+        return $result;
     }
 
     /**
-     * Defined by AbstractTableGateway; Insert
+     * Defined by ResourceInterface via EntityInterface; Returns the string identifier of the Resource
      *
-     * Modified to handle EntityInterface.
+     * By default, the resource id is derived from the class name.
+     * Eg: ZnZend\Db\AbstractEntity becomes znzend.db.abstractentity
      *
-     * @param  array|EntityInterface $set
-     * @return int Affected rows, not last insert id as in ZF1
+     * @return string
      */
-    public function insert($set)
+    public function getResourceId()
     {
-        if ($set instanceof EntityInterface) {
-            $set = $set->getArrayCopy();
-        }
-        return parent::insert($this->filterColumns($set));
+        return strtolower(str_replace(array('\\', '/', '_'), '.', get_called_class()));
     }
 
     /**
-     * Defined by AbstractTableGateway; Delete
+     * Defined by EntityInterface; Map getters to column names in table
      *
-     * Modified to handle EntityInterface.
-     *
-     * If an entity is passed in for $where, it is assumed that the
-     * entity is to be deleted. This is useful, eg. in the controller,
-     * where the user does not and should not know the column name or how to
-     * construct a where clause.
-     *
-     * @param  string|array|closure|EntityInterface $where
-     * @return int Affected rows
+     * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
+     * @return  array
      */
-    public function delete($where)
+    public static function mapGettersColumns()
     {
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
-        }
-        return parent::delete($where);
+        return static::$_mapGettersColumns;
     }
 
     /**
-     * Defined in AbstractTableGateway; Get select result prototype
+     * Defined by EntityInterface; Get name of getter mapped to property
      *
-     * Method signature modified to create ad hoc result set prototype different from $resultSetClass.
-     * Useful when returning result sets from junction tables which fall under composite entities.
-     *
-     * Example: A CompanyTable returns result sets of Company entities. findMapCompanyEmployee()
-     * which returns records mapping all companies to all employees should return CompanyEmployee entities,
-     * which in turn should have getCompany() and getEmployee() methods. As such, findMapCompanyEmployee()
-     * should call $this->getResultSet($select, null, $this->getResultSetPrototype('CompanyEmployee')).
-     *
-     * @param  string $resultSetClass Fully qualified name of class to be used for result set prototype.
-     *                                Class must implement EntityInterface.
-     * @throws Exception\InvalidArgumentException If class does not implement EntityInterface.
-     * @return ResultSet
+     * @param  string $property Name of property
+     * @return null|string Return null if getter not found
      */
-    public function getResultSetPrototype($resultSetClass = '')
+    public function getPropertyGetter($property)
     {
-        if (empty($resultSetClass)) {
-            $resultSetClass = $this->resultSetClass;
+        $map = $this->mapColumnsGetters();
+        if (empty($map[$property])) {
+            return null;
         }
-
-        if (   $resultSetClass == $this->resultSetClass
-            && $this->resultSetPrototype instanceof ResultSetInterface
-        ) {
-            return $this->resultSetPrototype;
-        }
-
-        // Create prototype
-        $resultSetInstance = new $resultSetClass();
-        if (!$resultSetInstance instanceof EntityInterface) {
-            throw new Exception\InvalidArgumentException('Result set class does not implement EntityInterface');
-        }
-        $resultSetPrototype = new HydratingResultSet(
-            new ArraySerializableHydrator(),
-            $resultSetInstance
-        );
-
-        // Ad hoc prototype
-        if ($resultSetClass != $this->resultSetClass) {
-            return $resultSetPrototype;
-        }
-
-        $this->resultSetPrototype = $resultSetPrototype;
-
-        return $this->resultSetPrototype;
-    }
-
-    /*** FUNCTIONS DEFINED BY MapperInterface ***/
-
-    /**
-     * Defined by MapperInterface; Populate mapper with records from non-database source
-     *
-     * @param  array $records
-     * @return MapperInterface
-     */
-    public function setRecords($records)
-    {
-        if (!is_array($records)) {
-            throw new Exception\InvalidArgumentException('Array expected');
-        }
-
-        $this->records = $records;
+        return $map[$property];
     }
 
     /**
-     * Defined by MapperInterface; Get available row states as value-option pairs
-     * which can be used to populate a dropdown list
+     * Defined by EntityInterface; Get resource id for entity property
      *
-     * @return array
+     * @example getPropertyResourceIdFromGetter('id') returns znzend.db.abstractentity.id
+     * @example getPropertyResourceIdFromGetter($idFormElement->getName()) returns znzend.db.abstractentity.id
+     * @param   string $property Name of property
+     * @return  null|string Return null if property does not exist
      */
-    public static function getRowStates()
+    public function getPropertyResourceId($property)
     {
-        $values = array(static::ACTIVE_ROWS, static::DELETED_ROWS, static::ALL_ROWS);
-        return array_combine($values, $values);
+        if (!property_exists($this, $property)) {
+            return null;
+        }
+
+        return $this->getResourceId() . '.' . $property;
     }
 
     /**
-     * Defined by MapperInterface; Check whether the mapper and its entity support
-     * row states (active, deleted, all)
+     * Defined by EntityInterface; Store authenticated identity (current logged in user)
      *
-     * Ideally, no records should ever be deleted from the database and should have
-     * a field to mark it as deleted instead - this is what row state refers to.
-     *
-     * @return bool
+     * @param  string $identity
+     * @return EntityInterface
      */
-    public function hasRowState()
+    public function setAuthIdentity($identity)
     {
-        $hasActiveRowState  = is_array($this->activeRowState) && !empty($this->activeRowState);
-        $hasDeletedRowState = is_array($this->deletedRowState) && !empty($this->deletedRowState);
-        return ($hasActiveRowState && $hasDeletedRowState);
-    }
-
-    /**
-     * Defined by MapperInterface; Set row state
-     *
-     * Rows returned from query results will conform to the current specified row state
-     *
-     * @param  string $rowState Options: self::ACTIVE_ROWS, self::DELETED_ROWS,
-     *                          self::ALL_ROWS
-     * @return MapperInterface
-     */
-    public function setRowState($rowState)
-    {
-        $this->rowState = $rowState;
+        $this->_authIdentity = (string) $identity; // objects must implement __toString()
         return $this;
     }
 
     /**
-     * Defined by MapperInterface; Mark records as active
+     * Defined by EntityInterface; Retrieve stored authenticated identity
      *
-     * @param  string|array|closure|EntityInterface $where
-     * @return bool|int Return false if row state not supported
+     * @return string
      */
-    public function markActive($where)
+    public function getAuthIdentity()
     {
-        if (!$this->hasRowState()) {
-            return false;
-        }
-
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
-        }
-        return parent::update($this->activeRowState, $where);
+        return $this->_authIdentity;
     }
 
     /**
-     * Defined by MapperInterface; Mark records as deleted
+     * Defined by EntityInterface; Set singular noun for entity (lowercase)
      *
-     * @param  string|array|closure|EntityInterface $where
-     * @return bool|int Return false if row state not supported
-     */
-    public function markDeleted($where)
-    {
-        if (!$this->hasRowState()) {
-            return false;
-        }
-
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
-        }
-        return parent::update($this->deletedRowState, $where);
-    }
-
-    /**
-     * Defined by MapperInterface; Fetch row by primary key
-     *
-     * @param  string $key The value for the primary key
+     * @param  string $value
      * @return EntityInterface
      */
-    public function fetch($key)
+    public function setSingularNoun($value)
     {
-        $select = $this->getBaseSelect();
-        $select->where(array($this->getPrimaryKey() => $key));
-        return $this->getResultSet($select, false);
+        $this->_singularNoun = strtolower($value);
+        return $this;
     }
 
     /**
-     * Defined by MapperInterface; Fetch all rows
+     * Defined by EntityInterface; Get singular noun for entity (lowercase)
      *
-     * @return Paginator
+     * @example 'person'
+     * @return  string
      */
-    public function fetchAll()
+    public function getSingularNoun()
     {
-        $select = $this->getBaseSelect();
-        return $this->getResultSet($select);
+        return $this->_singularNoun;
     }
 
     /**
-     * Defined by MapperInterface; Create
+     * Defined by EntityInterface; Set plural noun for entity (lowercase)
      *
-     * @param  array|EntityInterface $set
+     * @param  string $value
      * @return EntityInterface
      */
-    public function create($set)
+    public function setPluralNoun($value)
     {
-        if ($set instanceof EntityInterface) {
-            $set = $set->getArrayCopy();
-        }
-
-        $affectedRows = $this->insert($set); // insert() will throw Exception if $set is not an array
-        if (!$affectedRows) {
-            return null;
-        }
-
-        $entity = new $this->resultSetClass($set);
-        $entity->setId($this->getLastInsertValue()); // this is important!
-        return $entity;
+        $this->_pluralNoun = strtolower($value);
+        return $this;
     }
 
     /**
-     * Defined by MapperInterface and AbstractTableGateway; Update
+     * Defined by EntityInterface; Get plural noun for entity (lowercase)
      *
-     * If an entity is passed in for $where, it is assumed that the
-     * update is for that entity. This is useful, eg. in the controller,
-     * where the user does not and should not know the column name or how to
-     * construct a where clause.
-     *
-     * @param  array $set
-     * @param  string|array|closure|EntityInterface $where
-     * @return int Affected rows
+     * @example 'people'
+     * @return  string
      */
-    public function update($set, $where = null)
+    public function getPluralNoun()
     {
-        if ($set instanceof EntityInterface) {
-            $set = $set->getArrayCopy();
+        return $this->_pluralNoun;
+    }
+
+    /**
+     * Defined by EntityInterface; Set record id
+     *
+     * @param  null|int $value
+     * @return EntityInterface
+     */
+    public function setId($value)
+    {
+        // Alternative: $this->set($value, 'int', 'id') where 'id' is the column name
+        return $this->set($value, 'int');
+    }
+
+    /**
+     * Defined by EntityInterface; Get record id
+     *
+     * @return null|int
+     */
+    public function getId()
+    {
+        // Alternative: $this->get('id') where 'id' is the column name
+        return $this->get();
+    }
+
+    /**
+     * Defined by EntityInterface; Set name
+     *
+     * @param  null|string $value
+     * @return EntityInterface
+     */
+    public function setName($value)
+    {
+        return $this->set($value);
+    }
+
+    /**
+     * Defined by EntityInterface; Get name
+     *
+     * @return null|string
+     */
+    public function getName()
+    {
+        return $this->get();
+    }
+
+    /**
+     * Defined by EntityInterface; Check whether entity is marked as hidden
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return (bool) $this->get();
+    }
+
+    /**
+     * Defined by EntityInterface; Check whether entity is marked as deleted
+     *
+     * Ideally, no records should ever be deleted from the database and
+     * should have a field to mark it as deleted instead.
+     *
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return (bool) $this->get();
+    }
+
+    /**
+     * Compute array for mapping columns to getters
+     *
+     * array_flip was used previously but would run into errors if null or boolean values
+     * were set in $_mapGettersColumns - array_flip can only flip strings and integers.
+     *
+     * @return array
+     */
+    protected function mapColumnsGetters()
+    {
+        if (null === static::$_mapColumnsGetters) {
+            $map = array();
+            foreach (static::$_mapGettersColumns as $getter => $column) {
+                if (is_string($column)) {
+                    $map[$column] = $getter;
+                }
+            }
+            static::$_mapColumnsGetters = $map;
         }
-        if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+        return static::$_mapColumnsGetters;
+    }
+
+    /**
+     * Generic internal setter for entity properties
+     *
+     * @param  null|mixed  $value    Value to set
+     * @param  null|string $type     Optional data type to cast to, if any. No casting is done
+     *                               if value is null. If $type is lowercase, cast
+     *                               to primitive type, eg. (string) $value, else cast to object,
+     *                               eg. new DateTime($value).
+     * @param  null|string $property Optional property to set $value to. If not specified,
+     *                               $_mapGettersColumns is checked for the corresponding getter
+     *                               of the calling function to get the mapped property.
+     *                               In general, for setX(), the corresponding getter is getX().
+     * @throws Exception\InvalidArgumentException Property does not exist
+     * @return AbstractEntity For fluent interface
+     */
+    protected function set($value, $type = null, $property = null)
+    {
+        // Check if property exists
+        if (null === $property) {
+            $trace = debug_backtrace();
+            $callerFunction = $trace[1]['function'];
+            $map = static::$_mapGettersColumns;
+            $getFunc = substr_replace($callerFunction, 'get', 0, 3);
+            if (array_key_exists($getFunc, $map)) {
+                $property = $map[$getFunc];
+            }
         }
 
-        return parent::update($this->filterColumns($set), $where);
+        if (!property_exists($this, $property)) {
+            throw new Exception\InvalidArgumentException("Property \"{$property}\" does not exist.");
+        }
+
+        // Cast to specified type before setting - skip if value is null or no type specified
+        if ($value !== null && $type !== null) {
+            if ($type == strtolower($type)) { // primitive type
+                settype($value, $type);
+            } elseif ('DateTime' == $type && !$value instanceof DateTime) { // special handling for DateTime
+                $value = (string) $value;
+                $value = (false === strtotime($value)) ? null : new DateTime($value);
+            } else { // object
+                $value = new $type($value);
+            }
+        }
+
+        $this->$property = $value;
+        return $this;
+    }
+
+    /**
+     * Generic internal getter for entity properties
+     *
+     * @param  null|string $property Optional property to retrieve. If not specified,
+     *                               $_mapGettersColumns is checked for the name of the calling
+     *                               function to get the mapped property.
+     * @param  null|mixed  $default  Optional default value if key or property does not exist
+     * @return mixed
+     * @internal E_USER_NOTICE is triggered if property does not exist
+     */
+    protected function get($property = null, $default = null)
+    {
+        if (null === $property) {
+            $trace = debug_backtrace();
+            $callerFunction = $trace[1]['function'];
+            $map = static::$_mapGettersColumns;
+            if (array_key_exists($callerFunction, $map)) {
+                $property = $map[$callerFunction];
+            }
+        }
+
+        // Handle simple negation of property
+        $negate = false;
+        if ('!' == substr($property, 0, 1)) {
+            $negate = true;
+            $property = substr($property, 1);
+        }
+        if (property_exists($this, $property)) {
+            return ($negate ? !$this->$property : $this->$property);
+        }
+
+        if (empty($trace)) {
+            $trace = debug_backtrace();
+        }
+        trigger_error(
+            sprintf(
+                'Undefined property "%s" via %s::%s() in %s on line %s',
+                $property,
+                get_class($trace[1]['object']),
+                $trace[1]['function'],
+                $trace[1]['file'],
+                $trace[1]['line']
+            ),
+            E_USER_NOTICE
+        );
+
+        return $default;
     }
 }
