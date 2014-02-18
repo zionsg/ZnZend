@@ -79,11 +79,7 @@ abstract class AbstractEntity implements EntityInterface
      * This class assumes that for a property X, its getter is getX() and setter is setX().
      *
      * @Annotation\Exclude()
-     * @example array(
-     *              'getId' => 'person_id', // maps to property
-     *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)"), // maps to SQL expression
-     *              'isDeleted' => '!enabled', // simple negation is allowed
-     *          )
+     * @see EntityInterface::mapGettersColumns() for example
      * @var array
      */
     protected static $_mapGettersColumns = array(
@@ -91,8 +87,8 @@ abstract class AbstractEntity implements EntityInterface
         // and are provided for easy copying when coding extending classes
         'getId'     => 'id',
         'getName'   => 'name',
-        'isHidden'  => 'ishidden',
-        'isDeleted' => 'isdeleted',
+        'isHidden'  => false,
+        'isDeleted' => false,
     );
 
     /**
@@ -132,8 +128,8 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Defined by ArraySerializableInterface via EntityInterface; Set entity properties from array
      *
-     * This uses $_mapGettersColumns - a column must be mapped and have a setter
-     * for the corresponding key in $data to be set. In general, for getX(),
+     * This uses $_mapGettersColumns - a column must be mapped and have a getter
+     * for the corresponding key in $data. The name of the setter is then inferred - for getX(),
      * the corresponding setter is assumed to be setX().
      * Extending classes should override this if this is not desired.
      *
@@ -155,13 +151,9 @@ abstract class AbstractEntity implements EntityInterface
                 continue;
             }
             $getter = $map[$key];
-            if (   'get' === substr($getter, 0, 3)
-                && strtoupper(substr($getter, 3, 1)) === substr($getter, 3, 1)
-            ) {
-                $setter = substr_replace($getter, 'set', 0, 3);
-                if (is_callable(array($this, $setter))) {
-                    $this->$setter($value);
-                }
+            $setter = substr_replace($getter, 'set', 0, 3);
+            if (is_callable(array($this, $setter))) {
+                $this->$setter($value);
             }
         }
     }
@@ -217,7 +209,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Defined by EntityInterface; Map getters to column names in table
      *
-     * @example array('getId' => 'person_id', 'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)")
+     * @see     EntityInterface::mapGettersColumns() for example
      * @return  array
      */
     public static function mapGettersColumns()
@@ -398,7 +390,8 @@ abstract class AbstractEntity implements EntityInterface
      * array_flip was used previously but would run into errors if null or boolean values
      * were set in $_mapGettersColumns - array_flip can only flip strings and integers.
      *
-     * only columns mapping to getX() will be returned, not those mapping to isX().
+     * Only columns mapping to actual getters such as getX() will be returned,
+     * not those mapping to isX(), SQL expressions, negated properties or boolean values.
      *
      * @return array
      */
