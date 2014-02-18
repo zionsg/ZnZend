@@ -156,7 +156,7 @@ abstract class AbstractEntity implements EntityInterface
             }
             $getter = $map[$key];
             if (   'get' === substr($getter, 0, 3)
-                && strtoupper(substr($getter, 3, 1)) == substr($getter, 3, 1)
+                && strtoupper(substr($getter, 3, 1)) === substr($getter, 3, 1)
             ) {
                 $setter = substr_replace($getter, 'set', 0, 3);
                 if (is_callable(array($this, $setter))) {
@@ -398,6 +398,8 @@ abstract class AbstractEntity implements EntityInterface
      * array_flip was used previously but would run into errors if null or boolean values
      * were set in $_mapGettersColumns - array_flip can only flip strings and integers.
      *
+     * only columns mapping to getX() will be returned, not those mapping to isX().
+     *
      * @return array
      */
     protected function mapColumnsGetters()
@@ -405,7 +407,11 @@ abstract class AbstractEntity implements EntityInterface
         if (null === $this->_mapColumnsGetters) {
             $map = array();
             foreach (static::$_mapGettersColumns as $getter => $column) {
-                if (is_string($column)) {
+                // Only include if mapped function is of getX() format
+                if (   is_string($column)
+                    && 'get' === substr($getter, 0, 3)
+                    && strtoupper(substr($getter, 3, 1)) === substr($getter, 3, 1)
+                ) {
                     $map[$column] = $getter;
                 }
             }
@@ -481,6 +487,11 @@ abstract class AbstractEntity implements EntityInterface
             if (array_key_exists($callerFunction, $map)) {
                 $property = $map[$callerFunction];
             }
+        }
+
+        // Handle boolean values
+        if (true === $property || false === $property) {
+            return $property;
         }
 
         // Handle simple negation of property
