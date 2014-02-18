@@ -41,6 +41,9 @@ abstract class AbstractEntity implements EntityInterface
      * Internal variables should be prefixed with an underscore and Annotation\Exclude(),
      * eg. $_mapGettersColumns, to differentiate between them and entity properties.
      *
+     * For AbstractEntity, database columns are mapped directly to entity properties,
+     * eg. $person_id corresponds to the `person_id` column in the database table.
+     *
      * The primary key column is usually set to null with Annotation\Exclude() as the value is generated
      * by the database.
      *
@@ -77,9 +80,27 @@ abstract class AbstractEntity implements EntityInterface
      * Array mapping getters to columns - to be set by extending class
      *
      * This class assumes that for a property X, its getter is getX() and setter is setX().
+     * This variable is used by mapGettersColumns() which is defined by EntityInterface.
+     * The usage here greatly expands the scope defined in EntityInterface to reduce boilerplate code, seen
+     * in the use of set() and get().
      *
+     * Special note on getDeleted and isDeleted in the example below:
+     *   isHidden() and isDeleted() are required in EntityInterface. Ideally, they would refer
+     *   to a numeric column and cast 0 or 1 to boolean. In this case, mapping them here saves work on
+     *   rewriting them for every entity class BUT separate getters/setters must still be written
+     *   for the columns in order to store/return the actual numeric value.
+     *   Eg: 'yes'/'no' is stored in the database for person_isdeleted - isDeleted() cannot simply cast to boolean here.
+     *       getDeleted() returns 'yes', but isDeleted() returns true for ('yes' == $this->person_isdeleted).
+     *
+     * @example array(
+     *              'getId'       => 'person_id', // maps directly to column (maps to property $person_id here)
+     *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)", // maps to SQL expression
+     *              'isSuspended' => '!enabled',  // simple negation of properties is allowed (in this case $enabled)
+     *              'isHidden'    => false,       // boolean values are allowed (in this case all records are visible)
+     *              'getDeleted'  => 'person_isdeleted',
+     *              'isDeleted'   => 'person_isdeleted',
+     *          )
      * @Annotation\Exclude()
-     * @see EntityInterface::mapGettersColumns() for example
      * @var array
      */
     protected static $_mapGettersColumns = array(
@@ -177,8 +198,8 @@ abstract class AbstractEntity implements EntityInterface
     public function getArrayCopy()
     {
         $result = array();
-        $map = static::$_mapGettersColumns;
-        foreach ($map as $getter => $column) {
+        $map = $this->mapColumnsGetters();
+        foreach ($map as $column => $getter) {
             // Skip if column is not a property (eg. an SQL expression) or is prefixed with an underscore
             if (!property_exists($this, $column) || '_' == substr($column, 0, 1)) {
                 continue; // in case the column is an SQL expression
@@ -209,8 +230,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Defined by EntityInterface; Map getters to column names in table
      *
-     * @see     EntityInterface::mapGettersColumns() for example
-     * @return  array
+     * @return array
      */
     public static function mapGettersColumns()
     {
@@ -392,6 +412,9 @@ abstract class AbstractEntity implements EntityInterface
      *
      * Only columns mapping to actual getters such as getX() will be returned,
      * not those mapping to isX(), SQL expressions, negated properties or boolean values.
+     * This behaviour is depended upon when used in exchangeArray() to infer names of setters and
+     * in getArrayCopy() to ensure only actual getters are used (eg. ensure isDeleted() does not override
+     * getDeleted() with boolean value).
      *
      * @return array
      */
