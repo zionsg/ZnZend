@@ -30,7 +30,7 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function __toString();
 
     /**
-     * Map getters to column names in table
+     * Map getters to columns in table
      *
      * Getters are preferred over public properties as the latter would likely be named
      * after the actual database columns, which the user should not know about.
@@ -40,13 +40,21 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * the names of the getters used for each <td> column in the view script and update the Select
      * object accordingly, without having to know the actual column names.
      *
-     * As the array may be flipped to get the reverse mappings, both key and value should be unique
-     * and must be strings.
+     * Special note on getDeleted and isDeleted in the example below:
+     *   isHidden() and isDeleted() are required in this interface. Ideally, they would refer
+     *   to a numeric column and cast 0 or 1 to boolean. In this case, mapping them here saves work on
+     *   rewriting them for every entity class BUT separate getters/setters must still be written
+     *   for the columns in order to store/return the actual numeric value.
+     *   Eg: 'yes'/'no' is stored in the database for person_isdeleted - isDeleted() cannot simply cast to boolean here.
+     *       getDeleted() returns 'yes', but isDeleted() returns true for ('yes' == $this->person_isdeleted).
      *
      * @example array(
-     *              'getId' => 'person_id', // maps to property
+     *              'getId'       => 'person_id', // maps to property (in this case $person_id)
      *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)"), // maps to SQL expression
-     *              'isDeleted' => '!enabled', // simple negation is allowed
+     *              'isSuspended' => '!enabled',  // simple negation of properties is allowed (in this case $enabled)
+     *              'isHidden'    => false,       // boolean values are allowed (in this case all records are visible)
+     *              'getDeleted'  => 'person_isdeleted',
+     *              'isDeleted'   => 'person_isdeleted',
      *          )
      * @return  array
      */
@@ -55,7 +63,7 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     /**
      * Get name of getter mapped to property
      *
-     * Scenario: Property name of credit card number retrieved from $element->getName() in form,
+     * Scenario: Property name of credit card number retrieved from $element->getName() in the form,
      * but user only has permission to view part of the number. The form view helper has no way
      * of knowing how to return the value. The getter allows a boolean flag to mask or unmask
      * the value but the getter name is not known, hence this function.
@@ -69,7 +77,7 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * Get resource id for entity property
      *
      * If the name of the property is unknown, it may be retrieved indirectly via
-     * $element->getName() provided the form fields are named after the properties.
+     * $element->getName() in the form provided the form fields are named after the properties.
      *
      * @param  string $property Name of property
      * @return null|string Return null if property does not exist
