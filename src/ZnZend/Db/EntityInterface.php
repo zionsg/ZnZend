@@ -40,21 +40,12 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * the names of the getters used for each <td> column in the view script and update the Select
      * object accordingly, without having to know the actual column names.
      *
-     * Special note on getDeleted and isDeleted in the example below:
-     *   isHidden() and isDeleted() are required in this interface. Ideally, they would refer
-     *   to a numeric column and cast 0 or 1 to boolean. In this case, mapping them here saves work on
-     *   rewriting them for every entity class BUT separate getters/setters must still be written
-     *   for the columns in order to store/return the actual numeric value.
-     *   Eg: 'yes'/'no' is stored in the database for person_isdeleted - isDeleted() cannot simply cast to boolean here.
-     *       getDeleted() returns 'yes', but isDeleted() returns true for ('yes' == $this->person_isdeleted).
+     * The mapped columns will be used in the WHERE and ORDER BY clauses of an SQL SELECT statement,
+     * hence the provision for SQL expressions.
      *
      * @example array(
-     *              'getId'       => 'person_id', // maps to property (in this case $person_id)
+     *              'getId'       => 'person_id', // maps directly to column
      *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)"), // maps to SQL expression
-     *              'isSuspended' => '!enabled',  // simple negation of properties is allowed (in this case $enabled)
-     *              'isHidden'    => false,       // boolean values are allowed (in this case all records are visible)
-     *              'getDeleted'  => 'person_isdeleted',
-     *              'isDeleted'   => 'person_isdeleted',
      *          )
      * @return  array
      */
