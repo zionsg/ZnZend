@@ -45,7 +45,7 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      *
      * @example array(
      *              'getId'       => 'person_id', // maps directly to column
-     *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)"), // maps to SQL expression
+     *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)", // maps to SQL expression
      *          )
      * @return  array
      */
