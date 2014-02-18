@@ -98,10 +98,13 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Array mapping columns to getters - computed by mapColumnsGetters()
      *
+     * Cannot use static - if an entity class's mapColumnsGetters() was called and this was initialized,
+     * the next entity will see this as not null and return the previous entity's mapping.
+     *
      * @Annotation\Exclude()
      * @var null|array Initialize to null as computed result might be an empty array
      */
-    protected static $_mapColumnsGetters = null;
+    protected $_mapColumnsGetters = null;
 
     /**
      * Constructor
@@ -399,16 +402,16 @@ abstract class AbstractEntity implements EntityInterface
      */
     protected function mapColumnsGetters()
     {
-        if (null === static::$_mapColumnsGetters) {
+        if (null === $this->_mapColumnsGetters) {
             $map = array();
             foreach (static::$_mapGettersColumns as $getter => $column) {
                 if (is_string($column)) {
                     $map[$column] = $getter;
                 }
             }
-            static::$_mapColumnsGetters = $map;
+            $this->_mapColumnsGetters = $map;
         }
-        return static::$_mapColumnsGetters;
+        return $this->_mapColumnsGetters;
     }
 
     /**
