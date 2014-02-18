@@ -159,7 +159,7 @@ class MathQuestionService implements QuestionServiceInterface
 
             // Eliminate the redundant zeroes in front
             if ($num != '') {
-                while ('0' == substr($num, 0, 1)) {
+                while ('0' === substr($num, 0, 1)) { // cannot use == as substr may return false
                     $num = substr($num, 1);
                 }
             }
