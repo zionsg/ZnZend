@@ -151,7 +151,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * @param  bool   $fetchAll Default = true. Whether to return all rows (as Paginator using ResultSetInterface)
      *                          or only the 1st row (as ResultSetInterface).
      * @param  ResultSetInterface $resultSetPrototype Optional alternate result set prototype to use.
-     * @return Paginator|ResultSetInterface
+     * @return null|Paginator|ResultSetInterface
      */
     protected function getResultSet(Select $select, $fetchAll = true, ResultSetInterface $resultSetPrototype = null)
     {
@@ -476,7 +476,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * Defined by MapperInterface; Mark records as active
      *
      * @param  string|array|closure|EntityInterface $where
-     * @return bool|int Return false if row state not supported
+     * @return int|bool Affected rows. Return false if row state not supported
      */
     public function markActive($where)
     {
@@ -494,7 +494,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * Defined by MapperInterface; Mark records as deleted
      *
      * @param  string|array|closure|EntityInterface $where
-     * @return bool|int Return false if row state not supported
+     * @return int|bool Affected rows. Return false if row state not supported
      */
     public function markDeleted($where)
     {
@@ -512,10 +512,14 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * Defined by MapperInterface; Fetch row by primary key
      *
      * @param  string $key The value for the primary key
-     * @return EntityInterface
+     * @return null|EntityInterface
      */
     public function fetch($key)
     {
+        if (null === $key) {
+            return null;
+        }
+
         $select = $this->getBaseSelect();
         $select->where(array($this->getPrimaryKey() => $key));
         return $this->getResultSet($select, false);
@@ -524,7 +528,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     /**
      * Defined by MapperInterface; Fetch all rows
      *
-     * @return Paginator
+     * @return null|Paginator
      */
     public function fetchAll()
     {
@@ -536,7 +540,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * Defined by MapperInterface; Create
      *
      * @param  array|EntityInterface $set
-     * @return EntityInterface
+     * @return null|EntityInterface Return null if unable to create
      */
     public function create($set)
     {
@@ -564,7 +568,8 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      *
      * @param  array $set
      * @param  string|array|closure|EntityInterface $where
-     * @return int Affected rows
+     * @return int No. of affected rows. Not practical to return EntityInterface
+     *             as the update could be for multiple rows.
      */
     public function update($set, $where = null)
     {
