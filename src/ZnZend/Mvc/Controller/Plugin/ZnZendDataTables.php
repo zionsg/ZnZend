@@ -64,6 +64,8 @@ class ZnZendDataTables extends AbstractPlugin
      *                                     in $paginator) to the database column names, to be used to modify Select.
      *                                     The array should ideally be provided via a method in the entity rather
      *                                     than being exposed/hardcoded in the controller action.
+     *                                     Non-string values such as the boolean values which may be returned by
+     *                                     ZnZend\Db\AbstractEntity::mapGettersColumns() will be ignored.
      *                                     Example as follows:
      *                                     array(
      *                                         // property $p->person_id => `person_id` column in database table
@@ -107,7 +109,9 @@ class ZnZendDataTables extends AbstractPlugin
             }
 
             $column = $mapGettersColumns[$getter];
-            $select->order($column . ' ' . strtoupper($dataTablesParams['sSortDir_' . $i]));
+            if (is_string($column)) {
+                $select->order($column . ' ' . strtoupper($dataTablesParams['sSortDir_' . $i]));
+            }
         }
         // Append original order by iteration so that the keys will not upset precedence
         foreach ($orders as $order) {
@@ -127,6 +131,10 @@ class ZnZendDataTables extends AbstractPlugin
                 continue;
             }
             $column = $mapGettersColumns[$getter];
+
+            if (!is_string($column)) {
+                continue;
+            }
 
             if ('false' == $dataTablesParams['bRegex_' . $i]) {
                 // Use LIKE
