@@ -81,7 +81,7 @@ interface MapperInterface
      * construct a where clause.
      *
      * @param  string|array|closure|EntityInterface $where
-     * @return bool|int Return false if row state not supported
+     * @return int|bool Affected rows. Return false if row state not supported
      */
     public function markActive($where);
 
@@ -94,7 +94,7 @@ interface MapperInterface
      * construct a where clause.
      *
      * @param  string|array|closure|EntityInterface $where
-     * @return bool|int Return false if row state not supported
+     * @return int|bool Affected rows. Return false if row state not supported
      */
     public function markDeleted($where);
 
