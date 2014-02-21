@@ -35,6 +35,7 @@ return array(
     'ZnZend\Form\Exception\InvalidArgumentException'              => __DIR__ . '/src/ZnZend/Form/Exception/InvalidArgumentException.php',
     'ZnZend\Form\View\Helper\ZnZendFormElementValue'              => __DIR__ . '/src/ZnZend/Form/View/Helper/ZnZendFormElementValue.php',
     'ZnZend\Form\View\Helper\Captcha\Question'                    => __DIR__ . '/src/ZnZend/Form/View/Helper/Captcha/Question.php',
+    'ZnZend\Mvc\Controller\Plugin\ZnZendDatabaseRowSize'          => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendDatabaseRowSize.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendDataTables'               => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendDataTables.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendIdentity'                 => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendIdentity.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams'                => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendMvcParams.php',
