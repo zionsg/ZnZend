@@ -32,11 +32,12 @@ return array(
         ),
 
         'invokables' => array(
-            'znZendDataTables' => 'ZnZend\Mvc\Controller\Plugin\ZnZendDataTables',
-            'znZendMvcParams'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams',
-            'znZendPageStore'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore',
-            'znZendRestJson'   => 'ZnZend\Mvc\Controller\Plugin\ZnZendRestJson',
-            'znZendTimestamp'  => 'ZnZend\Mvc\Controller\Plugin\ZnZendTimestamp',
+            'znZendDatabaseRowSize' => 'ZnZend\Mvc\Controller\Plugin\ZnZendDatabaseRowSize',
+            'znZendDataTables'      => 'ZnZend\Mvc\Controller\Plugin\ZnZendDataTables',
+            'znZendMvcParams'       => 'ZnZend\Mvc\Controller\Plugin\ZnZendMvcParams',
+            'znZendPageStore'       => 'ZnZend\Mvc\Controller\Plugin\ZnZendPageStore',
+            'znZendRestJson'        => 'ZnZend\Mvc\Controller\Plugin\ZnZendRestJson',
+            'znZendTimestamp'       => 'ZnZend\Mvc\Controller\Plugin\ZnZendTimestamp',
         ),
     ),
 
