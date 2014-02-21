@@ -66,6 +66,7 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 * `ZnZend\Db\EntityInterface` - An entity interface for database rows
 * `ZnZend\Db\MapperInterface` - An entity mapper interface for database tables
 * `ZnZend\Captcha\Service\QuestionServiceInterface` - An interface for services providing questions for captcha
+* `ZnZend\Json\JsonProviderInterface` - An interface to provide JSON representation for an object
 * `ZnZend\Permissions\Acl\Role\RoleInterface` - Adds additional methods for comparing 2 roles
 
 ## Classes
