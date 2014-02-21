@@ -88,6 +88,7 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 * `ZnZend\Captcha\Service\MathQuestionService` - A service which provides simple arithmetic questions for captcha
 
 ## Controller Plugins
+* `znZendDatabaseRowSize` - Calculate row size for each table in specified database
 * `znZendDataTables` - Update Paginator (DbSelect) with params sent from jQuery DataTables plugin
 * `znZendIdentity`   - Fetch the authenticated identity as an instance of IdentityInterface
                        and its role as an instance of RoleInterface. When invoked, its factory will look for a service
