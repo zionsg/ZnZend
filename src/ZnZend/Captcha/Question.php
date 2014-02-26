@@ -67,7 +67,7 @@ class Question extends AbstractWord
      *
      * @var int
      */
-    protected $fontSize = 24;
+    protected $fontSize = 50;
 
     /**
      * Padding (in pixels) around question in generated image
