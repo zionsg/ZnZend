@@ -537,4 +537,42 @@ abstract class AbstractEntity implements EntityInterface
 
         return $default;
     }
+
+    /**
+     * Compute bitflag from array of bits to set using multiples of 2
+     *
+     * @example array array(1, 2, 5) results in 7
+     * @param   array $bitsToSet Array of bits to set
+     * @return  int   Computed bitflag
+     */
+    protected function arrayToBitflag(array $setBits)
+    {
+        $bitflag = 0;
+        foreach ($setBits as $bit) {
+            $bitflag |= (int) $bit; // '1' and 1 will yield different results hence cast to int
+        }
+        return $bitflag;
+    }
+
+    /**
+     * Extract set bits in a bit flag into an array using multiples of 2
+     *
+     * @example 7 results in array(1, 2, 4)
+     * @param   int   $bitflag Bitflag - max value is PHP_INT_MAX
+     * @return  array Array of values for set bits
+     */
+    protected function bitflagToArray($bitflag)
+    {
+        $bitflag = (int) $bitflag; // '1' and 1 will yield different results hence cast to int
+        $highestBitSet = 1 << floor(log10($bitflag) / log10(2));
+
+        $setBits = array();
+        for ($bit = 1; $bit <= $highestBitSet; $bit *= 2) {
+            if (($bit & $bitflag) != 0) {
+                $setBits[] = $bit;
+            }
+        }
+
+        return $setBits;
+    }
 }
