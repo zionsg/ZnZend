@@ -19,7 +19,7 @@ use ZnZend\Mvc\Exception;
 /**
  * Controller plugin to update Paginator (DbSelect adapter) with params from jQuery DataTables
  *
- * Params is based on version 1.9.4 (23 Sep 2012) of the DataTables plugin.
+ * Params are based on version 1.9.4 (23 Sep 2012) of the DataTables plugin.
  *
  * @link http://www.datatables.net/ for info on jQuery DataTables plugin
  */
