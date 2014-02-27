@@ -108,7 +108,6 @@ abstract class AbstractEntity implements EntityInterface
         // and are provided for easy copying when coding extending classes
         'getId'     => 'id',
         'getName'   => 'name',
-        'isHidden'  => false,
         'isDeleted' => false,
     );
 
@@ -379,16 +378,6 @@ abstract class AbstractEntity implements EntityInterface
     public function getName()
     {
         return $this->get();
-    }
-
-    /**
-     * Defined by EntityInterface; Check whether entity is marked as hidden
-     *
-     * @return bool
-     */
-    public function isHidden()
-    {
-        return (bool) $this->get();
     }
 
     /**
