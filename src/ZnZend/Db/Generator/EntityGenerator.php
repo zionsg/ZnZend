@@ -112,7 +112,7 @@ class EntityGenerator
             );
 
             // Create getter and setters for each column and map them
-            $mapGettersColumns = array('getId' => null, 'getName' => null, 'isHidden' => false, 'isDeleted' => false);
+            $mapGettersColumns = array('getId' => null, 'getName' => null, 'isDeleted' => false);
             $properties = array();
             $methods = array();
             $types = array();
@@ -180,7 +180,7 @@ class EntityGenerator
                     )),
                 ));
 
-                if ($setterName) {
+                if (!in_array($setterName, array('setId', 'setName'))) { // skip methods defined in AbstractEntity
                     $desc = 'Set ' . lcfirst($label);
                     $methods[] = MethodGenerator::fromArray(array(
                         'name'       => $setterName,
@@ -208,7 +208,8 @@ class EntityGenerator
 
                 if ($getterName) {
                     $mapGettersColumns[$getterName] = $columnName;
-
+                }
+                if (!in_array($getterName, array('getId', 'getName'))) { // skip methods defined in AbstractEntity
                     $desc = 'Get ' . lcfirst($label);
                     $methods[] = MethodGenerator::fromArray(array(
                         'name'       => $getterName,
@@ -225,11 +226,9 @@ class EntityGenerator
                     ));
                 }
 
-                // Special handling for isHidden() and isDeleted()
-                // If a column name ends in "_ishidden", that column is mapped to isHidden()
-                if (preg_match('/_ishidden$/i', $columnName)) {
-                    $mapGettersColumns['isHidden'] = $columnName;
-                } elseif (preg_match('/_isdeleted$/i', $columnName)) {
+                // Special handling for isDeleted()
+                // If a column name ends in "_isdeleted", that column is mapped to isDeleted()
+                if (preg_match('/_isdeleted$/i', $columnName)) {
                     $mapGettersColumns['isDeleted'] = $columnName;
                 }
             }
