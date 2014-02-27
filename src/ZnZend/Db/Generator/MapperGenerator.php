@@ -64,7 +64,7 @@ class MapperGenerator
             $rowStateFunc = function ($stateValue) {
                 return function ($tableName, $columnNames) use ($stateValue) {
                     foreach ($columnNames as $columnName) {
-                        if (preg_match('/^.*[^a-zA-Z0-9]+isdeleted$/', $columnName)) {
+                        if (preg_match('/^.*[^a-zA-Z0-9]+isdeleted$/i', $columnName)) {
                             return array($columnName => $stateValue);
                         }
                     }
