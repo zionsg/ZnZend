@@ -227,8 +227,8 @@ class EntityGenerator
                 }
 
                 // Special handling for isDeleted()
-                // If a column name ends in "_isdeleted", that column is mapped to isDeleted()
-                if (preg_match('/_isdeleted$/i', $columnName)) {
+                // If a column name ends in "isdeleted", that column is mapped to isDeleted()
+                if (preg_match('/^.*[^a-zA-Z0-9]+isdeleted$/i', $columnName)) {
                     $mapGettersColumns['isDeleted'] = $columnName;
                 }
             }
