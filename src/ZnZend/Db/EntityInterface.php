@@ -156,13 +156,6 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function getName();
 
     /**
-     * Check whether entity is marked as hidden
-     *
-     * @return bool
-     */
-    public function isHidden();
-
-    /**
      * Check whether entity is marked as deleted
      *
      * Ideally, no records should ever be deleted from the database and
