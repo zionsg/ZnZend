@@ -112,7 +112,7 @@ class EntityGenerator
             );
 
             // Create getter and setters for each column and map them
-            $mapGettersColumns = array('getId' => null, 'getName' => null, 'isHidden' => null, 'isDeleted' => null);
+            $mapGettersColumns = array('getId' => null, 'getName' => null, 'isHidden' => false, 'isDeleted' => false);
             $properties = array();
             $methods = array();
             $types = array();
@@ -223,6 +223,14 @@ class EntityGenerator
                             ),
                         )),
                     ));
+                }
+
+                // Special handling for isHidden() and isDeleted()
+                // If a column name ends in "_ishidden", that column is mapped to isHidden()
+                if (preg_match('/_ishidden$/i', $columnName)) {
+                    $mapGettersColumns['isHidden'] = $columnName;
+                } elseif (preg_match('/_isdeleted$/i', $columnName)) {
+                    $mapGettersColumns['isDeleted'] = $columnName;
                 }
             }
 
