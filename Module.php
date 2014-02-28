@@ -83,7 +83,7 @@ class Module implements
 
         // This event will only be fired when an ActionController under this module's namespace is dispatched
         // $sharedEvents = $manager->getEventManager()->getSharedManager();
-        // $sharedEvents->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, function(MvcEvent $e) {
+        // $sharedEvents->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, function (MvcEvent $e) {
             // $controller = $e->getTarget();
 
             // // Replace application layout entirely with module-specific layout
@@ -115,7 +115,7 @@ class Module implements
      *
      * @return array|\Traversable
      */
-    public function getConfig($env = null)
+    public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
     }
