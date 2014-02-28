@@ -20,6 +20,9 @@ use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 
 /**
+ * Methods are listed according to loading order
+ *
+ * @see Zend\ModuleManager\Listener\DefaultListenerAggregate::attach() for order of default MVC events
  * @see Zend\Mvc\Service\ModuleManagerFactory and Zend\ModuleManager\Feature\*Interface.php for list of config methods
  */
 class Module implements
@@ -28,6 +31,49 @@ class Module implements
     ConfigProviderInterface,
     InitProviderInterface
 {
+    /**
+     * Defined by AutoloaderProviderInterface; Return an array for passing to Zend\Loader\AutoloaderFactory
+     *
+     * @return array
+     */
+    public function getAutoloaderConfig()
+    {
+        return array(
+            'Zend\Loader\ClassMapAutoloader' => array(
+                __DIR__ . '/autoload_classmap.php',
+            ),
+            'Zend\Loader\StandardAutoloader' => array(
+                'namespaces' => array(
+                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Defined by InitProviderInterface; Initialize workflow
+     *
+     * This can be used to load module-specific layout during module init.
+     *
+     * @param  ModuleManagerInterface $manager
+     * @return void
+     */
+    public function init(ModuleManagerInterface $manager)
+    {
+        // For reference only - up to application to implement
+
+        // $manager->getEventManager()->getSharedManager()->attach(
+            // array(__NAMESPACE__, 'Web', 'Cms'), // load module-specific layouts for these modules (last 2 are examples)
+            // MvcEvent::EVENT_DISPATCH,
+            // function (MvcEvent $e) {
+                // $controller = $e->getTarget();
+                // // Replace application layout entirely with module-specific layout
+                // $controller->layout('/layout/layout');
+            // },
+            // 100
+        // );
+    }
+
     /**
      * Defined by BootstrapListenerInterface; Listen to the bootstrap event
      *
@@ -72,49 +118,6 @@ class Module implements
         // $e->getApplication()->getMvcEvent()->getViewModel()->setVariables(array(
             // 'moduleTimestamp' => microtime(true),
         // ));
-    }
-
-    /**
-     * Defined by InitProviderInterface; Initialize workflow
-     *
-     * This can be used to load module-specific layout during module init.
-     *
-     * @param  ModuleManagerInterface $manager
-     * @return void
-     */
-    public function init(ModuleManagerInterface $manager)
-    {
-        // For reference only - up to application to implement
-
-        // $manager->getEventManager()->getSharedManager()->attach(
-            // array(__NAMESPACE__, 'Web', 'Cms'), // load module-specific layouts for these modules (last 2 are examples)
-            // MvcEvent::EVENT_DISPATCH,
-            // function (MvcEvent $e) {
-                // $controller = $e->getTarget();
-                // // Replace application layout entirely with module-specific layout
-                // $controller->layout('/layout/layout');
-            // },
-            // 100
-        // );
-    }
-
-    /**
-     * Defined by AutoloaderProviderInterface; Return an array for passing to Zend\Loader\AutoloaderFactory
-     *
-     * @return array
-     */
-    public function getAutoloaderConfig()
-    {
-        return array(
-            'Zend\Loader\ClassMapAutoloader' => array(
-                __DIR__ . '/autoload_classmap.php',
-            ),
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
     }
 
     /**
