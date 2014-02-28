@@ -17,6 +17,7 @@ use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\ModuleRouteListener;
+use Zend\Mvc\MvcEvent;
 
 /**
  * @see Zend\Mvc\Service\ModuleManagerFactory and Zend\ModuleManager\Feature\*Interface.php for list of config methods
@@ -80,9 +81,9 @@ class Module implements
     {
         // For reference only - up to application to implement
 
-        // This event will only be fired when an ActionController under this module's namespace is dispatched.
+        // This event will only be fired when an ActionController under this module's namespace is dispatched
         // $sharedEvents = $moduleManager->getEventManager()->getSharedManager();
-        // $sharedEvents->attach(__NAMESPACE__, 'dispatch', function(MvcEvent $e) {
+        // $sharedEvents->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, function(MvcEvent $e) {
             // $controller = $e->getTarget();
 
             // // Replace application layout entirely with module-specific layout
