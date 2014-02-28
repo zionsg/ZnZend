@@ -81,14 +81,16 @@ class Module implements
     {
         // For reference only - up to application to implement
 
-        // This event will only be fired when an ActionController under this module's namespace is dispatched
-        // $sharedEvents = $manager->getEventManager()->getSharedManager();
-        // $sharedEvents->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, function (MvcEvent $e) {
-            // $controller = $e->getTarget();
-
-            // // Replace application layout entirely with module-specific layout
-            // $controller->layout('/layout/layout');
-        // }, 100);
+        // $manager->getEventManager()->getSharedManager()->attach(
+            // array(__NAMESPACE__, 'Web', 'Cms'), // load module-specific layouts for these modules (last 2 are examples)
+            // MvcEvent::EVENT_DISPATCH,
+            // function (MvcEvent $e) {
+                // $controller = $e->getTarget();
+                // // Replace application layout entirely with module-specific layout
+                // $controller->layout('/layout/layout');
+            // },
+            // 100
+        // );
     }
 
     /**
