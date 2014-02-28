@@ -8,16 +8,24 @@
 
 namespace ZnZend;
 
+use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\I18n\Translator\TranslatorAwareInterface;
+use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\EventManager\EventInterface;
+use Zend\ModuleManager\Feature\InitProviderInterface;
+use Zend\ModuleManager\ModuleManagerInterface;
+use Zend\Mvc\ModuleRouteListener;
 
 /**
  * @see Zend\Mvc\Service\ModuleManagerFactory and Zend\ModuleManager\Feature\*Interface.php for list of config methods
  */
-class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ConfigProviderInterface
+class Module implements
+    AutoloaderProviderInterface,
+    BootstrapListenerInterface,
+    ConfigProviderInterface,
+    InitProviderInterface
 {
     /**
      * Defined by BootstrapListenerInterface; Listen to the bootstrap event
@@ -47,17 +55,43 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
             }
         });
 
+        // For reference only - up to application to implement
+
+        // Route listener
+        // $eventManager        = $e->getApplication()->getEventManager();
+        // $moduleRouteListener = new ModuleRouteListener();
+        // $moduleRouteListener->attach($eventManager);
+
         // Set global/static db adapter for feature-enabled TableGateways such as ZnZend\Model\AbstractMapper
-        // For example only - up to application to set it as the service manager key for the db adapter may be different
         // if ($sm->has('Zend\Db\Adapter\Adapter')) {
-            // \Zend\Db\TableGateway\Feature\GlobalAdapterFeature::setStaticAdapter(
-                // $sm->get('Zend\Db\Adapter\Adapter')
-            // );
+            // GlobalAdapterFeature::setStaticAdapter($sm->get('Zend\Db\Adapter\Adapter'));
         // }
     }
 
     /**
-     * Defined by AutoloaderProviderInterface; Return an array for passing to Zend\Loader\AutoloaderFactory.
+     * Defined by InitProviderInterface; Initialize workflow
+     *
+     * This can be used to load module-specific layout during module init.
+     *
+     * @param  ModuleManagerInterface $manager
+     * @return void
+     */
+    public function init(ModuleManagerInterface $moduleManager)
+    {
+        // For reference only - up to application to implement
+
+        // This event will only be fired when an ActionController under this module's namespace is dispatched.
+        // $sharedEvents = $moduleManager->getEventManager()->getSharedManager();
+        // $sharedEvents->attach(__NAMESPACE__, 'dispatch', function(MvcEvent $e) {
+            // $controller = $e->getTarget();
+
+            // // Replace application layout entirely with module-specific layout
+            // $controller->layout('/layout/layout');
+        // }, 100);
+    }
+
+    /**
+     * Defined by AutoloaderProviderInterface; Return an array for passing to Zend\Loader\AutoloaderFactory
      *
      * @return array
      */
@@ -80,7 +114,7 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
      *
      * @return array|\Traversable
      */
-    public function getConfig($env = null)
+    public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
     }
