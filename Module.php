@@ -77,12 +77,12 @@ class Module implements
      * @param  ModuleManagerInterface $manager
      * @return void
      */
-    public function init(ModuleManagerInterface $moduleManager)
+    public function init(ModuleManagerInterface $manager)
     {
         // For reference only - up to application to implement
 
         // This event will only be fired when an ActionController under this module's namespace is dispatched
-        // $sharedEvents = $moduleManager->getEventManager()->getSharedManager();
+        // $sharedEvents = $manager->getEventManager()->getSharedManager();
         // $sharedEvents->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, function(MvcEvent $e) {
             // $controller = $e->getTarget();
 
@@ -115,7 +115,7 @@ class Module implements
      *
      * @return array|\Traversable
      */
-    public function getConfig()
+    public function getConfig($env = null)
     {
         return include __DIR__ . '/config/module.config.php';
     }
