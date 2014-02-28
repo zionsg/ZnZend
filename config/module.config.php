@@ -3,13 +3,13 @@
  * @see Zend\Mvc\Service\ModuleManagerFactory for list of manager keys (ie. view_helpers, etc.)
  * @see Zend\ModuleManager\Listener\ServiceListener::serviceConfigToArray() and
  *      Zend\ServiceManager\Config for list of config keys for each service manager (ie. invokables, etc.)
- * @see ZnZend\Module::onBootstrap() for configuring of PHP settings via 'phpSettings' key
+ * @see ZnZend\Module::onBootstrap() for configuring of PHP settings via 'php_settings' key
  */
 
-// $isDevelopmentMode = ('127.0.0.1' == $_SERVER['REMOTE_ADDR']); // whether app is running in localhost development mode
+// $isDevelopmentMode = ('development' == getenv('APP_ENV')); // whether app is running in localhost development mode
 return array(
     // PHP settings can be configured via this key (preferrably in /config/autoload/global.php)
-    'phpSettings' => array(
+    'php_settings' => array(
         // 'display_startup_errors' => $isDevelopmentMode,
         // 'display_errors'  => $isDevelopmentMode,
         // 'error_reporting' => ($isDevelopmentMode ? E_ALL : E_ALL & ~E_NOTICE),
