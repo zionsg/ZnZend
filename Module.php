@@ -11,11 +11,11 @@ namespace ZnZend;
 use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\I18n\Translator\TranslatorAwareInterface;
 use Zend\EventManager\EventInterface;
+use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
-use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 
@@ -53,7 +53,7 @@ class Module implements
     /**
      * Defined by InitProviderInterface; Initialize workflow
      *
-     * This can be used to load module-specific layout during module init.
+     * This can be used to load module-specific layouts and pass variables to controller/view during module init.
      *
      * @param  ModuleManagerInterface $manager
      * @return void
@@ -63,12 +63,15 @@ class Module implements
         // For reference only - up to application to implement
 
         // $manager->getEventManager()->getSharedManager()->attach(
-            // array(__NAMESPACE__, 'Web', 'Cms'), // load module-specific layouts for these modules (last 2 are examples)
+            // array(__NAMESPACE__, 'Web', 'Cms'), // apply event to these modules (last 2 are examples)
             // MvcEvent::EVENT_DISPATCH,
             // function (MvcEvent $e) {
                 // $controller = $e->getTarget();
-                // // Replace application layout entirely with module-specific layout
-                // $controller->layout('/layout/layout');
+                // $controller->layout('/layout/layout'); // load module-specific layouts
+                // $controller->myVar = 'My Var'; // pass variables to controller (use $this->myVar when in controller)
+                // $e->getViewModel()->setVariables(array( // pass variables to layout and view (use $myVar when in view)
+                    // 'myVar' => 'My Var',
+                // ));
             // },
             // 100
         // );
@@ -79,16 +82,21 @@ class Module implements
      *
      * $e in this case is usually an instance of Zend\Mvc\MvcEvent.
      *
-     * @param EventInterface $e
+     * @param  EventInterface $e
      * @return array
      */
     public function onBootstrap(EventInterface $e)
     {
+        // Methods called on $e below belong to MvcEvent and are not found in EventInterface
+        if (!$e instanceof MvcEvent) {
+            return;
+        }
+
         $sm = $e->getApplication()->getServiceManager();
 
-        // Allow configuration of PHP settings via 'phpSettings' key in config
+        // Allow configuration of PHP settings via 'php_settings' key in config
         $config = $sm->get('Config');
-        $phpSettings = isset($config['phpSettings']) ? $config['phpSettings'] : array();
+        $phpSettings = isset($config['php_settings']) ? $config['php_settings'] : array();
         foreach($phpSettings as $key => $value) {
             ini_set($key, $value);
         }
@@ -114,9 +122,9 @@ class Module implements
             // GlobalAdapterFeature::setStaticAdapter($sm->get('Zend\Db\Adapter\Adapter'));
         // }
 
-        // Assign variables to layout and view - 'module' is prefixed to indicate source from Module.php
-        // $e->getApplication()->getMvcEvent()->getViewModel()->setVariables(array(
-            // 'moduleTimestamp' => microtime(true),
+        // Another way to assign variables to layout and view other than in init()
+        // $e->getViewModel()->setVariables(array(
+            // 'myVar' => 'My Var',  // use $myVar when in view
         // ));
     }
 
