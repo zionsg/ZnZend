@@ -67,6 +67,11 @@ class Module implements
         // if ($sm->has('Zend\Db\Adapter\Adapter')) {
             // GlobalAdapterFeature::setStaticAdapter($sm->get('Zend\Db\Adapter\Adapter'));
         // }
+
+        // Assign variables to layout and view - 'module' is prefixed to indicate source from Module.php
+        // $e->getApplication()->getMvcEvent()->getViewModel()->setVariables(array(
+            // 'moduleTimestamp' => microtime(true),
+        // ));
     }
 
     /**
