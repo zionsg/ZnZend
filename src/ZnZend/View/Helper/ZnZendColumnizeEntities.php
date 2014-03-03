@@ -8,6 +8,7 @@
 
 namespace ZnZend\View\Helper;
 
+use Traversable;
 use Zend\View\Helper\AbstractHelper;
 use ZnZend\View\Exception;
 
@@ -129,13 +130,18 @@ class ZnZendColumnizeEntities extends AbstractHelper
         $webRoot = $this->addSlash($webRoot);
         $thumbnailPath = $this->addSlash($thumbnailPath);
 
-        // Convert associative array to numerically indexed array
+        // Convert associative array or foreach-compatible list to numerically indexed array
         if (empty($entities)) {
             return $output;
         }
-        $entities = array_values(
-            is_array($entities) ? $entities : array($entities)
-        );
+        if (!is_array($entities) && !$entities instanceof Traversable) { // when single entity is passed in
+            $entities = array($entities);
+        }
+        $entityArray = array();
+        foreach ($entities as $entity) {
+            $entityArray[] = $entity;
+        }
+        $entities = $entityArray;
         $entityCount = count($entities);
 
         // Calculate initial rows
