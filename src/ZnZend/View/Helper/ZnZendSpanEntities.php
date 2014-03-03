@@ -140,14 +140,15 @@ class ZnZendSpanEntities extends AbstractHelper
         if (empty($entities)) {
             return $output;
         }
-        if (!is_array($entities) && !$entities instanceof Traversable) { // when single entity is passed in
-            $entities = array($entities);
+        if (is_array($entities) || $entities instanceof Traversable) {
+            $entityArray = array();
+            foreach ($entities as $entity) {
+                $entityArray[] = $entity;
+            }
+            $entities = $entityArray;
+        } else {
+            $entities = array($entities); // when single entity is passed in
         }
-        $entityArray = array();
-        foreach ($entities as $entity) {
-            $entityArray[] = $entity;
-        }
-        $entities = $entityArray;
         $entityCount = count($entities);
 
         // Calculate initial rows
