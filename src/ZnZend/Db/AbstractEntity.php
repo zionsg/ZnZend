@@ -27,6 +27,9 @@ use ZnZend\Db\Exception;
  * to get everyone in the world to convert their code from $entity->foo = $x; to $entity->setFoo($x);
  *
  * Typically, type checking/casting is done once in setters and not repeated in getters.
+ * Values passed to setters and from getters should be the actual value as stored in the database,
+ * eg. getEmails() would return a comma-delimited list of emails. If an array is expected, a separate
+ * function, eg. getEmailsAsArray() should be created to prevent confusion.
  *
  * @Annotation\Name("Entity")
  * @Annotation\Type("ZnZend\Form\Form")
@@ -184,10 +187,11 @@ abstract class AbstractEntity implements EntityInterface
      * This uses $_mapGettersColumns and calls all the getters to populate the array.
      * By default, properties prefixed with an underscore will be omitted.
      *
-     * All values are cast to string for use in forms and database calls.
+     * All values are cast to string for use in forms and database queries.
      * If the value is DateTime, $value->format('c') is used to return the ISO 8601 timestamp.
+     * If the value is an array, it will be imploded into a comma-delimited list.
      * If the value is an object, $value->__toString() must be defined.
-     * Extending classes should override this if this is not desired.
+     * Extending classes should override this if any of the above is not desired.
      *
      * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::extract()
      * typically in forms to extract values from an object.
@@ -206,6 +210,8 @@ abstract class AbstractEntity implements EntityInterface
             $value = $this->$getter();
             if ($value instanceof DateTime) {
                 $value = $value->format('c');
+            } elseif (is_array($value)) {
+                $value = implode(',', $value);
             }
             $result[$column] = (string) $value;
         }
