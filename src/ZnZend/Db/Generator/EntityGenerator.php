@@ -30,9 +30,9 @@ use ZnZend\Db\Exception;
  *
  * The default column naming convention (see columnToSetterFunc() and columnToGetterFunc()) is assumed as:
  *   <table prefix>_<first word>_<second word if any, if none, no trailing underscore>
- * If the first word is "is" or "has", the column is assumed to be a BOOLEAN flag column and a boolean function
+ * If the first word is "is" or "has", the column is assumed to be a BOOLEAN flag column and a boolean method
  * will be generated as well which casts the actual string/numeric value to boolean by default.
- * The user should modify the boolean function after generating if the values do not cast easily to boolean,
+ * The user should modify the boolean method after generating if the values do not cast easily to boolean,
  * eg. "yes" and "no".
  *
  * Examples for default naming rules:
@@ -77,18 +77,18 @@ class EntityGenerator
      *
      * The params are applied to all the entities.
      *
-     * @param string            $filePath           Path to write generated files
-     * @param Adapter           $dbAdapter          Database adapter
-     * @param string            $namespace          Namespace for entity and table gateway classes
-     * @param DocBlockGenerator $fileDocBlock       Optional docblock for all files
-     * @param callable          $columnToSetterFunc Optional callback that takes in
-     *                                              (string $tableName, string $columnName) and returns setter name
-     * @param callable $columnToGetterFunc Optional callback that takes in
-     *                                     (string $tableName, string $columnName) and returns getter name
-     * @param callable $columnToBooleanFunc Optional callback that takes in
-     *                                      (string $tableName, string $columnName) and returns
-     *                                      boolean function name if it is considered a BOOLEAN column
-     *                                      or false if it is not considered a BOOLEAN column
+     * @param  string            $filePath            Path to write generated files
+     * @param  Adapter           $dbAdapter           Database adapter
+     * @param  string            $namespace           Namespace for entity and table gateway classes
+     * @param  DocBlockGenerator $fileDocBlock        Optional docblock for all files
+     * @param  callable          $columnToSetterFunc  Optional callback that takes in
+     *                                                (string $tableName, string $columnName) and returns setter name
+     * @param  callable          $columnToGetterFunc  Optional callback that takes in
+     *                                                (string $tableName, string $columnName) and returns getter name
+     * @param  callable          $columnToBooleanFunc Optional callback that takes in
+     *                                                (string $tableName, string $columnName) and returns
+     *                                                boolean function name if it is considered a BOOLEAN column
+     *                                                or false if it is not considered a BOOLEAN column
      * @throws Exception\InvalidArgumentException When path is not writable
      * @return void
      */
@@ -254,7 +254,7 @@ class EntityGenerator
                     }
                 }
 
-                // Boolean function
+                // Boolean method
                 if ($booleanName) {
                     $mapGettersColumns[$booleanName] = $columnName;
                     if ($booleanName != 'isDeleted') { // skip methods defined in AbstractEntity
@@ -436,7 +436,7 @@ class EntityGenerator
     }
 
     /**
-     * Get default callback for generating boolean function name from BOOLEAN column
+     * Get default callback for generating boolean method name from BOOLEAN column
      *
      * Format of BOOLEAN column: <table prefix>_is_<...> or <table prefix>_has_<...>
      *
