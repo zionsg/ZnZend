@@ -31,16 +31,18 @@ class MapperGenerator
      *
      * The params are applied to all the tables.
      *
-     * @param string   $filePath            Path to write generated files
-     * @param Adapter  $dbAdapter           Database adapter
-     * @param string   $namespace           Namespace for entity and table gateway classes
-     * @param callable $activeRowStateFunc  Optional callback that takes in (string $tableName, array $columnNames)
-     *                                      and returns array('activeColumn' => 'activeValue') for
-     *                                      AbstractMapper::$activeRowState
-     * @param callable $deletedRowStateFunc Optional callback that takes in (string $tableName, array $columnNames)
-     *                                      and returns array('deletedColumn' => 'deletedValue') for
-     *                                      AbstractMapper::$deletedRowState
-     * @param DocBlockGenerator $fileDocBlock  Optional docblock for all files
+     * @param  string            $filePath            Path to write generated files
+     * @param  Adapter           $dbAdapter           Database adapter
+     * @param  string            $namespace           Namespace for entity and table gateway classes
+     * @param  DocBlockGenerator $fileDocBlock        Optional docblock for all files
+     * @param  callable          $activeRowStateFunc  Optional callback that takes in
+     *                                                (string $tableName, array $columnNames)
+     *                                                and returns array('activeColumn' => 'activeValue') for
+     *                                                AbstractMapper::$activeRowState
+     * @param  callable          $deletedRowStateFunc Optional callback that takes in
+     *                                                (string $tableName, array $columnNames)
+     *                                                and returns array('deletedColumn' => 'deletedValue') for
+     *                                                AbstractMapper::$deletedRowState
      * @throws Exception\InvalidArgumentException When path is not writable
      * @return void
      */
@@ -48,23 +50,24 @@ class MapperGenerator
         $filePath,
         Adapter $dbAdapter,
         $namespace,
+        DocBlockGenerator $fileDocBlock = null,
         $activeRowStateFunc = null,
-        $deletedRowStateFunc = null,
-        DocBlockGenerator $fileDocBlock = null
+        $deletedRowStateFunc = null
     ) {
         if (!is_writable($filePath)) {
             throw new Exception\InvalidArgumentException("{$filePath} is not writable");
         }
 
         // Default callbacks for getting active/deleted row state column-value pairs if BOTH are undefined
-        // If a table has a column ending in 'isdeleted', it is assumed that the column indicates the row state
-        // Eg: `person_isdeleted` column is found, so $activeRowState = array('person_isdeleted' => 0)
-        // and $deletedRowState = array('person_isdeleted' => 1)
+        // If a table has a column ending in '_is_deleted' or '_isdeleted', it is assumed that the column
+        // indicates the row state.
+        // Eg: `person_is_deleted` column is found, so $activeRowState = array('person_is_deleted' => 0)
+        // and $deletedRowState = array('person_is_deleted' => 1)
         if (!is_callable($activeRowStateFunc) && !is_callable($deletedRowStateFunc)) {
             $rowStateFunc = function ($stateValue) {
                 return function ($tableName, $columnNames) use ($stateValue) {
                     foreach ($columnNames as $columnName) {
-                        if (preg_match('/^.*[^a-zA-Z0-9]+isdeleted$/i', $columnName)) {
+                        if (preg_match('/.+_is_?deleted$/i', $columnName)) {
                             return array($columnName => $stateValue);
                         }
                     }
