@@ -84,10 +84,10 @@ class ZnZendResizeImage extends AbstractHelper
                 return $failure;
         }
 
-        // Do not create resized copy if current image dimensions are the same
+        // Do not create resized copy if current image dimensions are the same or smaller
         $currWidth  = $imageInfo[0];
         $currHeight = $imageInfo[1];
-        if ($currWidth == $width && $currHeight == $height) {
+        if ($currWidth <= $width && $currHeight <= $height) {
             return $imagePath;
         }
 
