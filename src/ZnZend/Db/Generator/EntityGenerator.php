@@ -26,13 +26,27 @@ use ZnZend\Db\Exception;
  *
  * This only generates the initial classes and does not do all the work for you.
  * The entity name, $_mapGettersColumns, setters and getters for each column are generated
- * using simplistic naming rules. Eg: For a `useragent` column, the generated getter
- * will be named 'getUseragent()' and not 'getUserAgent()'.
+ * using simplistic naming rules.
+ *
+ * The default column naming convention (see columnToSetterFunc() and columnToGetterFunc()) is assumed as:
+ *   <table prefix>_<first word>_<second word if any, if none, no trailing underscore>
+ * If the first word is "is" or "has", the column is assumed to be a BOOLEAN flag column and a boolean function
+ * will be generated as well which casts the actual string/numeric value to boolean by default.
+ * The user should modify the boolean function after generating if the values do not cast easily to boolean,
+ * eg. "yes" and "no".
+ *
+ * Examples for default naming rules:
+ *   `name` will generate setName() and getName(), assuming there is no table prefix
+ *   `is_deleted` will generated setDeleted() and getDeleted() as "is_" is considered as the table prefix
+ *   `person_first_name` will generate setFirstName() and getFirstName()
+ *   `person_firstname` will generate setFirstname() and getFirstname()
+ *   `person_is_deleted` will generate setIsDeleted(), getIsDeleted() and isDeleted()
+ *   `person_has_visa` will generate setHasVisa(), getHasVisa() and hasVisa()
  *
  * Note: If a table has 2 columns with the same '_*' ending, eg. user_id and role_id,
- * an error will occur as the default column to setter/getter naming functions,
- * columnToSetterFunc() and columnToGetterFunc(), will create setId() and getId() for both columns,
- * resulting in a conflict. In this case, custom naming callbacks should be passed to generate().
+ * an error will occur as the default columnToSetterFunc() and columnToGetterFunc()
+ * will create setId() and getId() for both columns, resulting in a conflict.
+ * In this case, custom naming callbacks should be passed to generate().
  */
 class EntityGenerator
 {
@@ -66,11 +80,14 @@ class EntityGenerator
      * @param string   $filePath            Path to write generated files
      * @param Adapter  $dbAdapter           Database adapter
      * @param string   $namespace           Namespace for entity and table gateway classes
+     * @param DocBlockGenerator $fileDocBlock Optional docblock for all files
      * @param callable $columnToSetterFunc  Optional callback that takes in (string $tableName, string $columnName)
      *                                      and returns setter name
      * @param callable $columnToGetterFunc  Optional callback that takes in (string $tableName, string $columnName)
      *                                      and returns getter name
-     * @param DocBlockGenerator $fileDocBlock Optional docblock for all files
+     * @param callable $columnToBooleanFunc Optional callback that takes in (string $tableName, string $columnName)
+     *                                      and returns boolean function name if it is considered a BOOLEAN column
+     *                                      or false if it is not considered a BOOLEAN column
      * @throws Exception\InvalidArgumentException When path is not writable
      * @return void
      */
@@ -78,9 +95,10 @@ class EntityGenerator
         $filePath,
         Adapter $dbAdapter,
         $namespace,
+        DocBlockGenerator $fileDocBlock = null,
         $columnToSetterFunc = null,
         $columnToGetterFunc = null,
-        DocBlockGenerator $fileDocBlock = null
+        $columnToBooleanFunc = null
     ) {
         if (!is_writable($filePath)) {
             throw new Exception\InvalidArgumentException("{$filePath} is not writable");
@@ -90,6 +108,9 @@ class EntityGenerator
         }
         if (!is_callable($columnToGetterFunc)) {
             $columnToGetterFunc = self::columnToGetterFunc();
+        }
+        if (!is_callable($columnToBooleanFunc)) {
+            $columnToBooleanFunc = self::columnToBooleanFunc();
         }
 
         // Iterate thru tables
@@ -121,14 +142,16 @@ class EntityGenerator
                 $isPrimary  = ('PRI' == $column->column_key);
                 $isNumeric  = ($column->numeric_precision !== null);
                 $defaultValue = ($isPrimary ? null : $column->column_default);
-                $sqlType    = $column->data_type;
-                $phpType    = self::getPhpType($sqlType);
-                $setterName = $columnToSetterFunc($tableName, $columnName);
-                $getterName = $columnToGetterFunc($tableName, $columnName);
-                $label = substr(
-                    $getterName ?: $setterName,
-                    strcspn($getterName ?: $setterName, 'ABCDEFGHJIJKLMNOPQRSTUVWXYZ')
-                );
+                $sqlType      = $column->data_type;
+                $phpType      = self::getPhpType($sqlType);
+                $setterName   = $columnToSetterFunc($tableName, $columnName);
+                $getterName   = $columnToGetterFunc($tableName, $columnName);
+                $booleanName  = $columnToBooleanFunc($tableName, $columnName);
+                $columnWords  = explode('_', $columnName);
+                if (count($columnWords) > 1) {
+                    array_shift($columnWords);
+                }
+                $label = strtolower(implode(' ', $columnWords));
 
                 $tags = array(new Tag(array(
                     'name' => '@Annotation\Exclude()', // no form input needed for primary keys
@@ -180,56 +203,75 @@ class EntityGenerator
                     )),
                 ));
 
-                if (!in_array($setterName, array('setId', 'setName'))) { // skip methods defined in AbstractEntity
-                    $desc = 'Set ' . lcfirst($label);
-                    $methods[] = MethodGenerator::fromArray(array(
-                        'name'       => $setterName,
-                        'parameters' => array(
-                            ParameterGenerator::fromArray(array('name' => 'value')),
-                        ),
-                        'body'       =>   ('string' == $phpType)
-                                        ? 'return $this->set($value);'
-                                        : "return \$this->set(\$value, '{$phpType}');",
-                        'docblock'   => DocBlockGenerator::fromArray(array(
-                            'shortDescription' => $desc,
-                            'longDescription'  => null,
-                            'tags'             => array(
-                                new ParamTag(array(
-                                    'paramName' => 'value',
-                                    'datatype'  => 'null|' . $phpType,
-                                )),
-                                new ReturnTag(array(
-                                    'datatype'  => $entityName,
-                                )),
+                // Setter
+                if ($setterName) {
+                    if (!in_array($setterName, array('setId', 'setName'))) { // skip methods defined in AbstractEntity
+                        $desc = 'Set ' . $label;
+                        $methods[] = MethodGenerator::fromArray(array(
+                            'name'       => $setterName,
+                            'parameters' => array(
+                                ParameterGenerator::fromArray(array('name' => 'value')),
                             ),
-                        )),
-                    ));
+                            'body'       =>   ('string' == $phpType)
+                                            ? 'return $this->set($value);'
+                                            : "return \$this->set(\$value, '{$phpType}');",
+                            'docblock'   => DocBlockGenerator::fromArray(array(
+                                'shortDescription' => $desc,
+                                'longDescription'  => null,
+                                'tags'             => array(
+                                    new ParamTag(array(
+                                        'paramName' => 'value',
+                                        'datatype'  => 'null|' . $phpType,
+                                    )),
+                                    new ReturnTag(array(
+                                        'datatype'  => $entityName,
+                                    )),
+                                ),
+                            )),
+                        ));
+                    }
                 }
 
+                // Getter
                 if ($getterName) {
                     $mapGettersColumns[$getterName] = $columnName;
-                }
-                if (!in_array($getterName, array('getId', 'getName'))) { // skip methods defined in AbstractEntity
-                    $desc = 'Get ' . lcfirst($label);
-                    $methods[] = MethodGenerator::fromArray(array(
-                        'name'       => $getterName,
-                        'body'       => 'return $this->get();',
-                        'docblock'   => DocBlockGenerator::fromArray(array(
-                            'shortDescription' => $desc,
-                            'longDescription'  => null,
-                            'tags'             => array(
-                                new ReturnTag(array(
-                                    'datatype'  => self::getPhpType($sqlType),
-                                )),
-                            ),
-                        )),
-                    ));
+                    if (!in_array($getterName, array('getId', 'getName'))) { // skip methods defined in AbstractEntity
+                        $desc = 'Get ' . $label;
+                        $methods[] = MethodGenerator::fromArray(array(
+                            'name'       => $getterName,
+                            'body'       => 'return $this->get();',
+                            'docblock'   => DocBlockGenerator::fromArray(array(
+                                'shortDescription' => $desc,
+                                'longDescription'  => null,
+                                'tags'             => array(
+                                    new ReturnTag(array(
+                                        'datatype'  => self::getPhpType($sqlType),
+                                    )),
+                                ),
+                            )),
+                        ));
+                    }
                 }
 
-                // Special handling for isDeleted()
-                // If a column name ends in "isdeleted", that column is mapped to isDeleted()
-                if (preg_match('/^.*[^a-zA-Z0-9]+isdeleted$/i', $columnName)) {
-                    $mapGettersColumns['isDeleted'] = $columnName;
+                // Boolean function
+                if ($booleanName) {
+                    $mapGettersColumns[$booleanName] = $columnName;
+                    if ($booleanName != 'isDeleted') { // skip methods defined in AbstractEntity
+                        $desc = 'Check if ' . $label;
+                        $methods[] = MethodGenerator::fromArray(array(
+                            'name'       => $booleanName,
+                            'body'       => 'return (bool) $this->get();',
+                            'docblock'   => DocBlockGenerator::fromArray(array(
+                                'shortDescription' => $desc,
+                                'longDescription'  => null,
+                                'tags'             => array(
+                                    new ReturnTag(array(
+                                        'datatype'  => 'bool',
+                                    )),
+                                ),
+                            )),
+                        ));
+                    }
                 }
             }
 
@@ -351,39 +393,68 @@ class EntityGenerator
     /**
      * Get default callback for generating setter name from column name
      *
-     * 'name' and 'person_name' becomes 'setName'
-     * 'isdeleted' and 'person_isdeleted' becomes 'setDeleted'
-     *
+     * @see    class docblock for examples
      * @return callable
      */
     protected static function columnToSetterFunc()
     {
         return function ($tableName, $columnName) {
-            $pattern = '/^.*[^a-zA-Z0-9]+(.+)$/';
-            $matches = array();
-            $normalizedName = (preg_match($pattern, $columnName, $matches) ? $matches[1] : $columnName);
-            if (0 === stripos($normalizedName, 'is')) {
-                return 'set' . ucfirst(substr($normalizedName, 2));
+            $words = explode('_', $columnName);
+
+            if (count($words) <= 1) { // no table prefix
+                return 'set' . ucfirst($columnName);
             }
-            return 'set' . ucfirst($normalizedName);
+
+            $tablePrefix = array_shift($words);
+            return 'set' . implode('', array_map('ucfirst', $words));
         };
     }
 
     /**
      * Get default callback for generating getter name from column name
      *
-     * 'name' and 'person_name' becomes 'getName'
-     * 'isdeleted' and 'person_isdeleted' becomes 'getIsdeleted'
-     *
+     * @see    class docblock for examples
      * @return callable
      */
     protected static function columnToGetterFunc()
     {
         return function ($tableName, $columnName) {
-            $pattern = '/^.*[^a-zA-Z0-9]+(.+)$/';
-            $matches = array();
-            $normalizedName = (preg_match($pattern, $columnName, $matches) ? $matches[1] : $columnName);
-            return 'get' . ucfirst($normalizedName);
+            $words = explode('_', $columnName);
+
+            if (count($words) <= 1) { // no table prefix
+                return 'get' . ucfirst($columnName);
+            }
+
+            $tablePrefix = array_shift($words);
+            return 'get' . implode('', array_map('ucfirst', $words));
+        };
+    }
+
+    /**
+     * Get default callback for generating boolean function name from BOOLEAN column
+     *
+     * Format of BOOLEAN column: <table prefix>_is_<...> or <table prefix>_has_<...>
+     *
+     * @see    class docblock for examples
+     * @return callable
+     */
+    protected static function columnToBooleanFunc()
+    {
+        return function ($tableName, $columnName) {
+            $words = explode('_', $columnName);
+
+            if (count($words) < 3) { // not considered a BOOLEAN column
+                return false;
+            }
+
+            $tablePrefix = array_shift($words);
+            $verb = strtolower(array_shift($words));
+
+            if ($verb != 'is' && $verb != 'has') { // not considered a BOOLEAN column
+                return false;
+            }
+
+            return $verb . implode('', array_map('ucfirst', $words));
         };
     }
 
