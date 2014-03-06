@@ -402,11 +402,13 @@ class EntityGenerator
             $words = explode('_', $columnName);
 
             if (count($words) <= 1) { // no table prefix
-                return 'set' . ucfirst($columnName);
+                $name = 'set' . ucfirst($columnName);
+            } else {
+                $tablePrefix = array_shift($words);
+                $name = 'set' . implode('', array_map('ucfirst', $words));
             }
 
-            $tablePrefix = array_shift($words);
-            return 'set' . implode('', array_map('ucfirst', $words));
+            return $name;
         };
     }
 
@@ -422,11 +424,13 @@ class EntityGenerator
             $words = explode('_', $columnName);
 
             if (count($words) <= 1) { // no table prefix
-                return 'get' . ucfirst($columnName);
+                $name = 'get' . ucfirst($columnName);
+            } else {
+                $tablePrefix = array_shift($words);
+                $name = 'get' . implode('', array_map('ucfirst', $words));
             }
 
-            $tablePrefix = array_shift($words);
-            return 'get' . implode('', array_map('ucfirst', $words));
+            return $name;
         };
     }
 
@@ -444,17 +448,19 @@ class EntityGenerator
             $words = explode('_', $columnName);
 
             if (count($words) < 3) { // not considered a BOOLEAN column
-                return false;
+                $name = false;
+            } else {
+                $tablePrefix = array_shift($words);
+                $verb = strtolower(array_shift($words));
+
+                if ($verb != 'is' && $verb != 'has') { // not considered a BOOLEAN column
+                    $name = false;
+                } else {
+                    $name = $verb . implode('', array_map('ucfirst', $words));
+                }
             }
 
-            $tablePrefix = array_shift($words);
-            $verb = strtolower(array_shift($words));
-
-            if ($verb != 'is' && $verb != 'has') { // not considered a BOOLEAN column
-                return false;
-            }
-
-            return $verb . implode('', array_map('ucfirst', $words));
+            return $name;
         };
     }
 
