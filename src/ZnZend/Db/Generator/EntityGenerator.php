@@ -77,18 +77,18 @@ class EntityGenerator
      *
      * The params are applied to all the entities.
      *
-     * @param string            $filePath            Path to write generated files
-     * @param Adapter           $dbAdapter           Database adapter
-     * @param string            $namespace           Namespace for entity and table gateway classes
-     * @param DocBlockGenerator $fileDocBlock        Optional docblock for all files
-     * @param callable          $columnToSetterFunc  Optional callback that takes in
-     *                                               (string $tableName, string $columnName) and returns setter name
-     * @param callable          $columnToGetterFunc  Optional callback that takes in
-     *                                               (string $tableName, string $columnName) and returns getter name
-     * @param callable          $columnToBooleanFunc Optional callback that takes in
-     *                                               (string $tableName, string $columnName) and returns
-     *                                               boolean function name if it is considered a BOOLEAN column
-     *                                               or false if it is not considered a BOOLEAN column
+     * @param string            $filePath           Path to write generated files
+     * @param Adapter           $dbAdapter          Database adapter
+     * @param string            $namespace          Namespace for entity and table gateway classes
+     * @param DocBlockGenerator $fileDocBlock       Optional docblock for all files
+     * @param callable          $columnToSetterFunc Optional callback that takes in
+     *                                              (string $tableName, string $columnName) and returns setter name
+     * @param callable $columnToGetterFunc Optional callback that takes in
+     *                                     (string $tableName, string $columnName) and returns getter name
+     * @param callable $columnToBooleanFunc Optional callback that takes in
+     *                                      (string $tableName, string $columnName) and returns
+     *                                      boolean function name if it is considered a BOOLEAN column
+     *                                      or false if it is not considered a BOOLEAN column
      * @throws Exception\InvalidArgumentException When path is not writable
      * @return void
      */
