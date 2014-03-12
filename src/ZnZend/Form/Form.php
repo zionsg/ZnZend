@@ -250,14 +250,17 @@ class Form extends ZendForm implements ResourceInterface
     /**
      * Checks if the form has errors
      *
+     * Must check error messages as they could have been added via additional checks
+     * after the usual form validation.
+     *
      * @return bool
      */
     public function hasErrors()
     {
         if ($this->hasValidated) {
-            return $this->isValid;
+            return (!empty($this->errorMessages)) && $this->isValid;
         }
-        return (!empty($this->errorMessages));
+        return false;
     }
 
     /**
