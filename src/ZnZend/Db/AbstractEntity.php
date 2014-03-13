@@ -56,6 +56,19 @@ abstract class AbstractEntity implements EntityInterface
     protected $id;
 
     /**
+     * List of columns which were modified, using columns as keys and empty strings as values
+     *
+     * This is used for getModifiedArrayCopy() and gets populated everytime set() is used.
+     * Setters of extending classes should populate this if not using set().
+     * This must be cleared after the initial populating of the entity.
+     *
+     * @Annotation\Exclude()
+     * @example array('id' => '', ...)
+     * @var array
+     */
+    protected $_modifiedColumns = array();
+
+    /**
      * Authenticated identity (current logged in user)
      *
      * @Annotation\Exclude()
@@ -179,6 +192,9 @@ abstract class AbstractEntity implements EntityInterface
                 $this->$setter($value);
             }
         }
+
+        // Clear modified flags
+        $this->_modifiedColumns = array();
     }
 
     /**
@@ -217,6 +233,19 @@ abstract class AbstractEntity implements EntityInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Defined by EntityInterface; Get modified entity properties as an array
+     *
+     * This only works if every setter adds the column name to $_modifiedColumns.
+     * This is automatically done if the setter uses set().
+     *
+     * @return array
+     */
+    public function getModifiedArrayCopy()
+    {
+        return array_intersect_key($this->getArrayCopy(), $this->_modifiedColumns);
     }
 
     /**
@@ -475,7 +504,9 @@ abstract class AbstractEntity implements EntityInterface
             }
         }
 
+        // Set value and indicate that property has been modified
         $this->$property = $value;
+        $this->_modifiedColumns[$property] = ''; // empty value is just a placeholder
         return $this;
     }
 
