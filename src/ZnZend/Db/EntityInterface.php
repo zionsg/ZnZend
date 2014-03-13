@@ -30,6 +30,18 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
     public function __toString();
 
     /**
+     * Get modified entity properties as an array
+     *
+     * getArrayCopy() is used when updating an entity using a mapper or table gateway but that
+     * returns the unmodified values as well. This method can be used to reduce data sent and
+     * in logs to audit changes.
+     * One way of keeping track would be to set a flag whenever a setter is called.
+     *
+     * @return array
+     */
+    public function getModifiedArrayCopy();
+
+    /**
      * Map getters to columns in table
      *
      * Getters are preferred over public properties as the latter would likely be named
