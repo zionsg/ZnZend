@@ -124,8 +124,8 @@ interface MapperInterface
     /**
      * Update
      *
-     * If an entity is passed in for $where, it is assumed that the
-     * update is for that entity. This is useful, eg. in the controller,
+     * If an entity is passed in for $where OR an entity is passed with null $where,
+     * it is assumed that the update is for that entity. This is useful, eg. in the controller,
      * where the user does not and should not know the column name or how to
      * construct a where clause.
      *
