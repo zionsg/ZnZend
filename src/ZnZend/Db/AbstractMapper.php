@@ -561,8 +561,8 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     /**
      * Defined by MapperInterface and AbstractTableGateway; Update
      *
-     * If an entity is passed in for $where, it is assumed that the
-     * update is for that entity. This is useful, eg. in the controller,
+     * If an entity is passed in for $where OR an entity is passed with null $where,
+     * it is assumed that the update is for that entity. This is useful, eg. in the controller,
      * where the user does not and should not know the column name or how to
      * construct a where clause.
      *
@@ -574,6 +574,9 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     public function update($set, $where = null)
     {
         if ($set instanceof EntityInterface) {
+            if (null === $where) {
+                $where = $set;
+            }
             $set = $set->getArrayCopy();
         }
         if ($where instanceof EntityInterface) {
