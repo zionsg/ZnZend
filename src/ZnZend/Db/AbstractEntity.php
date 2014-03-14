@@ -264,10 +264,9 @@ abstract class AbstractEntity implements EntityInterface
             if (!isset($modifiedData[$key])) {
                 continue;
             }
-            if ($value == $modifiedData[$key]) {
-                continue;
+            if ($value != $modifiedData[$key]) {
+                $result[$key] = $modifiedData[$key];
             }
-            $result[$key] = $modifiedData[$key];
         }
 
         return $result;
