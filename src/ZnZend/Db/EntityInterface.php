@@ -37,9 +37,16 @@ interface EntityInterface extends ArraySerializableInterface, ResourceInterface
      * in logs to audit changes.
      * One way of keeping track would be to set a flag whenever a setter is called.
      *
+     * The optional argument is to cater to Zend\Form\Form's bind() and isValid(), which
+     * uses exchangeArray() to update the object, hence clearing any modified flags.
+     * In this case, the original copy of the entity should be kept with a clone passed to bind()
+     * and using $original->getModifiedArrayCopy($form->getData()).
+     *
+     * @param  array|EntityInterface $modifiedData If this is passed in, the values which are different
+     *                                             from getArrayCopy() are returned
      * @return array
      */
-    public function getModifiedArrayCopy();
+    public function getModifiedArrayCopy($modifiedData = null);
 
     /**
      * Map getters to columns in table
