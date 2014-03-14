@@ -58,9 +58,9 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * List of columns which were modified, using columns as keys and empty strings as values
      *
-     * This is used for getModifiedArrayCopy() and gets populated everytime set() is used.
+     * This is used for getModifiedArrayCopy() and gets populated every time set() is used.
      * Setters of extending classes should populate this if not using set().
-     * This must be cleared after the initial populating of the entity.
+     * This should be cleared after the initial populating of the entity, usually during exchangeArray().
      *
      * @Annotation\Exclude()
      * @example array('id' => '', ...)
@@ -241,11 +241,36 @@ abstract class AbstractEntity implements EntityInterface
      * This only works if every setter adds the column name to $_modifiedColumns.
      * This is automatically done if the setter uses set().
      *
+     * @param  array|EntityInterface $modifiedData If this is passed in, the values which are different
+     *                                             from getArrayCopy() are returned
      * @return array
      */
-    public function getModifiedArrayCopy()
+    public function getModifiedArrayCopy($modifiedData = null)
     {
-        return array_intersect_key($this->getArrayCopy(), $this->_modifiedColumns);
+        if (null === $modifiedData) {
+            return array_intersect_key($this->getArrayCopy(), $this->_modifiedColumns);
+        }
+
+        if ($modifiedData instanceof EntityInterface) {
+            $modifiedData = $modifiedData->getArrayCopy();
+        }
+        if (!is_array($modifiedData)) {
+            return array();
+        }
+
+        // A new array must be used as $modifiedData may contain additional keys, eg. from the form
+        $result = array();
+        foreach ($this->getArrayCopy() as $key => $value) {
+            if (!isset($modifiedData[$key])) {
+                continue;
+            }
+            if ($value == $modifiedData[$key]) {
+                continue;
+            }
+            $result[$key] = $modifiedData[$key];
+        }
+
+        return $result;
     }
 
     /**
