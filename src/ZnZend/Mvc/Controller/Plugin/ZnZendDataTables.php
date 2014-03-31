@@ -17,7 +17,7 @@ use ZnZend\Paginator\Adapter\DbSelect;
 use ZnZend\Mvc\Exception;
 
 /**
- * Controller plugin to update Paginator (DbSelect adapter) with params from jQuery DataTables
+ * Controller plugin to update Paginator (that uses DbSelect adapter) with params from jQuery DataTables
  *
  * Params are based on version 1.9.4 (23 Sep 2012) of the DataTables plugin.
  *
@@ -30,8 +30,8 @@ class ZnZendDataTables extends AbstractPlugin
      *
      * Note that the global search filter is not processed, only those for the individual columns.
      *
-     * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect or an adapter that implements
-     *                                     a getSelect() method to retrieve the Select object.
+     * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect which has getSelect() to retrieve
+     *                                     Select object and updateSelect() to update Select object
      * @param array     $dataTablesParams  Params passed to server by jQuery DataTables plugin
      *                                     (@link http://www.datatables.net/usage/server-side)
      *                                     The getters (for the result set prototype in $paginator) used for each
@@ -83,11 +83,9 @@ class ZnZendDataTables extends AbstractPlugin
         // The adapter and Select must be cloned to prevent modification of the original
         $adapter = clone ($paginator->getAdapter());
 
-        // method_exists() not used as it returns true for private methods which are not callable
-        if (   !is_callable(array($adapter, 'getSelect'))
-            || !(($select = clone ($adapter->getSelect())) instanceof Select)) {
+        if (!$adapter instanceof DbSelect) {
             throw new Exception\InvalidArgumentException(
-                get_class($adapter) . ' does not implement getSelect() method to retrieve \Zend\Db\Sql\Select object'
+                get_class($adapter) . ' is not an instance of ZnZend\Paginator\Adapter\DbSelect'
             );
         }
 
