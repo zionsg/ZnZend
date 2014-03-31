@@ -83,7 +83,9 @@ class ZnZendDataTables extends AbstractPlugin
         // The adapter and Select must be cloned to prevent modification of the original
         $adapter = clone ($paginator->getAdapter());
 
-        if (!$adapter instanceof DbSelect) {
+        if ($adapter instanceof DbSelect) {
+            $select = $adapter->getSelect();
+        } else {
             throw new Exception\InvalidArgumentException(
                 get_class($adapter) . ' is not an instance of ZnZend\Paginator\Adapter\DbSelect'
             );
