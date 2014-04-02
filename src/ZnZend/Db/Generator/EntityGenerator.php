@@ -173,12 +173,12 @@ class EntityGenerator
                         )),
                         new Tag(array(
                             'name' => sprintf(
-                                '@Annotation\Attributes({"placeholder":"' . $label . '"%s})',
+                                '@Annotation\Attributes({"placeholder":"' . ucwords($label) . '"%s})',
                                 ($sqlType != 'varchar' ? '' : ', "maxlength":' . $column->character_maximum_length)
                             ),
                         )),
                         new Tag(array(
-                            'name' => '@Annotation\Options({"label":"' . $label . '"})',
+                            'name' => '@Annotation\Options({"label":"' . ucwords($label) . '"})',
                         )),
                         new Tag(array(
                             'name' => '@Annotation\Filter({"name":"StringTrim"})',
