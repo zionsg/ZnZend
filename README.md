@@ -103,9 +103,13 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 ## Filters
 * `ZnZend\Filter\File\RenameUploadWithCallback` - Allows use of custom callback to rename file uploads
 
+## Form Elements
+* `ZnZend\Form\Element\Value` - Element for displaying value only without &lt;input&gt;
+
 ## Form View Helpers
 * `znZendFormCaptchaQuestion` - Render captcha element using ZnZend\Captcha\Question adapter
-* `znZendFormElementValue` - Render value of element without input for viewing only
+* `znZendFormElement` - Overrides `formElement` helper to handle rendering of ZnZend form elements
+* `znZendFormValue` - Render value of element only without &lt;input&gt;
 
 ## View Helpers
 * `znZendColumnizeEntities` - Output entities in columns using &lt;table&gt;
