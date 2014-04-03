@@ -338,6 +338,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     public function insert($set)
     {
         if ($set instanceof EntityInterface) {
+            // $set->setCreator($set->getAuthIdentity())->setCreated(date('c')); // eg. of how getAuthIdentity() is used
             $set = $set->getArrayCopy();
         }
         return parent::insert($this->filterColumns($set));
@@ -544,13 +545,13 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public function create($set)
     {
-        if ($set instanceof EntityInterface) {
-            $set = $set->getArrayCopy();
-        }
-
-        $affectedRows = $this->insert($set); // insert() will throw Exception if $set is not an array
+        $affectedRows = $this->insert($set);
         if (!$affectedRows) {
             return null;
+        }
+
+        if ($set instanceof EntityInterface) {
+            $set = $set->getArrayCopy();
         }
 
         $entity = new $this->resultSetClass($set);
@@ -577,6 +578,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
             if (null === $where) {
                 $where = $set;
             }
+            // $set->setUpdator($set->getAuthIdentity())->setUpdated(date('c')); // eg. of how getAuthIdentity() is used
             $set = $set->getArrayCopy();
         }
         if ($where instanceof EntityInterface) {
