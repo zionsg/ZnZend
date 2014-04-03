@@ -52,7 +52,8 @@ return array(
             'znZendResizeImage'       => 'ZnZend\View\Helper\ZnZendResizeImage',
             'znZendSpanEntities'      => 'ZnZend\View\Helper\ZnZendSpanEntities',
             // Form view helpers
-            'znZendFormElementValue'    => 'ZnZend\Form\View\Helper\ZnZendFormElementValue',
+            'formElement'               => 'ZnZend\Form\View\Helper\ZnZendFormElement', // override default helper
+            'znZendFormValue'           => 'ZnZend\Form\View\Helper\ZnZendFormValue',
             'znZendFormCaptchaQuestion' => 'ZnZend\Form\View\Helper\Captcha\Question',
         ),
     ),
