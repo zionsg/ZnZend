@@ -32,13 +32,13 @@ class ZnZendDataTables extends AbstractPlugin
      *
      * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect which has getSelect() to retrieve
      *                                     Select object and updateSelect() to update Select object
-     * @param array     $dataTablesParams  Params passed to server by jQuery DataTables plugin
+     * @param array     $dataTablesParams  Parameters sent to server by jQuery DataTables plugin
      *                                     (@link http://www.datatables.net/usage/server-side)
      *                                     The getters (for the result set prototype in $paginator) used for each
      *                                     column MUST BE SET via 'aoColumns' or 'aoColumnDefs' using 'sName'.
      *                                     'sName' can be set to null if no data is to be fetched for that column.
      *                                     Example as follows:
-     *                                       $('#example').dataTable({
+     *                                       $('#myTable').dataTable({
      *                                           'bProcessing': true,
      *                                           'bServerSide': true,
      *                                           'sServerMethod': 'POST',
@@ -75,14 +75,21 @@ class ZnZendDataTables extends AbstractPlugin
      *                                         // method $p->getFullName() => SQL expression
      *                                         'getFullName' => "CONCAT('person_firstname, ' ', person_lastname)",
      *                                     )
-     * @param  bool     $returnPaginator   Default = false. If true, updated Paginator is returned instead of array
-     *                                     of DataTables params. This allows the controller action to have full control
-     *                                     over the rendering of the HTML table using view scripts, as opposed to
+     * @param  bool     $returnPaginator   Default = false. If true, updated Paginator is returned under 'paginator' key
+     *                                     with 'aaData' set to empty array. This allows the controller action to fully
+     *                                     control the rendering of the HTML table using view scripts, as opposed to
      *                                     customising mRender for each column without access to the actual PHP object.
-     *                                     The controller action will need to disable the layout so that only the table
-     *                                     HTML is returned, ie. $viewModel->setTerminal(true).
-     *                                     Example for DataTables plugin to receive HTML instead of JSON:
-     *                                       $('#example').dataTable({
+     *                                     Example in controller ($result being the returned array):
+     *                                       $viewModel = new ViewModel();
+     *                                       $viewModel->setTerminal(true)
+     *                                                 ->setTemplate('module/controller/action')
+     *                                                 ->setVariables(array('paginator' => $result['paginator']));
+     *                                       $result['html'] =
+     *                                           $this->getServiceLocator()->get('ViewRenderer')->render($viewModel);
+     *                                       unset($result['paginator']); // do not send paginator to the jQuery plugin
+     *                                       return new \Zend\View\Model\JsonModel(array('result' => $result));
+     *                                     Corresponding example for DataTables plugin:
+     *                                       $('#myTable').dataTable({
      *                                           'bProcessing': true,
      *                                           'bServerSide': true,
      *                                           'sServerMethod': 'POST',
@@ -93,17 +100,16 @@ class ZnZendDataTables extends AbstractPlugin
      *                                                   'url': sSource,
      *                                                   'data': aoData,
      *                                                   'dataType': 'json',
-     *                                                   'success': fnCallback,
-     *                                                   // Override default behaviour while retaining it for reference
-     *                                                   'dataType': 'html',
-     *                                                   'success': function (html) {
-     *                                                       $('#myTable').html(html); // update entire table
+     *                                                   'success': function (json) {
+     *                                                       fnCallback(json); // default behaviour
+     *                                                       $('#myTable').html(json.html); // update entire table
      *                                                   }
      *                                               });
      *                                           }
      *                                       });
      * @throws Exception\InvalidArgumentException
-     * @return array|Paginator Array contains all parameters for returning to DataTables plugin
+     * @return array Contains parameters for returning to DataTables plugin
+     *               (@link http://www.datatables.net/usage/server-side)
      */
     public function __invoke(Paginator $paginator,
                              array $dataTablesParams,
@@ -187,9 +193,18 @@ class ZnZendDataTables extends AbstractPlugin
         $filteredPaginator->setItemCountPerPage($itemCountPerPage)
                           ->setCurrentPageNumber($page);
 
-        // Return paginator instead of array if specified
+        // Params to return to DataTables plugin
+        $returnParams = array(
+            'sEcho' => (int) $dataTablesParams['sEcho'],
+            'iTotalRecords' => $paginator->getTotalItemCount(),
+            'iTotalDisplayRecords' => $filteredPaginator->getTotalItemCount(),
+            'aaData' => array(),
+        );
+
+        // Return params with updated paginator and empty aaData (to reduce processing and data sent)
         if ($returnPaginator) {
-            return $filteredPaginator;
+            $returnParams['paginator'] = $filteredPaginator;
+            return $returnParams;
         }
 
         // Construct data for each row and column for current page
@@ -222,13 +237,8 @@ class ZnZendDataTables extends AbstractPlugin
             $aaData[] = $rowRender;
         }
 
-        // Return expected parameters for DataTables plugin
-        return array(
-            'sEcho' => (int) $dataTablesParams['sEcho'],
-            'iTotalRecords' => $paginator->getTotalItemCount(),
-            'iTotalDisplayRecords' => $filteredPaginator->getTotalItemCount(),
-            'aaData' => $aaData,
-        );
-
+        // Populate aaData and return params
+        $returnParams['aaData'] = $aaData;
+        return $returnParams;
     } // end function __invoke
 }
