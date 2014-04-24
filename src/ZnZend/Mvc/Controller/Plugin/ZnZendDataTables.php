@@ -75,11 +75,41 @@ class ZnZendDataTables extends AbstractPlugin
      *                                         // method $p->getFullName() => SQL expression
      *                                         'getFullName' => "CONCAT('person_firstname, ' ', person_lastname)",
      *                                     )
+     * @param  bool     $returnPaginator   Default = false. If true, updated Paginator is returned instead of array
+     *                                     of DataTables params. This allows the controller action to have full control
+     *                                     over the rendering of the HTML table using view scripts, as opposed to
+     *                                     customising mRender for each column without access to the actual PHP object.
+     *                                     The controller action will need to disable the layout so that only the table
+     *                                     HTML is returned, ie. $viewModel->setTerminal(true).
+     *                                     Example for DataTables plugin to receive HTML instead of JSON:
+     *                                       $('#example').dataTable({
+     *                                           'bProcessing': true,
+     *                                           'bServerSide': true,
+     *                                           'sServerMethod': 'POST',
+     *                                           'sAjaxSource': 'process.php',
+     *                                           'fnServerData': function (sSource, aoData, fnCallback, oSettings) {
+     *                                               oSettings.jqXHR = $.ajax({
+     *                                                   'type': 'POST',
+     *                                                   'url': sSource,
+     *                                                   'data': aoData,
+     *                                                   'dataType': 'json',
+     *                                                   'success': fnCallback,
+     *                                                   // Override default behaviour while retaining it for reference
+     *                                                   'dataType': 'html',
+     *                                                   'success': function (html) {
+     *                                                       $('#myTable').html(html); // update entire table
+     *                                                   }
+     *                                               });
+     *                                           }
+     *                                       });
      * @throws Exception\InvalidArgumentException
-     * @return array Contains all parameters for returning to DataTables plugin
+     * @return array|Paginator Array contains all parameters for returning to DataTables plugin
      */
-    public function __invoke(Paginator $paginator, array $dataTablesParams, array $mapGettersColumns)
-    {
+    public function __invoke(Paginator $paginator,
+                             array $dataTablesParams,
+                             array $mapGettersColumns,
+                             $returnPaginator = false
+    ) {
         // The adapter and Select must be cloned to prevent modification of the original
         $adapter = clone ($paginator->getAdapter());
 
@@ -150,11 +180,17 @@ class ZnZendDataTables extends AbstractPlugin
         $adapter->updateSelect($select);
         $filteredPaginator = new Paginator($adapter);
 
+        // Paging
         $itemCountPerPage = (int) $dataTablesParams['iDisplayLength'];
         $itemStart = (int) $dataTablesParams['iDisplayStart'];
         $page = (int) ceil(($itemStart + 1) / $itemCountPerPage);
         $filteredPaginator->setItemCountPerPage($itemCountPerPage)
                           ->setCurrentPageNumber($page);
+
+        // Return paginator instead of array if specified
+        if ($returnPaginator) {
+            return $filteredPaginator;
+        }
 
         // Construct data for each row and column for current page
         $aaData = array();
