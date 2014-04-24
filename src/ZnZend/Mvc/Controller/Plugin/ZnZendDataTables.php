@@ -75,10 +75,10 @@ class ZnZendDataTables extends AbstractPlugin
      *                                         // method $p->getFullName() => SQL expression
      *                                         'getFullName' => "CONCAT('person_firstname, ' ', person_lastname)",
      *                                     )
-     * @param  bool     $returnPaginator   Default = false. If true, updated Paginator is returned under 'paginator' key
-     *                                     with 'aaData' set to empty array. This allows the controller action to fully
-     *                                     control the rendering of the HTML table using view scripts, as opposed to
-     *                                     customising mRender for each column without access to the actual PHP object.
+     * @param  bool     $returnPaginator   Default = false. If true, updated Paginator is returned under 'paginator'
+     *                                     key in the array. This allows the controller action to fully control the
+     *                                     rendering of the HTML table using view scripts, as opposed to customising
+     *                                     mRender for each column without access to the actual PHP object.
      *                                     Example in controller ($result being the returned array):
      *                                       $viewModel = new ViewModel();
      *                                       $viewModel->setTerminal(true)
@@ -193,20 +193,6 @@ class ZnZendDataTables extends AbstractPlugin
         $filteredPaginator->setItemCountPerPage($itemCountPerPage)
                           ->setCurrentPageNumber($page);
 
-        // Params to return to DataTables plugin
-        $returnParams = array(
-            'sEcho' => (int) $dataTablesParams['sEcho'],
-            'iTotalRecords' => $paginator->getTotalItemCount(),
-            'iTotalDisplayRecords' => $filteredPaginator->getTotalItemCount(),
-            'aaData' => array(),
-        );
-
-        // Return params with updated paginator and empty aaData (to reduce processing and data sent)
-        if ($returnPaginator) {
-            $returnParams['paginator'] = $filteredPaginator;
-            return $returnParams;
-        }
-
         // Construct data for each row and column for current page
         $aaData = array();
         foreach ($filteredPaginator as $row) {
@@ -237,8 +223,17 @@ class ZnZendDataTables extends AbstractPlugin
             $aaData[] = $rowRender;
         }
 
-        // Populate aaData and return params
-        $returnParams['aaData'] = $aaData;
+        // Params to return to DataTables plugin
+        $returnParams = array(
+            'sEcho' => (int) $dataTablesParams['sEcho'],
+            'iTotalRecords' => $paginator->getTotalItemCount(),
+            'iTotalDisplayRecords' => $filteredPaginator->getTotalItemCount(),
+            'aaData' => $aaData,
+        );
+        if ($returnPaginator) {
+            $returnParams['paginator'] = $filteredPaginator;
+        }
+
         return $returnParams;
     } // end function __invoke
 }
