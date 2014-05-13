@@ -18,11 +18,13 @@ class ZnZendResizeImage extends AbstractHelper
     /**
      * __invoke
      *
-     * Creates resized copy of image if it does not exist and returns path
+     * Creates resized copy of image if it does not exist and returns path.
      *
      * Example: __invoke('/public/images/test.jpg', 150, 100)
      * Result for centered image: '/public/images/150x100/test_150x100c.jpg'
      * Result for non-centered image: '/public/images/150x100/test_150x100.jpg'
+     *
+     * Original image need not exist if resized copy is available and $overwrite is false.
      *
      * @param  string $imagePath Path to image file, relative to $_SERVER['DOCUMENT_ROOT']
      * @param  int    $width     Maximum width for resized image
@@ -40,7 +42,7 @@ class ZnZendResizeImage extends AbstractHelper
         $webRoot = $_SERVER['DOCUMENT_ROOT'];
         $failure = '';
 
-        if (!extension_loaded('gd') || !file_exists($webRoot . $imagePath)) {
+        if (!extension_loaded('gd')) {
             return $failure;
         }
 
@@ -63,6 +65,11 @@ class ZnZendResizeImage extends AbstractHelper
         );
         if (!$overwrite && file_exists($webRoot . $resizedPath)) {
             return $resizedPath;
+        }
+
+        // Check if original image exists
+        if (!file_exists($webRoot . $imagePath)) {
+            return $failure;
         }
 
         // Detect type of image
