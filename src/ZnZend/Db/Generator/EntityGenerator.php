@@ -154,40 +154,26 @@ class EntityGenerator
                 }
                 $label = strtolower(implode(' ', $columnWords));
 
-                $tags = array(new Tag(array(
-                    'name' => '@Annotation\Exclude()', // no form input needed for primary keys
-                )));
+                $tags = array(
+                    new Tag('@Annotation\Exclude()'), // no form input needed for primary keys
+                );
                 if (!$isPrimary) {
                     $tags = array(
-                        new Tag(array(
-                            'name' => '@Annotation\Name("' . $columnName . '")',
+                        new Tag('@Annotation\Name("' . $columnName . '")'),
+                        new Tag('@Annotation\Required(false)'),
+                        new Tag(sprintf(
+                            '@Annotation\Type("Zend\Form\Element\%s")',
+                            ('text' == substr($sqlType, -4) ? 'Textarea' : 'Text')
                         )),
-                        new Tag(array(
-                            'name' => '@Annotation\Required(false)',
+                        new Tag(sprintf(
+                            '@Annotation\Attributes({"placeholder":"' . ucwords($label) . '"%s})',
+                            ($sqlType != 'varchar' ? '' : ', "maxlength":' . $column->character_maximum_length)
                         )),
-                        new Tag(array(
-                            'name' => sprintf(
-                                '@Annotation\Type("Zend\Form\Element\%s")',
-                                ('text' == substr($sqlType, -4) ? 'Textarea' : 'Text')
-                            ),
-                        )),
-                        new Tag(array(
-                            'name' => sprintf(
-                                '@Annotation\Attributes({"placeholder":"' . ucwords($label) . '"%s})',
-                                ($sqlType != 'varchar' ? '' : ', "maxlength":' . $column->character_maximum_length)
-                            ),
-                        )),
-                        new Tag(array(
-                            'name' => '@Annotation\Options({"label":"' . ucwords($label) . '"})',
-                        )),
-                        new Tag(array(
-                            'name' => '@Annotation\Filter({"name":"StringTrim"})',
-                        )),
+                        new Tag('@Annotation\Options({"label":"' . ucwords($label) . '"})'),
+                        new Tag('@Annotation\Filter({"name":"StringTrim"})'),
                     );
                     if ($isNumeric) { // numeric field
-                        $tags[] = new Tag(array(
-                            'name' => '@Annotation\Validator({"name":"Digits"})',
-                        ));
+                        $tags[] = new Tag('@Annotation\Validator({"name":"Digits"})');
                     }
                 }
                 if ($isNumeric && !$isPrimary) {
@@ -220,13 +206,8 @@ class EntityGenerator
                                 'shortDescription' => $desc,
                                 'longDescription'  => null,
                                 'tags'             => array(
-                                    new ParamTag(array(
-                                        'paramName' => 'value',
-                                        'datatype'  => 'null|' . $phpType,
-                                    )),
-                                    new ReturnTag(array(
-                                        'datatype'  => $entityName,
-                                    )),
+                                    new ParamTag('value', array('null', $phpType)),
+                                    new ReturnTag(array($entityName)),
                                 ),
                             )),
                         ));
@@ -245,9 +226,7 @@ class EntityGenerator
                                 'shortDescription' => $desc,
                                 'longDescription'  => null,
                                 'tags'             => array(
-                                    new ReturnTag(array(
-                                        'datatype'  => self::getPhpType($sqlType),
-                                    )),
+                                    new ReturnTag(array(self::getPhpType($sqlType))),
                                 ),
                             )),
                         ));
@@ -266,9 +245,7 @@ class EntityGenerator
                                 'shortDescription' => $desc,
                                 'longDescription'  => null,
                                 'tags'             => array(
-                                    new ReturnTag(array(
-                                        'datatype'  => 'bool',
-                                    )),
+                                    new ReturnTag(array('bool')),
                                 ),
                             )),
                         ));
@@ -288,15 +265,9 @@ class EntityGenerator
                               'shortDescription' => null,
                               'longDescription'  => null,
                               'tags'             => array(
-                                  new Tag(array(
-                                      'name' => '@Annotation\Name("' . $entityName . '")',
-                                  )),
-                                  new Tag(array(
-                                      'name' => '@Annotation\Type("ZnZend\Form\Form")',
-                                  )),
-                                  new Tag(array(
-                                      'name' => '@Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")',
-                                  )),
+                                  new Tag('@Annotation\Name("' . $entityName . '")'),
+                                  new Tag('@Annotation\Type("ZnZend\Form\Form")'),
+                                  new Tag('@Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")'),
                               ),
                           )));
 
@@ -310,13 +281,8 @@ class EntityGenerator
                         'shortDescription' => null,
                         'longDescription'  => null,
                         'tags'             => array(
-                            new Tag(array(
-                                'name' => '@Annotation\Exclude()',
-                            )),
-                            new Tag(array(
-                                'name' => '@var',
-                                'description' => 'array',
-                            )),
+                            new Tag('@Annotation\Exclude()'),
+                            new Tag('@var', 'array'),
                         ),
                     ))
                 )));
@@ -332,13 +298,8 @@ class EntityGenerator
                         'shortDescription' => null,
                         'longDescription'  => null,
                         'tags'             => array(
-                            new Tag(array(
-                                'name' => '@Annotation\Exclude()',
-                            )),
-                            new Tag(array(
-                                'name' => '@var',
-                                'description' => 'string',
-                            )),
+                            new Tag('@Annotation\Exclude()'),
+                            new Tag('@var', 'string'),
                         ),
                     ))
                 )),
@@ -350,13 +311,8 @@ class EntityGenerator
                         'shortDescription' => null,
                         'longDescription'  => null,
                         'tags'             => array(
-                            new Tag(array(
-                                'name' => '@Annotation\Exclude()',
-                            )),
-                            new Tag(array(
-                                'name' => '@var',
-                                'description' => 'string',
-                            )),
+                            new Tag('@Annotation\Exclude()'),
+                            new Tag('@var', 'string'),
                         ),
                     ))
                 ))
