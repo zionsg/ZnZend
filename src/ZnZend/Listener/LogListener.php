@@ -10,6 +10,7 @@ namespace ZnZend\Listener;
 
 use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Log\LoggerInterface;
 
@@ -19,7 +20,7 @@ use Zend\Log\LoggerInterface;
  * This is used to show sample code in Module.php on how to set up a log listener.
  * This can also be easily extended by overriding the log() method.
  */
-class LogListener implements ListenerAggregateInterface
+class LogListener extends AbstractListenerAggregate
 {
     /**
      * Events to listen to
@@ -27,13 +28,6 @@ class LogListener implements ListenerAggregateInterface
      * @var array
      */
     protected $events = array('emerg', 'alert', 'crit', 'err', 'warn', 'notice', 'info', 'debug');
-
-    /**
-     * Attached listeners
-     *
-     * @var array
-     */
-    protected $listeners = array();
 
     /**
      * Logger
@@ -55,7 +49,7 @@ class LogListener implements ListenerAggregateInterface
     }
 
     /**
-     * Defined in ListenerAggregateInterface; Attach one or more listeners
+     * Defined in ListenerAggregateInterface via AbstractListenerAggregate; Attach one or more listeners
      *
      * Once attached, the listener will listen to the events named after the RFC5424 severity levels,
      * eg. when the following code is run in a controller:
@@ -68,21 +62,6 @@ class LogListener implements ListenerAggregateInterface
     {
         $sharedEvents      = $events->getSharedManager(); // must use shared manager else it will not work
         $this->listeners[] = $sharedEvents->attach('*', $this->events, array($this, 'log'));
-    }
-
-    /**
-     * Defined in ListenerAggregateInterface; Detach all previously attached listeners
-     *
-     * @param EventManagerInterface $events
-     * @return void
-     */
-    public function detach(EventManagerInterface $events)
-    {
-        foreach ($this->listeners as $index => $listener) {
-            if ($events->detach($listener)) {
-                unset($this->listeners[$index]);
-            }
-        }
     }
 
     /**
