@@ -11,6 +11,8 @@ namespace ZnZend;
 use Zend\Db\TableGateway\Feature\GlobalAdapterFeature;
 use Zend\I18n\Translator\TranslatorAwareInterface;
 use Zend\EventManager\EventInterface;
+use Zend\Log\Logger;
+use Zend\Log\Writer\Mock;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
@@ -129,7 +131,9 @@ class Module implements
         // $moduleRouteListener->attach($eventManager);
 
         // Log listener
-        // $logListener = new LogListener();
+        // $logger = new Logger();
+        // $logger->addWriter(new Mock());
+        // $logListener = new LogListener($logger);
         // $eventManager->attachAggregate($logListener); // alternate way of attaching listener from above
 
         // Set global/static db adapter for feature-enabled TableGateways such as ZnZend\Model\AbstractMapper
