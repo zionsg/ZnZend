@@ -111,6 +111,9 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 * `znZendFormElement` - Overrides `formElement` helper to handle rendering of ZnZend form elements
 * `znZendFormValue` - Render value of element only without &lt;input&gt;
 
+## Listeners
+* `ZnZend\Listener\LogListener` - Simple log listener to listen to events named 'log' and RFC5424 severity levels
+
 ## View Helpers
 * `znZendColumnizeEntities` - Output entities in columns using &lt;table&gt;
 * `znZendContrastColor` - Choose color that provides sufficient constrast when combined with specified color
