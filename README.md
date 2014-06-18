@@ -112,7 +112,7 @@ This is more of a general-purpose module unlike ZfcUser and is meant to quicksta
 * `znZendFormValue` - Render value of element only without &lt;input&gt;
 
 ## Listeners
-* `ZnZend\Listener\LogListener` - Simple log listener to listen to events named 'log' and RFC5424 severity levels
+* `ZnZend\Listener\LogListener` - Simple log listener to listen to events named after RFC5424 severity levels
 
 ## View Helpers
 * `znZendColumnizeEntities` - Output entities in columns using &lt;table&gt;
