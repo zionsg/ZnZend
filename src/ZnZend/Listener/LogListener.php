@@ -86,10 +86,12 @@ class LogListener implements ListenerAggregateInterface
     /**
      * Write event to log
      *
+     * Method must be public due to callback in attach().
+     *
      * @param  EventInterface $e
      * @return void
      */
-    protected function log(EventInterface $e)
+    public function log(EventInterface $e)
     {
         if (null == $this->logger) {
             return;
