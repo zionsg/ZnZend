@@ -22,6 +22,13 @@ use Zend\Log\LoggerInterface;
 class LogListener implements ListenerAggregateInterface
 {
     /**
+     * Events to listen to
+     *
+     * @var array
+     */
+    protected $events = array('emerg', 'alert', 'crit', 'err', 'warn', 'notice', 'info', 'debug');
+
+    /**
      * Attached listeners
      *
      * @var array
@@ -38,8 +45,7 @@ class LogListener implements ListenerAggregateInterface
     /**
      * Constructor
      *
-     * Logger is made optional for flexibility's sake as the log() method may not
-     * need a full-fledged logger.
+     * Logger is made optional for flexibility's sake as the log() method may not use a logger.
      *
      * @param LoggerInterface $logger
      */
@@ -51,7 +57,7 @@ class LogListener implements ListenerAggregateInterface
     /**
      * Defined in ListenerAggregateInterface; Attach one or more listeners
      *
-     * Once attached, the listener will listen to the events named 'log' and the RFC5424 severity levels,
+     * Once attached, the listener will listen to the events named after the RFC5424 severity levels,
      * eg. when the following code is run in a controller:
      *     $this->getEventManager()->trigger('log', $this, array('param' => 'value'));
      *
@@ -61,11 +67,7 @@ class LogListener implements ListenerAggregateInterface
     public function attach(EventManagerInterface $events)
     {
         $sharedEvents      = $events->getSharedManager(); // must use shared manager else it will not work
-        $this->listeners[] = $sharedEvents->attach(
-            '*',
-            array('log', 'emerg', 'alert', 'crit', 'err', 'warn', 'notice', 'info', 'debug'),
-            array($this, 'log')
-        );
+        $this->listeners[] = $sharedEvents->attach('*', $this->events, array($this, 'log'));
     }
 
     /**
@@ -93,14 +95,11 @@ class LogListener implements ListenerAggregateInterface
      */
     public function log(EventInterface $e)
     {
-        if (null == $this->logger) {
+        $logLevel = $e->getName();
+        if (null == $this->logger || !in_array($logLevel, $this->events)) {
             return;
         }
 
-        $logLevel = $e->getName();
-        if ('log' == $logLevel) {
-            $logLevel = 'info';
-        }
         $params = $e->getParams();
         $this->logger->{$logLevel}(sprintf('%s: %s', $logLevel, json_encode($params)));
     }
