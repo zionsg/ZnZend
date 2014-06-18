@@ -131,6 +131,8 @@ class Module implements
         // $moduleRouteListener->attach($eventManager);
 
         // Log listener
+        // $logger->registerErrorHandler() not used as notices will be logged also and be missed out in development env
+        // $logger->registerExceptionHandler() does not work - listener used instead to listen to dispatch error event
         // $logger = new Logger();
         // $logger->addWriter(new Mock());
         // $logListener = new LogListener($logger);
