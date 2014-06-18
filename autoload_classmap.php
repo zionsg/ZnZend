@@ -37,6 +37,7 @@ return array(
     'ZnZend\Form\View\Helper\ZnZendFormElement'                   => __DIR__ . '/src/ZnZend/Form/View/Helper/ZnZendFormElement.php',
     'ZnZend\Form\View\Helper\ZnZendFormValue'                     => __DIR__ . '/src/ZnZend/Form/View/Helper/ZnZendFormValue.php',
     'ZnZend\Form\View\Helper\Captcha\Question'                    => __DIR__ . '/src/ZnZend/Form/View/Helper/Captcha/Question.php',
+    'ZnZend\Listener\LogListener'                                 => __DIR__ . '/src/ZnZend/Listener/LogListener.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendDatabaseRowSize'          => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendDatabaseRowSize.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendDataTables'               => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendDataTables.php',
     'ZnZend\Mvc\Controller\Plugin\ZnZendIdentity'                 => __DIR__ . '/src/ZnZend/Mvc/Controller/Plugin/ZnZendIdentity.php',
