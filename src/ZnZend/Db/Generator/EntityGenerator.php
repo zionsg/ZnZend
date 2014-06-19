@@ -166,7 +166,9 @@ class EntityGenerator
                             ('text' == substr($sqlType, -4) ? 'Textarea' : 'Text')
                         )),
                         new Tag(sprintf(
-                            '@Annotation\Attributes({"placeholder":"' . ucwords($label) . '"%s})',
+                            '@Annotation\Attributes({"id":"%s", "placeholder":"%s"%s})',
+                            $columnName,
+                            ucwords($label),
                             ($sqlType != 'varchar' ? '' : ', "maxlength":' . $column->character_maximum_length)
                         )),
                         new Tag('@Annotation\Options({"label":"' . ucwords($label) . '"})'),
