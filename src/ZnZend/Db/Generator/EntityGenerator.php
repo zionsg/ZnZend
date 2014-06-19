@@ -172,12 +172,17 @@ class EntityGenerator
                         new Tag('@Annotation\Options({"label":"' . ucwords($label) . '"})'),
                         new Tag('@Annotation\Filter({"name":"StringTrim"})'),
                     );
+
                     if ($isNumeric) { // numeric field
                         $tags[] = new Tag('@Annotation\Validator({"name":"Digits"})');
+                        $defaultValue = ('int' == substr($sqlType, -3)) ? (int) $defaultValue : (float) $defaultValue;
                     }
-                }
-                if ($isNumeric && !$isPrimary) {
-                    $defaultValue = ('int' == substr($sqlType, -3)) ? (int) $defaultValue : (float) $defaultValue;
+
+                    if (   'CURRENT_TIMESTAMP' == $defaultValue
+                        && ('datetime' == $sqlType || 'timestamp' == $sqlType)
+                    ) {
+                        $defaultValue = null; // cannot have string as default for datetime field
+                    }
                 }
                 $properties[] = PropertyGenerator::fromArray(array(
                     'name'         => $columnName,
