@@ -67,7 +67,7 @@ class LogListener extends AbstractListenerAggregate
         $this->listeners[] = $sharedEvents->attach('*', $this->logEvents, array($this, 'log'));
         $this->listeners[] = $sharedEvents->attach(
             'Zend\Mvc\Application',
-            MvcEvent::EVENT_DISPATCH_ERROR,
+            array(MvcEvent::EVENT_DISPATCH_ERROR, MvcEvent::EVENT_RENDER_ERROR),
             array($this, 'logException')
         );
     }
