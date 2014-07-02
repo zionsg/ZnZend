@@ -21,11 +21,12 @@ class Question extends AbstractWord
     /**
      * Render the captcha
      *
-     * Allows setting of captcha position and separator via element options
+     * Allows setting of captcha class, position and separator via element options
      * as there is no other way to set it when using the formRow view helper.
      * Eg: echo $this->formRow()->render(
      *         $form->get('captcha')->setOptions(array(
-     *             'captchaPosition' => 'append', // append input to captcha
+     *             'captchaClass'    => 'img-responsive', // CSS class to apply to captcha image
+     *             'captchaPosition' => 'append', // append input to captcha image
      *             'separator' => '<br>',
      *     )));
      *
@@ -52,6 +53,9 @@ class Question extends AbstractWord
 
         if ($element->hasAttribute('id')) {
             $imgAttributes['id'] = $element->getAttribute('id') . '-image';
+        }
+        if ($element->hasAttribute('captchaClass')) {
+            $imgAttributes['class'] = $element->getAttribute('captchaClass');
         }
 
         $closingBracket = $this->getInlineClosingBracket();
