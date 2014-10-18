@@ -95,7 +95,6 @@ class ZnZendDatabaseRowSize extends AbstractPlugin
                 $value = $this->dataTypeBytes[$column->data_type];
                 $columnBytes = is_callable($value) ? $value($column) : $value;
             }
-                if ($column->table_name == 'test') var_dump($column->column_name, $columnBytes);
             if (!isset($tableBytes[$column->table_name])) {
                 $tableBytes[$column->table_name] = 0;
             }
