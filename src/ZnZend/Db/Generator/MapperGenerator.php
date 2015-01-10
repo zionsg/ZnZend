@@ -20,9 +20,9 @@ use ZnZend\Db\Exception;
  * Generate entity mapper classes for tables in the database based on AbstractMapper
  *
  * This only generates the initial classes and does not do all the work for you.
+ *
  * Simple naming is used for the class name. Eg: For a `map_company_employee` table,
- * the generated class will be named 'Map_company_employee' and not 'MapCompanyEmployee'
- * nor 'Map_Company_Employee'.
+ * the generated mapper class will be named 'MapCompanyEmployeeMapper'.
  */
 class MapperGenerator
 {
@@ -85,8 +85,9 @@ class MapperGenerator
             array($databaseName)
         );
         foreach ($tables as $table) {
+            // If table name is `map_ab_cd`, entity name will be MapAbCd
             $tableName  = $table->table_name;
-            $entityName = ucfirst($tableName);
+            $entityName = str_replace(' ', '', ucwords(str_replace('_', ' ', $tableName)));
 
             // Get column names for each table
             $columns = $dbAdapter->query(
