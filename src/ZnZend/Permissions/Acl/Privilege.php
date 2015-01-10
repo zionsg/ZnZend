@@ -13,7 +13,8 @@ use ReflectionClass;
 /**
  * Class providing a standardized set of constants for Acl privileges
  *
- * Set is currently kept small at less than 10 constants, with the names kept within 8 characters each.
+ * Set is currently kept small at less than 20 constants, with the names kept within 8 characters each.
+ * Some constants have alternatives to allow flexibility.
  * These privileges are usually used in a Content Management System (CMS).
  *
  * In general, lower-ranked roles should NOT be allowed to view/edit/delete the records of
@@ -31,7 +32,14 @@ class Privilege
     const ADD = 'add';
 
     /**
-     * For editing/updating of an active record
+     * For creating of a new record
+     *
+     * Alternative to ADD constant.
+     */
+    const CREATE = 'create';
+
+    /**
+     * For editing of an active record
      *
      * Applies to a single record or form field.
      * An inactive/deleted record must be undeleted before it can be edited.
@@ -43,6 +51,13 @@ class Privilege
      * will imply viewing of the actual unmasked value (so as to edit it).
      */
     const EDIT = 'edit';
+
+    /**
+     * For updating of an active record
+     *
+     * Alternative to EDIT constant.
+     */
+    const UPDATE = 'update';
 
     /**
      * For deleting/removing a record or marking it as deleted
@@ -68,11 +83,26 @@ class Privilege
     const LISTLIVE = 'listlive';
 
     /**
+     * For enumerating of active records
+     *
+     * Alternative to LISTLIVE constant.
+     * This covers the scope of a ENUMLIVE constant which is not implemented to prevent confusion.
+     */
+    const ENUM = 'enum';
+
+    /**
      * For listing of inactive/deleted records
      *
      * Applies to a set of records.
      */
     const LISTDEAD = 'listdead';
+
+    /**
+     * For enumerating of inactive/deleted records
+     *
+     * Alternative to LISTDEAD constant.
+     */
+    const ENUMDEAD = 'enumdead';
 
     /**
      * For viewing of active records or accessing/viewing of contents/details
