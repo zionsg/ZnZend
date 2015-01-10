@@ -28,6 +28,9 @@ use ZnZend\Db\Exception;
  * The entity name, $_mapGettersColumns, setters and getters for each column are generated
  * using simplistic naming rules.
  *
+ * Simple naming is used for the class name. Eg: For a `map_company_employee` table,
+ * the generated entity class will be named 'MapCompanyEmployee'.
+ *
  * The default column naming convention (see columnToSetterFunc() and columnToGetterFunc()) is assumed as:
  *   <table prefix>_<first word>_<second word if any, if none, no trailing underscore>
  * If the first word is "is" or "has", the column is assumed to be a BOOLEAN flag column and a boolean method
