@@ -121,8 +121,9 @@ class EntityGenerator
             array($databaseName)
         );
         foreach ($tables as $table) {
+            // If table name is `map_ab_cd`, entity name will be MapAbCd
             $tableName  = $table->table_name;
-            $entityName = ucfirst($tableName);
+            $entityName = str_replace(' ', '', ucwords(str_replace('_', ' ', $tableName)));
 
             // Get column info for each table
             $columns = $dbAdapter->query(
