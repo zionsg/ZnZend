@@ -283,6 +283,11 @@ class EntityGenerator
                           )));
 
             if ($mapGettersColumns) {
+                // If no column is mapped to getName, eg. in a junction table which has no name column, use getId's
+                if (null === $mapGettersColumns['getName']) {
+                    $mapGettersColumns['getName'] = $mapGettersColumns['getId']; // hopefully getId's is not null also
+                }
+
                 array_unshift($properties, PropertyGenerator::fromArray(array(
                     'name'         => '_mapGettersColumns',
                     'visibility'   => 'protected',
