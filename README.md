@@ -1,8 +1,17 @@
 #ZnZend
 
+Master:
 [![Build Status](https://secure.travis-ci.org/zionsg/ZnZend.png?branch=master)](https://travis-ci.org/zionsg/ZnZend)
+Develop:
+[![Build Status](https://secure.travis-ci.org/zionsg/ZnZend.png?branch=develop)](https://travis-ci.org/zionsg/ZnZend)
 
 Zend Framework 2 module containing helpers and base classes for my projects at intzone.com.
+
+## Release Information
+
+*ZnZend 0.1.0*
+
+18 May 2015
 
 ## Introduction
 
