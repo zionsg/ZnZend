@@ -12,7 +12,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [Commit](https://github.com/zionsg/ZnZend/commit/c1e01417e68550e3cc748e87ef0c71095fc6bbfe) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to work with both version 1.9 and 1.10 of the
   [jQuery DataTables plugin](http://datatables.net/).
-
+- [Commit](https://github.com/zionsg/ZnZend/commit/4726c6ea7fe77f9e8b06392a6c6987ff688810bb) updates
+  `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to process the global search in addition to the
+  individual column filters.
+  
 ### Deprecated
 - Nothing yet.
 
