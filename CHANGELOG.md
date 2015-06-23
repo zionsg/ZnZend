@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 ### Added
-- This CHANGELOG file
+- This CHANGELOG file.
 
 ### Changed
 - [Commit](https://github.com/zionsg/ZnZend/commit/c1e01417e68550e3cc748e87ef0c71095fc6bbfe) updates
@@ -14,10 +14,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   [jQuery DataTables plugin](http://datatables.net/).
 
 ### Deprecated
-- Nothing yet
+- Nothing yet.
 
 ### Removed
-- Nothing yet
+- Nothing yet.
 
 ### Fixed
 - [Commit](https://github.com/zionsg/ZnZend/commit/ec6b932aa18fafcf5428a1a3bd8df0231b4a44d2) fixes
