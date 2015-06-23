@@ -9,6 +9,7 @@
 namespace ZnZend\Mvc\Controller\Plugin;
 
 use DateTime;
+use Zend\Db\Sql\Predicate;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Where;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
@@ -67,10 +68,10 @@ class ZnZendDataTables extends AbstractPlugin
      *
      * Version check is based on the counter name in the params sent by DataTables, 'sEcho' for 1.9, 'draw' for 1.10.
      * The handler will update the Select object in a Paginator's DbSelect adapter with params from DataTables.
-     * Note that the global search filter is not processed, only those for the individual columns.
+     * Note that the global search filter is applied on the entire $mapGettersColumns, not just the displayed columns.
      *
-     * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect which has getSelect() to retrieve
-     *                                     Select object and updateSelect() to update Select object
+     * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect which has getSelect() to
+     *                                     retrieve the Select object and updateSelect() to update Select object
      * @param array     $dataTablesParams  Parameters sent to server by DataTables
      *                                     (@link http://legacy.datatables.net/usage/server-side for 1.9)
      *                                     (@link http://datatables.net/manual/server-side for 1.10)
@@ -130,7 +131,7 @@ class ZnZendDataTables extends AbstractPlugin
      *                                     The array should ideally be provided via a method in the entity rather
      *                                     than being exposed/hardcoded in the controller action.
      *                                     Non-string values such as the boolean values which may be returned by
-     *                                     ZnZend\Db\AbstractEntity::mapGettersColumns() will be ignored.
+     *                                     \ZnZend\Db\AbstractEntity::mapGettersColumns() will be ignored.
      *                                     Example as follows:
      *                                     array(
      *                                         // property $p->person_id => `person_id` column in database table
@@ -258,8 +259,26 @@ class ZnZendDataTables extends AbstractPlugin
             $this->select->order($order);
         }
 
+        // Build upon existing Where clause
+        $where = $this->select->where;
+
+        // Global search
+        $searchText = $this->params['sSearch'];
+        $searchRegex = $this->params['bRegex'];
+        if ($searchText) {
+            $globalWhere = new Where();
+            foreach ($this->map as $getter => $column) {
+                if (is_string($column)) {
+                    $globalWhere->orPredicate(new Predicate\Expression(
+                        $column . ($searchRegex ? ' REGEXP ?' : ' LIKE %?%'),
+                        $searchText
+                    ));
+                }
+            }
+            $where->andPredicate($globalWhere);
+        }
+
         // Column filtering
-        $where = $this->select->where; // build upon existing Where clause
         for ($i = 0; $i < (int) $this->params['iColumns']; $i++) {
             $searchText = $this->params['sSearch_' . $i];
             if ('' == $searchText || 'false' == $this->params['bSearchable_' . $i]) {
@@ -292,7 +311,7 @@ class ZnZendDataTables extends AbstractPlugin
         $filteredPaginator = new Paginator($this->adapter);
 
         // Paging
-        $itemCountPerPage = (int) $this->params['iDisplayLength'];
+        $itemCountPerPage = (int) $this->params['iDisplayLength']; // -1 for all
         $itemStart = (int) $this->params['iDisplayStart'];
         $page = (int) ceil(($itemStart + 1) / $itemCountPerPage);
         $filteredPaginator->setItemCountPerPage($itemCountPerPage)
@@ -376,8 +395,26 @@ class ZnZendDataTables extends AbstractPlugin
             $this->select->order($order);
         }
 
+        // Build upon existing Where clause
+        $where = $this->select->where;
+
+        // Global search
+        $searchText = $this->params['search']['value'];
+        $searchRegex = $this->params['search']['regex'];
+        if ($searchText) {
+            $globalWhere = new Where();
+            foreach ($this->map as $getter => $column) {
+                if (is_string($column)) {
+                    $globalWhere->orPredicate(new Predicate\Expression(
+                        $column . ($searchRegex ? ' REGEXP ?' : ' LIKE %?%'),
+                        $searchText
+                    ));
+                }
+            }
+            $where->andPredicate($globalWhere);
+        }
+
         // Column filtering
-        $where = $this->select->where; // build upon existing Where clause
         for ($i = 0; $i < $columnCnt; $i++) {
             $searchText = $this->params['columns'][$i]['search']['value'];
             if ('' == $searchText || 'false' == $this->params['columns'][$i]['searchable']) {
@@ -410,7 +447,7 @@ class ZnZendDataTables extends AbstractPlugin
         $filteredPaginator = new Paginator($this->adapter);
 
         // Paging
-        $itemCountPerPage = (int) $this->params['length'];
+        $itemCountPerPage = (int) $this->params['length']; // -1 for all
         $itemStart = (int) $this->params['start'];
         $page = (int) ceil(($itemStart + 1) / $itemCountPerPage);
         $filteredPaginator->setItemCountPerPage($itemCountPerPage)
