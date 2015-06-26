@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [Commit](https://github.com/zionsg/ZnZend/commit/4726c6ea7fe77f9e8b06392a6c6987ff688810bb) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to process the global search in addition to the
   individual column filters.
+- [Commit](https://github.com/zionsg/ZnZend/commit/137907adaeef4df21a49c303e587f16ca2f34003) updates
+  `ZnZend\Db\AbstractMapper::create()` not to re-create the entity if `$set` is already of type `EntityInterface`.
   
 ### Deprecated
 - Nothing yet.
