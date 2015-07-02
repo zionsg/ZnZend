@@ -103,7 +103,7 @@ abstract class AbstractEntity implements EntityInterface
      * Special note on getDeleted and isDeleted in the example below:
      *   isDeleted() is required in EntityInterface. Ideally, it would refer to a numeric column & cast 0/1 to boolean.
      *   In this case, mapping them here saves work on rewriting them for every entity class BUT separate
-     *   getters/setters must still be written for the columns in order to store/return the actual numeric value.
+     *   setters/getters must still be written for the columns in order to store/return the actual numeric value.
      *   Eg: 'yes'/'no' is stored in the database for person_isdeleted - isDeleted() cannot simply cast to boolean here.
      *       getDeleted() returns 'yes', but isDeleted() returns true for ('yes' == $this->person_isdeleted).
      *
