@@ -101,12 +101,21 @@ abstract class AbstractEntity implements EntityInterface
      * in the use of set() and get().
      *
      * Special note on getDeleted and isDeleted in the example below:
-     *   isHidden() and isDeleted() are required in EntityInterface. Ideally, they would refer
-     *   to a numeric column and cast 0 or 1 to boolean. In this case, mapping them here saves work on
-     *   rewriting them for every entity class BUT separate getters/setters must still be written
-     *   for the columns in order to store/return the actual numeric value.
+     *   isDeleted() is required in EntityInterface. Ideally, it would refer to a numeric column & cast 0/1 to boolean.
+     *   In this case, mapping them here saves work on rewriting them for every entity class BUT separate
+     *   getters/setters must still be written for the columns in order to store/return the actual numeric value.
      *   Eg: 'yes'/'no' is stored in the database for person_isdeleted - isDeleted() cannot simply cast to boolean here.
      *       getDeleted() returns 'yes', but isDeleted() returns true for ('yes' == $this->person_isdeleted).
+     *
+     * Additional notes on getters that map to SQL expression instead of a property and return computed information:
+     *   An example is that of the database storing a duration in minutes but it has to be shown in hours in DataTables.
+     *   A getter (setter not needed) must be written as such:
+     *     public function getDurationHrs() { return round($this->duration_mins / 60, 2); }
+     *   The mapping serves to register the getter as well as provide the SQL expression for use in column filtering:
+     *     array(
+     *         'getDurationMins' => 'duration_mins', // original mapping for database column & property `duration_mins`
+     *         'getDurationHrs'  => 'ROUND(duration_mins / 60, 2)', // SQL expression used in column filtering
+     *     )
      *
      * @example array(
      *              'getId'       => 'person_id', // maps directly to column (maps to property $person_id here)
