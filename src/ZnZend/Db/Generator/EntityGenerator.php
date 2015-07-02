@@ -142,9 +142,9 @@ class EntityGenerator
             $properties = array();
             $methods = array();
             $types = array();
-            $priority = 0;
+            $priority = count($columns) + 1; // priority for elements - larger numbers mean higher priority
             foreach ($columns as $column) {
-                $priority++;
+                $priority--;
                 $columnName = $column->column_name;
                 $isPrimary  = ('PRI' == $column->column_key);
                 $isNumeric  = ($column->numeric_precision !== null);
