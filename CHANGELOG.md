@@ -33,6 +33,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `ZnZend\Db\AbstractMapper::create()` not to re-create the entity if `$set` is already of type `EntityInterface`.
 - [Commit](https://github.com/zionsg/ZnZend/commit/b2b0d694fedc806f5bb829f761cbfcc7838fb803) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to use the HAVING clause for global search and column filtering as column aliases are not allowed in the WHERE clause.
+- [Commit](https://github.com/zionsg/ZnZend/commit/4183045083b08dc434c140bc6990b18b74abce02) fixes
+  annotations for priority in `ZnZend\Db\Generator\EntityGenerator` to correctly assign larger numbers for higher priority.
 
 ## 0.1.0 - 2015-05-18
 ### Added
