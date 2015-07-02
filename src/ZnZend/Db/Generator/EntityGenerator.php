@@ -142,7 +142,9 @@ class EntityGenerator
             $properties = array();
             $methods = array();
             $types = array();
+            $priority = 0;
             foreach ($columns as $column) {
+                $priority++;
                 $columnName = $column->column_name;
                 $isPrimary  = ('PRI' == $column->column_key);
                 $isNumeric  = ($column->numeric_precision !== null);
@@ -160,6 +162,7 @@ class EntityGenerator
 
                 $tags = array(
                     new Tag('@Annotation\Exclude()'), // no form input needed for primary keys
+                    new Tag('@Annotation\Flags({"priority": ' . ($priority * 10) . '})'), // priority
                 );
                 if (!$isPrimary) {
                     $tags = array(
@@ -169,6 +172,7 @@ class EntityGenerator
                             '@Annotation\Type("Zend\Form\Element\%s")',
                             ('text' == substr($sqlType, -4) ? 'Textarea' : 'Text')
                         )),
+                        new Tag('@Annotation\Flags({"priority": ' . ($priority * 10) . '})'), // priority
                         new Tag(sprintf(
                             '@Annotation\Attributes({"id":"%s", "placeholder":"%s"%s})',
                             $columnName,
