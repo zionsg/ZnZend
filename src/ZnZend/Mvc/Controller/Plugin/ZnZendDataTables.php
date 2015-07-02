@@ -259,23 +259,23 @@ class ZnZendDataTables extends AbstractPlugin
             $this->select->order($order);
         }
 
-        // Build upon existing Where clause
-        $where = $this->select->where;
+        // Build upon existing HAVING clause (not WHERE clause as column aliases cannot be used)
+        $having = $this->select->having;
 
         // Global search
         $searchText = $this->params['sSearch'];
         $searchRegex = $this->params['bRegex'];
         if ($searchText) {
-            $globalWhere = new Where();
+            $globalHaving = new Where();
             foreach ($this->map as $getter => $column) {
                 if (is_string($column)) {
-                    $globalWhere->orPredicate(new Predicate\Expression(
+                    $globalHaving->orPredicate(new Predicate\Expression(
                         $column . ($searchRegex ? ' REGEXP ?' : ' LIKE %?%'),
                         $searchText
                     ));
                 }
             }
-            $where->andPredicate($globalWhere);
+            $having->andPredicate($globalHaving);
         }
 
         // Column filtering
@@ -298,13 +298,13 @@ class ZnZendDataTables extends AbstractPlugin
             if ('false' == $this->params['bRegex_' . $i]) {
                 // Use LIKE
                 // like() not used in case $column is an expression and everything gets quoted
-                $where->expression("{$column} LIKE ?", "%{$searchText}%");
+                $having->expression("{$column} LIKE ?", "%{$searchText}%");
             } else {
                 // Use REGEXP
-                $where->expression("{$column} REGEXP ?", $searchText);
+                $having->expression("{$column} REGEXP ?", $searchText);
             }
         }
-        $this->select->where($where);
+        $this->select->having($having);
 
         // Create new Paginator with updated Select
         $this->adapter->updateSelect($this->select);
@@ -395,23 +395,23 @@ class ZnZendDataTables extends AbstractPlugin
             $this->select->order($order);
         }
 
-        // Build upon existing Where clause
-        $where = $this->select->where;
+        // Build upon existing HAVING clause (not WHERE clause as column aliases cannot be used)
+        $having = $this->select->having;
 
         // Global search
         $searchText = $this->params['search']['value'];
         $searchRegex = $this->params['search']['regex'];
         if ($searchText) {
-            $globalWhere = new Where();
+            $globalHaving = new Where();
             foreach ($this->map as $getter => $column) {
                 if (is_string($column)) {
-                    $globalWhere->orPredicate(new Predicate\Expression(
+                    $globalHaving->orPredicate(new Predicate\Expression(
                         $column . ($searchRegex ? ' REGEXP ?' : ' LIKE %?%'),
                         $searchText
                     ));
                 }
             }
-            $where->andPredicate($globalWhere);
+            $having->andPredicate($globalHaving);
         }
 
         // Column filtering
@@ -434,13 +434,13 @@ class ZnZendDataTables extends AbstractPlugin
             if ('false' == $this->params['columns'][$i]['search']['regex']) {
                 // Use LIKE
                 // like() not used in case $column is an expression and everything gets quoted
-                $where->expression("{$column} LIKE ?", "%{$searchText}%");
+                $having->expression("{$column} LIKE ?", "%{$searchText}%");
             } else {
                 // Use REGEXP
-                $where->expression("{$column} REGEXP ?", $searchText);
+                $having->expression("{$column} REGEXP ?", $searchText);
             }
         }
-        $this->select->where($where);
+        $this->select->having($having);
 
         // Create new Paginator with updated Select
         $this->adapter->updateSelect($this->select);
