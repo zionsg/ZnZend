@@ -50,11 +50,18 @@ class ZnZendDataTables extends AbstractPlugin
     protected $params = array();
 
     /**
-     * Mapping of columns to getters
+     * Mapping of columns to all getters
      *
      * @var array
      */
     protected $map = array();
+
+    /**
+     * Mapping of columns to getters used in global search
+     *
+     * @var array
+     */
+    protected $searchMap = array();
 
     /**
      * Whether to return updated Paginator
@@ -68,7 +75,6 @@ class ZnZendDataTables extends AbstractPlugin
      *
      * Version check is based on the counter name in the params sent by DataTables, 'sEcho' for 1.9, 'draw' for 1.10.
      * The handler will update the Select object in a Paginator's DbSelect adapter with params from DataTables.
-     * Note that the global search filter is applied on the entire $mapGettersColumns, not just the displayed columns.
      *
      * @param Paginator $paginator         Must use \ZnZend\Paginator\Adapter\DbSelect which has getSelect() to
      *                                     retrieve the Select object and updateSelect() to update Select object
@@ -77,6 +83,7 @@ class ZnZendDataTables extends AbstractPlugin
      *                                     (@link http://datatables.net/manual/server-side for 1.10)
      *                                     The getters (for the result set prototype in $paginator) used for each
      *                                     column MUST BE SET via the name property in the column definitions.
+     *                                     Getters are used instead of accessing public properties in the entity.
      *                                     Set the name property to null if no data is to be fetched for that column.
      *                                     Example for DataTables 1.9:
      *                                       $('#myTable').dataTable({
@@ -141,6 +148,9 @@ class ZnZendDataTables extends AbstractPlugin
      *                                         // method $p->getFullName() => SQL expression
      *                                         'getFullName' => "CONCAT('person_firstname, ' ', person_lastname)",
      *                                     )
+     * @param  array    $searchGetters     Default = array(). List of getters whose columns (as mapped in
+     *                                     $mapGettersColumns) will be used in the global search. If not provided,
+     *                                     the global search filter is applied on the entire $mapGettersColumns.
      * @param  bool     $returnPaginator   Default = false. If true, updated Paginator is returned under 'paginator'
      *                                     key in the array. This allows the controller action to fully control the
      *                                     rendering of the HTML table using view scripts, as opposed to customising
@@ -194,6 +204,7 @@ class ZnZendDataTables extends AbstractPlugin
     public function __invoke(Paginator $paginator,
                              array $dataTablesParams,
                              array $mapGettersColumns,
+                             array $searchGetters = array(),
                              $returnPaginator = false
     ) {
         // The adapter and Select must be cloned to prevent modification of the original
@@ -221,6 +232,16 @@ class ZnZendDataTables extends AbstractPlugin
         $this->params    = $dataTablesParams;
         $this->map       = $mapGettersColumns;
         $this->returnPaginator = $returnPaginator;
+
+        if (!$searchGetters) {
+            $this->searchMap = $this->map;
+        } else {
+            foreach ($searchGetters as $getter) {
+                if (isset($this->map[$getter])) {
+                    $this->searchMap[$getter] = $this->map[$getter];
+                }
+            }
+        }
 
         return $this->$handler();
     }
@@ -267,7 +288,7 @@ class ZnZendDataTables extends AbstractPlugin
         $searchRegex = $this->params['bRegex'];
         if ($searchText) {
             $globalHaving = new Where();
-            foreach ($this->map as $getter => $column) {
+            foreach ($this->searchMap as $getter => $column) {
                 if (is_string($column)) {
                     $globalHaving->orPredicate(new Predicate\Expression(
                         $column . ($searchRegex ? ' REGEXP ?' : ' LIKE %?%'),
@@ -403,7 +424,7 @@ class ZnZendDataTables extends AbstractPlugin
         $searchRegex = $this->params['search']['regex'];
         if ($searchText) {
             $globalHaving = new Where();
-            foreach ($this->map as $getter => $column) {
+            foreach ($this->searchMap as $getter => $column) {
                 if (is_string($column)) {
                     $globalHaving->orPredicate(new Predicate\Expression(
                         $column . ($searchRegex ? ' REGEXP ?' : ' LIKE %?%'),
