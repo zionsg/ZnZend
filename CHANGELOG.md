@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   individual column filters.
 - [Commit](https://github.com/zionsg/ZnZend/commit/9ed55f40d30e736bba4e53bd91402be7a83844da) adds
   annotations for priority to entity properties in `ZnZend\Db\Generator\EntityGenerator`.
+- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/e3d66d9d290f4aaca54e422e3b2d11c33d41dbf0) adds a new argument
+  to `__invoke()` for `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` for use in global search but changes argument order.
 
 ### Deprecated
 - Nothing yet.
