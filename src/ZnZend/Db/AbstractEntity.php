@@ -531,7 +531,8 @@ abstract class AbstractEntity implements EntityInterface
                 settype($value, $type);
             } elseif ('DateTime' == $type && !$value instanceof DateTime) { // special handling for DateTime
                 $value = (string) $value;
-                $value = (false === strtotime($value)) ? null : new DateTime($value);
+                $intValue = (int) $value; // for checking default value of "0000-00-00 00:00:00.00000" from database
+                $value = (!$intValue || false === strtotime($value)) ? null : new DateTime($value);
             } else { // object
                 $value = new $type($value);
             }
