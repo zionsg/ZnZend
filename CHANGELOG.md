@@ -21,6 +21,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   annotations for priority to entity properties in `ZnZend\Db\Generator\EntityGenerator`.
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/e3d66d9d290f4aaca54e422e3b2d11c33d41dbf0) adds a new argument
   to `__invoke()` for `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` for use in global search but changes argument order.
+- [Commit](https://github.com/zionsg/ZnZend/commit/837031becb37eacda6df9452b025958447c2ecc1) changes return values for  
+  elements in `ZnZend\Form\View\Helper\ZnZendFormValue::render()`. No more `nl2br()` for textarea value.
 
 ### Deprecated
 - Nothing yet.
