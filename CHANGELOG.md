@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased][unreleased]
 ### Added
 - This CHANGELOG file.
+- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/9b7c6746742852d1c4eac725ce769b4b09a6e8d9) adds a new method `fetchIn()` in `ZnZend\Db\MapperInterface`.
+- [Commit](https://github.com/zionsg/ZnZend/commit/ca5d3ff23f6fe1b444f23dd1333e908e746432f2) adds new method `fetchIn()` to `ZnZend\Db\AbstractMapper` as required by `ZnZend\Db\MapperInterface`.
 
 ### Changed
 - [Commit](https://github.com/zionsg/ZnZend/commit/c1e01417e68550e3cc748e87ef0c71095fc6bbfe) updates
