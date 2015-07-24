@@ -10,6 +10,7 @@ namespace ZnZend\Db;
 
 use Zend\Db\ResultSet\HydratingResultSet;
 use Zend\Db\ResultSet\ResultSetInterface;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Where;
 use Zend\Db\TableGateway\AbstractTableGateway;
@@ -534,6 +535,38 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     public function fetchAll()
     {
         $select = $this->getBaseSelect();
+        return $this->getResultSet($select);
+    }
+
+    /**
+     * Defined by MapperInterface; Fetch rows where the primary key matches a list of values
+     *
+     * @param  array       $values
+     * @param  null|string $column Optional column to use instead of primary key column
+     * @return null|Paginator
+     */
+    public function fetchIn($values, $column = null)
+    {
+        if (!$values || !is_array($values)) {
+            return null;
+        }
+
+        if (null === $column) {
+            $column = $this->getPrimaryKey();
+        }
+
+        $dbAdapter = $this->adapter;
+        $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
+        $qv = function ($value) use ($dbAdapter) { return $dbAdapter->platform->quoteValue($value); };
+
+        $select = $this->getBaseSelect();
+        $select->where->in($column, $values);
+        $select->order(array(new Expression(sprintf( // sort according to the order of the given values
+            'FIELD (%s, %s)',
+            $qi($column),
+            implode(',', array_map($qv, $values))
+        ))));
+
         return $this->getResultSet($select);
     }
 
