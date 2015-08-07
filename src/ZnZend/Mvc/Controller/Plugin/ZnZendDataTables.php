@@ -50,6 +50,23 @@ class ZnZendDataTables extends AbstractPlugin
     protected $params = array();
 
     /**
+     * Name of property for specifying search operator in params sent by DataTables (for 1.10 only)
+     *
+     * DataTables has yet to implement this hence the default value may change.
+     * Assuming the property name is 'operator', it will be found in $params as such:
+     *     array(
+     *        'search' => array('value' => '', 'regex' => true, 'operator' => 'REGEXP'),
+     *        'columns' => array(
+     *            array('search' => array('value' => '', 'regex' => false, 'operator' => 'LIKE'),
+     *        ),
+     *        ...
+     *     )
+     *
+     * @var array
+     */
+    protected $searchOperatorName = 'operator';
+
+    /**
      * Mapping of columns to all getters
      *
      * @var array
@@ -85,6 +102,7 @@ class ZnZendDataTables extends AbstractPlugin
      *                                     column MUST BE SET via the name property in the column definitions.
      *                                     Getters are used instead of accessing public properties in the entity.
      *                                     Set the name property to null if no data is to be fetched for that column.
+     *                                     Search operator will be used if set (@see $searchOperatorName) - 1.10 only
      *                                     Example for DataTables 1.9:
      *                                       $('#myTable').dataTable({
      *                                           'bProcessing': true,
@@ -114,7 +132,14 @@ class ZnZendDataTables extends AbstractPlugin
      *                                           'serverSide': true,
      *                                           'ajax': {
      *                                               'url': 'process.php',
-     *                                               'type': 'POST'
+     *                                               'type': 'POST',
+     *                                               'data': function (data) { // modify request data before sending
+     *                                                   data.search.operator = 'REGEXP'; // add global search operator
+     *                                                   // Add search operator for columns, eg. LIKE, =, >
+     *                                                   $.each(data.columns, function (index, value) {
+     *                                                       data.columns[index].search.operator = 'LIKE';
+     *                                                   });
+     *                                               }
      *                                           },
      *                                           'columnDefs': [
      *                                               { 'targets': 0, 'name': 'getId' },
@@ -385,6 +410,8 @@ class ZnZendDataTables extends AbstractPlugin
     /**
      * Handler for DataTables 1.10
      *
+     * Uses search operators if set (@see $searchOperatorName).
+     *
      * @return array @link http://datatables.net/manual/server-side
      */
     protected function handler()
@@ -422,13 +449,18 @@ class ZnZendDataTables extends AbstractPlugin
         // Global search
         $searchText = $this->params['search']['value'];
         $searchRegex = $this->params['search']['regex'];
+        $searchOperator = empty($this->params['search'][$this->searchOperatorName])
+                        ? ($searchRegex != 'false' ? 'REGEXP' : 'LIKE')
+                        : $this->params['search'][$this->searchOperatorName];
         if ($searchText) {
             $globalHaving = new Where();
+            $searchTextFormatted = ('LIKE' == $searchOperator ? "%{$searchText}%" : $searchText);
+
             foreach ($this->searchMap as $getter => $column) {
                 if (is_string($column)) {
                     $globalHaving->orPredicate(new Predicate\Expression(
-                        $column . ($searchRegex ? ' REGEXP ?' : ' LIKE %?%'),
-                        $searchText
+                        "{$column} {$searchOperator} ?",
+                        $searchTextFormatted
                     ));
                 }
             }
@@ -452,14 +484,16 @@ class ZnZendDataTables extends AbstractPlugin
                 continue;
             }
 
-            if ('false' == $this->params['columns'][$i]['search']['regex']) {
-                // Use LIKE
-                // like() not used in case $column is an expression and everything gets quoted
-                $having->expression("{$column} LIKE ?", "%{$searchText}%");
-            } else {
-                // Use REGEXP
-                $having->expression("{$column} REGEXP ?", $searchText);
-            }
+            $searchRegex = $this->params['columns'][$i]['search']['regex'];
+            $searchOperator = empty($this->params['columns'][$i]['search'][$this->searchOperatorName])
+                            ? ($searchRegex != 'false' ? 'REGEXP' : 'LIKE')
+                            : $this->params['columns'][$i]['search'][$this->searchOperatorName];
+
+            // like() not used for LIKE operator in case $column is an expression and everything gets quoted
+            $having->expression(
+                "{$column} {$searchOperator} ?",
+                ('LIKE' == $searchOperator ? "%{$searchText}%" : $searchText)
+            );
         }
         $this->select->having($having);
 
