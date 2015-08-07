@@ -23,6 +23,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   to `__invoke()` for `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` for use in global search but changes argument order.
 - [Commit](https://github.com/zionsg/ZnZend/commit/837031becb37eacda6df9452b025958447c2ecc1) changes return values for  
   elements in `ZnZend\Form\View\Helper\ZnZendFormValue::render()`. No more `nl2br()` for textarea value.
+- [Commit](https://github.com/zionsg/ZnZend/commit/32c24edc9da9fd9e0e8e0bee497e66a7f6c18c65) updates
+  `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to allow specifying of search operators (DataTables 1.10 only)
 
 ### Deprecated
 - Nothing yet.
