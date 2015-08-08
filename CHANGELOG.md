@@ -45,6 +45,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   annotations for priority in `ZnZend\Db\Generator\EntityGenerator` to correctly assign larger numbers for higher priority.
 - [Commit](https://github.com/zionsg/ZnZend/commit/dfbc4ad71aabe30b7e42ba554fc4c20d63731c3a) adds check for empty timestamp
   in `ZnZend\Db\AbstractEntity::set()`.
+- [Commit](https://github.com/zionsg/ZnZend/commit/56919088d16ff624b9552bb8344c890f3de0fc55) fixes the return value for the 
+  Select element in `ZnZend\Form\View\Helper\ZnZendFormValue` to return the corresponding option.
 
 ## 0.1.0 - 2015-05-18
 ### Added
