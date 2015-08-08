@@ -40,8 +40,7 @@ class ZnZendFormValue extends AbstractHelper
      * Introspects the element type and its attributes to determine
      * how to render its value.
      *
-     * @TODO Determine value to render for remaining elements that do not return string
-     *
+     * @todo   Determine value to render for remaining elements that do not return string
      * @param  ElementInterface $element
      * @return string
      */
@@ -164,6 +163,12 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('select' == $type) {
+            foreach ($element->getValueOptions() as $selectValue => $selectOption) {
+                if ($selectValue == $value) {
+                    return $selectOption;
+                }
+            }
+
             return $value;
         }
 
