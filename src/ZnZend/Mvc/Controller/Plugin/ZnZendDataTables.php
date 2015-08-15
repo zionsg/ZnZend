@@ -9,6 +9,7 @@
 namespace ZnZend\Mvc\Controller\Plugin;
 
 use DateTime;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Predicate;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Where;
@@ -297,7 +298,8 @@ class ZnZendDataTables extends AbstractPlugin
 
             $column = $this->map[$getter];
             if (is_string($column)) {
-                $this->select->order($column . ' ' . strtoupper($this->params['sSortDir_' . $i]));
+                // Use Expression in case $column is an expression and gets quoted
+                $this->select->order(new Expression($column . ' ' . strtoupper($this->params['sSortDir_' . $i])));
             }
         }
         // Append original order by iteration so that the keys will not upset precedence
@@ -435,7 +437,8 @@ class ZnZendDataTables extends AbstractPlugin
 
             $column = $this->map[$getter];
             if (is_string($column)) {
-                $this->select->order($column . ' ' . strtoupper($orderParams['dir']));
+                // Use Expression in case $column is an expression and gets quoted
+                $this->select->order(new Expression($column . ' ' . strtoupper($orderParams['dir'])));
             }
         }
         // Append original order by iteration so that the keys will not upset precedence
