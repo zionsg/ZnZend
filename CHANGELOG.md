@@ -49,6 +49,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   in `ZnZend\Db\AbstractEntity::set()`.
 - [Commit](https://github.com/zionsg/ZnZend/commit/56919088d16ff624b9552bb8344c890f3de0fc55) fixes the return value for the 
   Select element in `ZnZend\Form\View\Helper\ZnZendFormValue` to return the corresponding option.
+- [Commit](https://github.com/zionsg/ZnZend/commit/94a00aa3d1b69f0c9a0c23899a62cc666bcb7dea) fixes the mapping of the decimal
+  and real SQL types to PHP float type in `ZnZend\Db\Generator\EntityGenerator::$mapTypes`.
 
 ## 0.1.0 - 2015-05-18
 ### Added
