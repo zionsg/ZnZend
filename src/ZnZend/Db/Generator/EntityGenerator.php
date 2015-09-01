@@ -67,10 +67,10 @@ class EntityGenerator
         'smallint' => 'int',
         'mediumint' => 'int',
         'bigint' => 'int',
-        'decimal' => 'real',
+        'decimal' => 'float', // this is not ideal if the decimal field is used to store currency due to precision loss
         'float' => 'float',
         'double' => 'double',
-        'real' => 'real',
+        'real' => 'float',
         'datetime' => 'DateTime',
         'timestamp' => 'DateTime',
     );
