@@ -51,6 +51,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Select element in `ZnZend\Form\View\Helper\ZnZendFormValue` to return the corresponding option.
 - [Commit](https://github.com/zionsg/ZnZend/commit/94a00aa3d1b69f0c9a0c23899a62cc666bcb7dea) fixes the mapping of the decimal
   and real SQL types to PHP float type in `ZnZend\Db\Generator\EntityGenerator::$mapTypes`.
+- [Commit](https://github.com/zionsg/ZnZend/commit/b0e9b9b73a7a1b52f480feb33da54d3a961f8528) adds `maxlength` attribute for  
+  CHAR types in `ZnZend\Db\Generator\EntityGenerator::generate()`.
 
 ## 0.1.0 - 2015-05-18
 ### Added
