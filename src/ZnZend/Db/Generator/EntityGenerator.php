@@ -146,11 +146,12 @@ class EntityGenerator
             foreach ($columns as $column) {
                 $priority--;
                 $columnName = $column->column_name;
-                $isPrimary  = ('PRI' == $column->column_key);
+                $isPrimary  = ('PRI' == strtoupper($column->column_key));
                 $isNumeric  = ($column->numeric_precision !== null);
                 $defaultValue = ($isPrimary ? null : $column->column_default);
-                $sqlType      = $column->data_type;
+                $sqlType      = strtolower($column->data_type);
                 $phpType      = self::getPhpType($sqlType);
+                $isCharType   = ('char' == $sqlType || 'varchar' == $sqlType);
                 $setterName   = $columnToSetterFunc($tableName, $columnName);
                 $getterName   = $columnToGetterFunc($tableName, $columnName);
                 $booleanName  = $columnToBooleanFunc($tableName, $columnName);
@@ -177,7 +178,7 @@ class EntityGenerator
                             '@Annotation\Attributes({"id":"%s", "placeholder":"%s"%s})',
                             $columnName,
                             ucwords($label),
-                            ($sqlType != 'varchar' ? '' : ', "maxlength":' . $column->character_maximum_length)
+                            ($isCharType ? ', "maxlength":' . $column->character_maximum_length : '')
                         )),
                         new Tag('@Annotation\Options({"label":"' . ucwords($label) . '"})'),
                         new Tag('@Annotation\Filter({"name":"StringTrim"})'),
