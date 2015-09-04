@@ -83,6 +83,8 @@ class EntityGenerator
      * @param  string            $filePath            Path to write generated files
      * @param  Adapter           $dbAdapter           Database adapter
      * @param  string            $namespace           Namespace for entity and table gateway classes
+     * @param  string            $extendedClass       Optional FQCN of class that entity classes extend from
+     *                                                This class should extend ZnZend\Db\AbstractEntity
      * @param  DocBlockGenerator $fileDocBlock        Optional docblock for all files
      * @param  callable          $columnToSetterFunc  Optional callback that takes in
      *                                                (string $tableName, string $columnName) and returns setter name
@@ -99,6 +101,7 @@ class EntityGenerator
         $filePath,
         Adapter $dbAdapter,
         $namespace,
+        $extendedClass = 'ZnZend\Db\AbstractEntity',
         DocBlockGenerator $fileDocBlock = null,
         $columnToSetterFunc = null,
         $columnToGetterFunc = null,
@@ -275,8 +278,8 @@ class EntityGenerator
                         ->setNamespaceName($namespace)
                         ->addUse('DateTime')
                         ->addUse('Zend\Form\Annotation')
-                        ->addUse('ZnZend\Db\AbstractEntity')
-                        ->setExtendedClass('AbstractEntity')
+                        ->addUse($extendedClass, 'BaseEntityClass')
+                        ->setExtendedClass('BaseEntityClass')
                         ->setDocBlock(DocBlockGenerator::fromArray(array(
                               'shortDescription' => null,
                               'longDescription'  => null,
