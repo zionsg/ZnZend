@@ -27,6 +27,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to allow specifying of search operators (DataTables 1.10 only).
 - [Commit](https://github.com/zionsg/ZnZend/commit/789fb150dad1844e128cb098f44ac76b1bf289cd) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to use `Zend\Db\Sql\Expression` when sorting columns.
+- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/ad538b5dd5c5bf85db2961380d5a097fa1779086) adds a new argument to
+  `ZnZend\Db\Generator\EntityGenerator::generate()` to allow different extending class.
+- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/329d251b6af09fc8e12c79ff4cabe939c360acf1) adds a new argument to
+  `ZnZend\Db\Generator\MapperGenerator::generate()` to allow different extending class.
 
 ### Deprecated
 - Nothing yet.
