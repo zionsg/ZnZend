@@ -112,8 +112,7 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('file' == $type) {
-            $helper = $renderer->plugin('form_file');
-            return $helper($element);
+            return $value;
         }
 
         if ('hidden' == $type) {
