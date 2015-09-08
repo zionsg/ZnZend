@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 It follows [Keep a CHANGELOG](http://keepachangelog.com/) as recommended by the
 [Zend Framework Maintainers Guide](https://github.com/zendframework/maintainers/blob/master/MAINTAINERS.md).
+BC breaks will be listed at the top of their respective sections.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
@@ -11,6 +12,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [Commit](https://github.com/zionsg/ZnZend/commit/ca5d3ff23f6fe1b444f23dd1333e908e746432f2) adds new method `fetchIn()` to `ZnZend\Db\AbstractMapper` as required by `ZnZend\Db\MapperInterface`.
 
 ### Changed
+- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/e3d66d9d290f4aaca54e422e3b2d11c33d41dbf0) adds a new argument
+  to `__invoke()` for `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` for use in global search but changes argument order.
+- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/ad538b5dd5c5bf85db2961380d5a097fa1779086) adds a new argument to
+  `ZnZend\Db\Generator\EntityGenerator::generate()` to allow different extending class.
+- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/329d251b6af09fc8e12c79ff4cabe939c360acf1) adds a new argument to
+  `ZnZend\Db\Generator\MapperGenerator::generate()` to allow different extending class.
 - [Commit](https://github.com/zionsg/ZnZend/commit/c1e01417e68550e3cc748e87ef0c71095fc6bbfe) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to work with both version 1.9 and 1.10 of the
   [jQuery DataTables plugin](http://datatables.net/).
@@ -19,18 +26,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   individual column filters.
 - [Commit](https://github.com/zionsg/ZnZend/commit/9ed55f40d30e736bba4e53bd91402be7a83844da) adds
   annotations for priority to entity properties in `ZnZend\Db\Generator\EntityGenerator`.
-- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/e3d66d9d290f4aaca54e422e3b2d11c33d41dbf0) adds a new argument
-  to `__invoke()` for `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` for use in global search but changes argument order.
 - [Commit](https://github.com/zionsg/ZnZend/commit/837031becb37eacda6df9452b025958447c2ecc1) changes return values for  
   elements in `ZnZend\Form\View\Helper\ZnZendFormValue::render()`. No more `nl2br()` for textarea value.
 - [Commit](https://github.com/zionsg/ZnZend/commit/32c24edc9da9fd9e0e8e0bee497e66a7f6c18c65) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to allow specifying of search operators (DataTables 1.10 only).
 - [Commit](https://github.com/zionsg/ZnZend/commit/789fb150dad1844e128cb098f44ac76b1bf289cd) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to use `Zend\Db\Sql\Expression` when sorting columns.
-- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/ad538b5dd5c5bf85db2961380d5a097fa1779086) adds a new argument to
-  `ZnZend\Db\Generator\EntityGenerator::generate()` to allow different extending class.
-- [BC Break Commit](https://github.com/zionsg/ZnZend/commit/329d251b6af09fc8e12c79ff4cabe939c360acf1) adds a new argument to
-  `ZnZend\Db\Generator\MapperGenerator::generate()` to allow different extending class.
+- [Commit](https://github.com/zionsg/ZnZend/commit/87830fc48ba413934eaa1361f4bf601f578d5747) changes return value for  
+  file element in `ZnZend\Form\View\Helper\ZnZendFormValue::render()`.
 
 ### Deprecated
 - Nothing yet.
