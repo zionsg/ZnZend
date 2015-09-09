@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - This CHANGELOG file.
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/9b7c6746742852d1c4eac725ce769b4b09a6e8d9) adds a new method `fetchIn()` in `ZnZend\Db\MapperInterface`.
 - [Commit](https://github.com/zionsg/ZnZend/commit/ca5d3ff23f6fe1b444f23dd1333e908e746432f2) adds new method `fetchIn()` to `ZnZend\Db\AbstractMapper` as required by `ZnZend\Db\MapperInterface`.
+- [Commit](https://github.com/zionsg/ZnZend/commit/b3dcdcc4a76928b32f0f4876467bc4ccfc006683) adds `$webRoot` optional method 
+  argument to `ZnZend\View\Helper\ZnZendResizeImage::__invoke()`.
 
 ### Changed
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/e3d66d9d290f4aaca54e422e3b2d11c33d41dbf0) adds a new argument
