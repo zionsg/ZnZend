@@ -26,21 +26,32 @@ class ZnZendResizeImage extends AbstractHelper
      *
      * Original image need not exist if resized copy is available and $overwrite is false.
      *
-     * @param  string $imagePath Path to image file, relative to $_SERVER['DOCUMENT_ROOT']
+     * @param  string $imagePath Path to image file, relative to $webRoot, as used in <img src="">
      * @param  int    $width     Maximum width for resized image
      * @param  int    $height    Maximum height for resized image
      * @param  bool   $center    Default = false. Optional flag to center resized image
      *                           in box defined by $width x $height
      * @param  int    $quality   Default = 100. Optional quality for resized image from 0 to 100
      * @param  bool   $overwrite Default = false. Optional flag to overwrite existing resized image
-     * @return string Path to resized copy of image for use in HTML <img>, relative to $_SERVER['DOCUMENT_ROOT'].
-     *                An empty string is returned upon any failure such as write permissions as returning
-     *                the original path will likely break the layout expecting a different size.
+     * @param  string $webRoot   Defaults to $_SERVER['DOCUMENT_ROOT']. Absolute server path for web root
+     * @return string Path to resized copy of image for use in HTML <img>, relative to $webRoot.
+     *                An empty string is returned upon any failure such as write permissions, as returning
+     *                the original path will likely break the layout expecting a different size
      */
-    public function __invoke($imagePath, $width, $height, $center = false, $quality = 100, $overwrite = false)
-    {
-        $webRoot = $_SERVER['DOCUMENT_ROOT'];
+    public function __invoke(
+        $imagePath,
+        $width,
+        $height,
+        $center = false,
+        $quality = 100,
+        $overwrite = false,
+        $webRoot = null
+    ) {
         $failure = '';
+
+        if (null === $webRoot) {
+            $webRoot = $_SERVER['DOCUMENT_ROOT'];
+        }
 
         if (!extension_loaded('gd')) {
             return $failure;
