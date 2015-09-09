@@ -17,9 +17,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/e3d66d9d290f4aaca54e422e3b2d11c33d41dbf0) adds a new argument
   to `__invoke()` for `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` for use in global search but changes argument order.
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/ad538b5dd5c5bf85db2961380d5a097fa1779086) adds a new argument to
-  `ZnZend\Db\Generator\EntityGenerator::generate()` to allow different extending class.
+  `ZnZend\Db\Generator\EntityGenerator::generate()` to allow different extending class but changes argument order.
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/329d251b6af09fc8e12c79ff4cabe939c360acf1) adds a new argument to
-  `ZnZend\Db\Generator\MapperGenerator::generate()` to allow different extending class.
+  `ZnZend\Db\Generator\MapperGenerator::generate()` to allow different extending class but changes argument order.
 - [Commit](https://github.com/zionsg/ZnZend/commit/c1e01417e68550e3cc748e87ef0c71095fc6bbfe) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to work with both version 1.9 and 1.10 of the
   [jQuery DataTables plugin](http://datatables.net/).
@@ -34,8 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to allow specifying of search operators (DataTables 1.10 only).
 - [Commit](https://github.com/zionsg/ZnZend/commit/789fb150dad1844e128cb098f44ac76b1bf289cd) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to use `Zend\Db\Sql\Expression` when sorting columns.
-- [Commit](https://github.com/zionsg/ZnZend/commit/87830fc48ba413934eaa1361f4bf601f578d5747) changes return value for  
-  file element in `ZnZend\Form\View\Helper\ZnZendFormValue::render()`.
 
 ### Deprecated
 - Nothing yet.
@@ -62,6 +60,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   and real SQL types to PHP float type in `ZnZend\Db\Generator\EntityGenerator::$mapTypes`.
 - [Commit](https://github.com/zionsg/ZnZend/commit/b0e9b9b73a7a1b52f480feb33da54d3a961f8528) adds `maxlength` attribute for  
   CHAR types in `ZnZend\Db\Generator\EntityGenerator::generate()`.
+- [Commit](https://github.com/zionsg/ZnZend/commit/87830fc48ba413934eaa1361f4bf601f578d5747) changes return value for  
+  file element in `ZnZend\Form\View\Helper\ZnZendFormValue::render()`.
 
 ## 0.1.0 - 2015-05-18
 ### Added
