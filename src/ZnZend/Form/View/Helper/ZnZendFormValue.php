@@ -40,8 +40,7 @@ class ZnZendFormValue extends AbstractHelper
      * Introspects the element type and its attributes to determine
      * how to render its value.
      *
-     * @TODO Determine value to render for remaining elements that do not return string
-     *
+     * @todo   Determine value to render for remaining elements that do not return string
      * @param  ElementInterface $element
      * @return string
      */
@@ -99,28 +98,21 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('date' == $type) {
-            $helper = $renderer->plugin('form_date');
-            return $helper($element);
-        }
+            return $value;        }
 
         if ('datetime' == $type) {
-            $helper = $renderer->plugin('form_date_time');
-            return $helper($element);
-        }
+            return $value;        }
 
         if ('datetime-local' == $type) {
-            $helper = $renderer->plugin('form_date_time_local');
-            return $helper($element);
+            return $value;
         }
 
         if ('email' == $type) {
-            $helper = $renderer->plugin('form_email');
-            return $helper($element);
+            return $value;
         }
 
         if ('file' == $type) {
-            $helper = $renderer->plugin('form_file');
-            return $helper($element);
+            return $value;
         }
 
         if ('hidden' == $type) {
@@ -133,8 +125,7 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('month' == $type) {
-            $helper = $renderer->plugin('form_month');
-            return $helper($element);
+            return $value;
         }
 
         if ('multi_checkbox' == $type) {
@@ -143,8 +134,7 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('number' == $type) {
-            $helper = $renderer->plugin('form_number');
-            return $helper($element);
+            return $value;
         }
 
         if ('password' == $type) {
@@ -172,6 +162,12 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('select' == $type) {
+            foreach ($element->getValueOptions() as $selectValue => $selectOption) {
+                if ($selectValue == $value) {
+                    return $selectOption;
+                }
+            }
+
             return $value;
         }
 
@@ -180,23 +176,19 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('tel' == $type) {
-            $helper = $renderer->plugin('form_tel');
-            return $helper($element);
+            return $value;
         }
 
         if ('text' == $type) {
             return $value;
-            $helper = $renderer->plugin('form_text');
-            return $helper($element);
         }
 
         if ('textarea' == $type) {
-            return nl2br($value); // convert newlines to <br />
+            return $value;
         }
 
         if ('time' == $type) {
-            $helper = $renderer->plugin('form_time');
-            return $helper($element);
+            return $value;
         }
 
         if ('url' == $type) {
@@ -204,8 +196,7 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('week' == $type) {
-            $helper = $renderer->plugin('form_week');
-            return $helper($element);
+            return $value;
         }
 
         return $value;

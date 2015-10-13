@@ -101,7 +101,8 @@ class LogListener extends AbstractListenerAggregate
      */
     public function logException(EventInterface $e)
     {
-        $exception = $e->getResult()->exception;
+        $result = $e->getResult();
+        $exception = isset($result->exception) ? $result->exception : null; // property may not exist, eg. if status 302
         if (!$exception) {
             return;
         }

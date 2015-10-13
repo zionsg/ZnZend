@@ -114,6 +114,15 @@ interface MapperInterface
     public function fetchAll();
 
     /**
+     * Fetch rows where the primary key matches a list of values
+     *
+     * @param  array       $values
+     * @param  null|string $column Optional column to use instead of primary key column
+     * @return null|Paginator
+     */
+    public function fetchIn($values, $column = null);
+
+    /**
      * Create
      *
      * @param  array|EntityInterface $set

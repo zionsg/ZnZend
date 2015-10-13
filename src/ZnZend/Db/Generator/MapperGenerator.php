@@ -34,6 +34,8 @@ class MapperGenerator
      * @param  string            $filePath            Path to write generated files
      * @param  Adapter           $dbAdapter           Database adapter
      * @param  string            $namespace           Namespace for entity and table gateway classes
+     * @param  string            $extendedClass       Optional FQCN of class that mapper classes extend from
+     *                                                This class should extend ZnZend\Db\AbstractMapper
      * @param  DocBlockGenerator $fileDocBlock        Optional docblock for all files
      * @param  callable          $activeRowStateFunc  Optional callback that takes in
      *                                                (string $tableName, array $columnNames)
@@ -50,6 +52,7 @@ class MapperGenerator
         $filePath,
         Adapter $dbAdapter,
         $namespace,
+        $extendedClass = 'ZnZend\Db\AbstractMapper',
         DocBlockGenerator $fileDocBlock = null,
         $activeRowStateFunc = null,
         $deletedRowStateFunc = null
@@ -151,8 +154,8 @@ class MapperGenerator
             $mapperClass->setName($entityName . 'Mapper')
                         ->setNamespaceName($namespace)
                         ->addUse("{$namespace}\\{$entityName}")
-                        ->addUse('ZnZend\Db\AbstractMapper')
-                        ->setExtendedClass('AbstractMapper')
+                        ->addUse($extendedClass, 'BaseMapperClass')
+                        ->setExtendedClass('BaseMapperClass')
                         ->addProperties($properties);
 
             // Generate file

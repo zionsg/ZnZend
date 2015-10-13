@@ -67,10 +67,10 @@ class EntityGenerator
         'smallint' => 'int',
         'mediumint' => 'int',
         'bigint' => 'int',
-        'decimal' => 'real',
+        'decimal' => 'float', // this is not ideal if the decimal field is used to store currency due to precision loss
         'float' => 'float',
         'double' => 'double',
-        'real' => 'real',
+        'real' => 'float',
         'datetime' => 'DateTime',
         'timestamp' => 'DateTime',
     );
@@ -83,6 +83,8 @@ class EntityGenerator
      * @param  string            $filePath            Path to write generated files
      * @param  Adapter           $dbAdapter           Database adapter
      * @param  string            $namespace           Namespace for entity and table gateway classes
+     * @param  string            $extendedClass       Optional FQCN of class that entity classes extend from
+     *                                                This class should extend ZnZend\Db\AbstractEntity
      * @param  DocBlockGenerator $fileDocBlock        Optional docblock for all files
      * @param  callable          $columnToSetterFunc  Optional callback that takes in
      *                                                (string $tableName, string $columnName) and returns setter name
@@ -99,6 +101,7 @@ class EntityGenerator
         $filePath,
         Adapter $dbAdapter,
         $namespace,
+        $extendedClass = 'ZnZend\Db\AbstractEntity',
         DocBlockGenerator $fileDocBlock = null,
         $columnToSetterFunc = null,
         $columnToGetterFunc = null,
@@ -142,13 +145,16 @@ class EntityGenerator
             $properties = array();
             $methods = array();
             $types = array();
+            $priority = count($columns) + 1; // priority for elements - larger numbers mean higher priority
             foreach ($columns as $column) {
+                $priority--;
                 $columnName = $column->column_name;
-                $isPrimary  = ('PRI' == $column->column_key);
+                $isPrimary  = ('PRI' == strtoupper($column->column_key));
                 $isNumeric  = ($column->numeric_precision !== null);
                 $defaultValue = ($isPrimary ? null : $column->column_default);
-                $sqlType      = $column->data_type;
+                $sqlType      = strtolower($column->data_type);
                 $phpType      = self::getPhpType($sqlType);
+                $isCharType   = ('char' == $sqlType || 'varchar' == $sqlType);
                 $setterName   = $columnToSetterFunc($tableName, $columnName);
                 $getterName   = $columnToGetterFunc($tableName, $columnName);
                 $booleanName  = $columnToBooleanFunc($tableName, $columnName);
@@ -160,6 +166,7 @@ class EntityGenerator
 
                 $tags = array(
                     new Tag('@Annotation\Exclude()'), // no form input needed for primary keys
+                    new Tag('@Annotation\Flags({"priority": ' . ($priority * 10) . '})'), // priority
                 );
                 if (!$isPrimary) {
                     $tags = array(
@@ -169,11 +176,12 @@ class EntityGenerator
                             '@Annotation\Type("Zend\Form\Element\%s")',
                             ('text' == substr($sqlType, -4) ? 'Textarea' : 'Text')
                         )),
+                        new Tag('@Annotation\Flags({"priority": ' . ($priority * 10) . '})'), // priority
                         new Tag(sprintf(
                             '@Annotation\Attributes({"id":"%s", "placeholder":"%s"%s})',
                             $columnName,
                             ucwords($label),
-                            ($sqlType != 'varchar' ? '' : ', "maxlength":' . $column->character_maximum_length)
+                            ($isCharType ? ', "maxlength":' . $column->character_maximum_length : '')
                         )),
                         new Tag('@Annotation\Options({"label":"' . ucwords($label) . '"})'),
                         new Tag('@Annotation\Filter({"name":"StringTrim"})'),
@@ -270,8 +278,8 @@ class EntityGenerator
                         ->setNamespaceName($namespace)
                         ->addUse('DateTime')
                         ->addUse('Zend\Form\Annotation')
-                        ->addUse('ZnZend\Db\AbstractEntity')
-                        ->setExtendedClass('AbstractEntity')
+                        ->addUse($extendedClass, 'BaseEntityClass')
+                        ->setExtendedClass('BaseEntityClass')
                         ->setDocBlock(DocBlockGenerator::fromArray(array(
                               'shortDescription' => null,
                               'longDescription'  => null,
