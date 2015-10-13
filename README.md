@@ -9,9 +9,9 @@ Zend Framework 2 module containing helpers and base classes for my projects at i
 
 ## Release Information
 
-*ZnZend 0.1.0*
+*ZnZend 0.2.0*
 
-18 May 2015
+13 October 2015
 
 ## Introduction
 
