@@ -6,6 +6,8 @@ BC breaks will be listed at the top of their respective sections.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
+
+## [0.2.0] - 2015-10-13
 ### Added
 - This CHANGELOG file.
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/9b7c6746742852d1c4eac725ce769b4b09a6e8d9) adds a new method `fetchIn()` in `ZnZend\Db\MapperInterface`.
@@ -35,12 +37,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [Commit](https://github.com/zionsg/ZnZend/commit/789fb150dad1844e128cb098f44ac76b1bf289cd) updates
   `ZnZend\Mvc\Controller\Plugin\ZnZendDataTables` to use `Zend\Db\Sql\Expression` when sorting columns.
 
-### Deprecated
-- Nothing yet.
-
-### Removed
-- Nothing yet.
-
 ### Fixed
 - [Commit](https://github.com/zionsg/ZnZend/commit/ec6b932aa18fafcf5428a1a3bd8df0231b4a44d2) fixes
   `ZnZend\Listener\LogListener::logException()` with a check on the existence of the `exception` property in the result.
@@ -67,4 +63,5 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - First official release for this project.
 
-[unreleased]: https://github.com/zionsg/ZnZend/compare/master...develop
+[unreleased]: https://github.com/zionsg/ZnZend/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/zionsg/ZnZend/compare/v0.1.0...v0.2.0
