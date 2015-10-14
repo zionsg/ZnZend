@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased][unreleased]
 
-## [0.2.0] - 2015-10-13
+## [0.2.0] - 2015-10-14
 ### Added
 - This CHANGELOG file.
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/9b7c6746742852d1c4eac725ce769b4b09a6e8d9) adds a new method `fetchIn()` in `ZnZend\Db\MapperInterface`.
