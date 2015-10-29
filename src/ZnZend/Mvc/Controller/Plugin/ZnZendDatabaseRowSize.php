@@ -74,9 +74,9 @@ class ZnZendDatabaseRowSize extends AbstractPlugin
     /**
      * Calculate row size in bytes for each table in specified database
      *
-     * @param  AdapterInterace $dbAdapter Database adapter
-     * @param  string          $dbName    Database name
-     * @return array           array(<table 1> => <row size>, <table 2> => <row size>, ...)
+     * @param  AdapterInterface $dbAdapter Database adapter
+     * @param  string           $dbName    Database name
+     * @return array            array(<table 1> => <row size>, <table 2> => <row size>, ...)
      */
     public function __invoke(AdapterInterface $dbAdapter, $dbName)
     {
