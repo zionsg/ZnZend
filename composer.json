@@ -33,8 +33,8 @@
         "doctrine/common": "^2.7"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.9",
-        "zendframework/zend-test": "^3.1"
+        "zendframework/zend-test": "^3.1",
+        "squizlabs/php_codesniffer": "^3.2"
     },
     "autoload": {
         "psr-4": {
@@ -45,5 +45,15 @@
         "psr-4": {
             "ZnZendTest\\": "test/"
         }
+    },
+    "scripts": {
+        "check": [
+            "@cs",
+            "@test"
+        ],
+        "cs": "phpcs",
+        "cs-fix": "phpcbf",
+        "serve": "php -S 0.0.0.0:8080 -t public/ public/index.php",
+        "test": "phpunit -c test/phpunit.xml test"
     }
 }
