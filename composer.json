@@ -52,7 +52,7 @@
             "@test"
         ],
         "cs": "phpcs config src test",
-        "cs-errors-only": "./vendor/bin/phpcs -q --warning-severity=0 --standard=PSR2 --no-colors --no-cache --ignore-annotations config src test",
+        "cs-errors-only": "./vendor/bin/phpcs -q --warning-severity=0 --standard=PSR1,PSR2 --no-colors --no-cache --ignore-annotations config src test",
         "cs-fix": "phpcbf config src test",
         "serve": "php -S 0.0.0.0:8080 -t public/ public/index.php",
         "test": "phpunit -c test/phpunit.xml test"
