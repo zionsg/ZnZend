@@ -8,7 +8,7 @@
 
 namespace ZnZendTest\View\Helper;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase as TestCase;
 use ZnZend\View\Helper\ZnZendFormatBytes;
 
 /**
