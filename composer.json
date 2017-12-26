@@ -12,20 +12,22 @@
         {
             "name": "Zion Ng",
             "email": "zion@intzone.com",
-            "homepage": "http://zion.sg/"
+            "homepage": "https://zion.sg/"
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": "^7.0",
         "zendframework/zendframework": "2.*",
-        "doctrine/common": ">=2.1"      
+        "doctrine/common": ">=2.1"
     },
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "ZnZend": "src/"
-        },
-        "classmap": [
-            "./Module.php"
-        ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZnZendTest": "test/"
+        }
     }
 }
