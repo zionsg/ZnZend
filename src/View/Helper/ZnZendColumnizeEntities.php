@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\View\Helper;
@@ -26,7 +25,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
      * @params array @see columnize() for docblock on $params
      * @return string
      */
-    public function __invoke(array $params = array())
+    public function __invoke(array $params = [])
     {
         return $this->columnize($params);
     }
@@ -92,14 +91,14 @@ class ZnZendColumnizeEntities extends AbstractHelper
      * @throws Exception\InvalidArgumentException When any of the callbacks is not callable.
      * @return string
      */
-    public function columnize(array $params = array(), $output = '')
+    public function columnize(array $params = [], $output = '')
     {
         // Ensure all keys are set before extracting to prevent notices
         $params = array_merge(
-            array(
+            [
                 'cols' => 1,
                 'drawTable' => true,
-                'entities' => array(),
+                'entities' => [],
                 'entityCallback' => null,
                 'nameClass' => '',
                 'nameCallback' => null,
@@ -121,7 +120,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                 'maxThumbnailHeight' => 0,
                 'maxThumbnailWidth' => 0,
                 'webRoot' => '',
-            ),
+            ],
             $params
         );
         extract($params);
@@ -135,18 +134,18 @@ class ZnZendColumnizeEntities extends AbstractHelper
             return $output;
         }
         if (is_array($entities) || $entities instanceof Traversable) {
-            $entityArray = array();
+            $entityArray = [];
             foreach ($entities as $entity) {
                 $entityArray[] = $entity;
             }
             $entities = $entityArray;
         } else {
-            $entities = array($entities); // when single entity is passed in
+            $entities = [$entities]; // when single entity is passed in
         }
         $entityCount = count($entities);
 
         // Calculate initial rows
-        if (!in_array($remainderAlign, array('left', 'center'))) {
+        if (! in_array($remainderAlign, ['left', 'center'])) {
             $remainderAlign = 'center';
         }
         if ($remainderAlign == 'left') {
@@ -193,7 +192,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                 $entityOutput = '';
 
                 if ($entityCallback) {
-                    if (!is_callable($entityCallback)) {
+                    if (! is_callable($entityCallback)) {
                         throw new Exception\InvalidArgumentException('Invalid entity callback provided');
                     }
                     $entityOutput = $entityCallback($entity) . PHP_EOL;
@@ -202,7 +201,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     $urlOutputBegin = '';
                     $urlOutputEnd = '';
                     if ($urlCallback) {
-                        if (!is_callable($urlCallback)) {
+                        if (! is_callable($urlCallback)) {
                             throw new Exception\InvalidArgumentException('Invalid url callback provided');
                         }
                         $url = $urlCallback($entity);
@@ -218,7 +217,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
                     // Get entity thumbnail
                     $thumbnail = null;
                     if ($thumbnailCallback) {
-                        if (!is_callable($thumbnailCallback)) {
+                        if (! is_callable($thumbnailCallback)) {
                             throw new Exception\InvalidArgumentException('Invalid thumbnail callback provided');
                         }
                         $thumbnail = $thumbnailCallback($entity);
@@ -274,7 +273,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
 
                     // Get entity name and add to entity output
                     if ($nameCallback) {
-                        if (!is_callable($nameCallback)) {
+                        if (! is_callable($nameCallback)) {
                             throw new Exception\InvalidArgumentException('Invalid name callback provided');
                         }
                         $name = $nameCallback($entity) . PHP_EOL;
@@ -286,7 +285,6 @@ class ZnZendColumnizeEntities extends AbstractHelper
                             $urlOutputEnd
                         );
                     }
-
                 } // end entity output
 
                 if ($drawTable) {
@@ -312,7 +310,7 @@ class ZnZendColumnizeEntities extends AbstractHelper
         if ($remainderCount == 0) {
             return $output;
         } else {
-            $remainderEntities = array();
+            $remainderEntities = [];
             for ($i = $entitiesProcessed; $i < $entityCount; $i++) {
                 $remainderEntities[] = $entities[$i];
             }

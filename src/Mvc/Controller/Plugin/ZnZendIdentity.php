@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Mvc\Controller\Plugin;
@@ -55,10 +54,10 @@ class ZnZendIdentity extends ZendIdentityPlugin
      */
     public function getIdentity()
     {
-        if (!$this->authenticationService instanceof AuthenticationService) {
+        if (! $this->authenticationService instanceof AuthenticationService) {
             throw new Exception\RuntimeException('No AuthenticationService instance provided');
         }
-        if (!$this->authenticationService->hasIdentity()) {
+        if (! $this->authenticationService->hasIdentity()) {
             return null;
         }
 

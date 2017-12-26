@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Captcha\Service;
@@ -34,7 +33,7 @@ class MathQuestionService implements QuestionServiceInterface
      *
      * @var array
      */
-    protected $operators = array(self::ADD => 'plus', self::SUBTRACT => 'minus');
+    protected $operators = [self::ADD => 'plus', self::SUBTRACT => 'minus'];
 
     /**
      * Operator constants
@@ -113,10 +112,14 @@ class MathQuestionService implements QuestionServiceInterface
         }
 
         // index 0 not used. Non-empty place suffixes have ' ' in front to facilitate concatenation
-        $placeSuffix = array('', '', '', ' hundred', ' thousand', ' thousand', ' thousand', ' million', ' million', ' million');
-        $onesPrefix  = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine');
-        $teensPrefix = array('ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen');
-        $tens        = array('', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety');
+        $placeSuffix = [
+            '', '', '', ' hundred', ' thousand', ' thousand', ' thousand', ' million', ' million', ' million',
+        ];
+        $onesPrefix  = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+        $teensPrefix = [
+            'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'
+        ];
+        $tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
         $ans = '';
         $partAns = '';
@@ -127,7 +130,7 @@ class MathQuestionService implements QuestionServiceInterface
             $prefix = '';
 
             // parse number according to pronunciation types
-            if (in_array($place, array(6, 9))) { // 100 thousand, 100 million
+            if (in_array($place, [6, 9])) { // 100 thousand, 100 million
                 $function = __FUNCTION__;
                 $prefix = $onesPrefix[$digit] . ' hundred';
                 $next2digits = $this->$function(substr($num, 1, 2)); // process the next 2 digits
@@ -136,7 +139,7 @@ class MathQuestionService implements QuestionServiceInterface
                 }
                 $partAns = $prefix . $placeSuffix[$place];
                 $num = substr($num, 3); // cut off the 3 leftmost digits
-            } elseif (in_array($place, array(2, 5, 8))) { // 10, 10 thousand, 10 million
+            } elseif (in_array($place, [2, 5, 8])) { // 10, 10 thousand, 10 million
                 $nextdigit = (int) substr($num, 1, 1);
 
                 if (1 == $digit) {  // 10 to 19
@@ -151,7 +154,7 @@ class MathQuestionService implements QuestionServiceInterface
                 }
                 $partAns = $prefix . $placeSuffix[$place];
                 $num = substr($num, 2); // cut off the 2 leftmost digits
-            } elseif (in_array($place, array(1, 3, 4, 7))) { // 1, 1 hundred, 1 thousand, 1 million
+            } elseif (in_array($place, [1, 3, 4, 7])) { // 1, 1 hundred, 1 thousand, 1 million
                 $prefix   = $onesPrefix[$digit];
                 $partAns = $prefix . $placeSuffix[$place];
                 $num = substr($num, 1); // cut off the leftmost digit
@@ -172,7 +175,6 @@ class MathQuestionService implements QuestionServiceInterface
             } else {
                 $ans .= ' and ' . $partAns;
             }
-
         } //end while
 
         return $ans;

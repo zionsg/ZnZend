@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Mvc\Controller\Plugin;
@@ -88,7 +87,7 @@ class ZnZendMvcParams extends AbstractPlugin
         if (null === $this->controllerName) {
             $controllerWithNs = $this->getRouteMatch()->getParam('controller');
             $tokens = explode('\\Controller\\', $controllerWithNs);
-            if (!empty($tokens)) {
+            if (! empty($tokens)) {
                 $this->controllerName = end($tokens);
             }
         }
@@ -109,7 +108,7 @@ class ZnZendMvcParams extends AbstractPlugin
         if (null === $this->moduleName) {
             $controllerWithNs = $this->getRouteMatch()->getParam('controller');
             $tokens = explode('\\Controller\\', $controllerWithNs);
-            if (!empty($tokens)) {
+            if (! empty($tokens)) {
                 $this->moduleName = reset($tokens);
             }
         }

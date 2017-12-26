@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Mvc\Controller\Plugin;
@@ -12,7 +11,6 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Session\Container;
 use Zend\Session\ManagerInterface as Manager;
 use Zend\Session\SessionManager;
-
 
 /**
  * Controller plugin to persist data for current page across page reloads
@@ -110,7 +108,7 @@ class ZnZendPageStore extends AbstractPlugin
      */
     public function getSessionManager()
     {
-        if (!$this->session instanceof Manager) {
+        if (! $this->session instanceof Manager) {
             $this->setSessionManager(new SessionManager());
         }
         return $this->session;

@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Authentication;
@@ -42,7 +41,7 @@ class Identity implements IdentityInterface
      *
      * @var array of RoleInterface
      */
-    protected $roles = array();
+    protected $roles = [];
 
 
     /**
@@ -159,7 +158,10 @@ class Identity implements IdentityInterface
         }
 
         $roles = $this->getRoles();
-        usort($roles, function ($a, $b) { return $a->compare($b); });
+        usort($roles, function ($a, $b) {
+            return $a->compare($b);
+        });
+
         return reset($roles);
     }
 }

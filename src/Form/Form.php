@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Form;
@@ -34,14 +33,14 @@ class Form extends ZendForm implements ResourceInterface
      *
      * @var array
      */
-    protected $params = array();
+    protected $params = [];
 
     /**
      * Custom form-level error messages
      *
      * @var array
      */
-    protected $errorMessages = array();
+    protected $errorMessages = [];
 
     /**
      * Resource id of form
@@ -76,7 +75,7 @@ class Form extends ZendForm implements ResourceInterface
      * @param  null|int|string  $name    Optional name for the element
      * @param  array            $options Optional options for the element
      */
-    public function __construct($name = null, $options = array())
+    public function __construct($name = null, $options = [])
     {
         parent::__construct($name, $options);
 
@@ -85,8 +84,7 @@ class Form extends ZendForm implements ResourceInterface
 
         // Add elements for extending classes
         $this->init();
-
-    } // end function __construct
+    }
 
     /**
      * Initialize form (used by extending classes)
@@ -122,7 +120,7 @@ class Form extends ZendForm implements ResourceInterface
      * @param  array $params Key-value pairs
      * @return Form
      */
-    public function setParams(array $params = array())
+    public function setParams(array $params = [])
     {
         $this->params = $params;
         return $this;
@@ -136,7 +134,7 @@ class Form extends ZendForm implements ResourceInterface
      * @param  array $params Key-value pairs
      * @return Form
      */
-    public function addParams(array $params = array())
+    public function addParams(array $params = [])
     {
         $this->params = array_merge(
             $this->params,
@@ -243,7 +241,7 @@ class Form extends ZendForm implements ResourceInterface
      */
     public function clearErrorMessages()
     {
-        $this->errorMessages = array();
+        $this->errorMessages = [];
         return $this;
     }
 
@@ -258,7 +256,7 @@ class Form extends ZendForm implements ResourceInterface
     public function hasErrors()
     {
         if ($this->hasValidated) {
-            return (!empty($this->errorMessages)) && $this->isValid;
+            return (! empty($this->errorMessages)) && $this->isValid;
         }
         return false;
     }
@@ -289,7 +287,7 @@ class Form extends ZendForm implements ResourceInterface
      */
     public function getElementResourceId($elementOrFieldset)
     {
-        if (!$this->has($elementOrFieldset)) {
+        if (! $this->has($elementOrFieldset)) {
             return null;
         }
         return $this->getResourceId() . '.' . strtolower($elementOrFieldset);

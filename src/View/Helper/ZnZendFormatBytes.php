@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\View\Helper;
@@ -21,7 +20,7 @@ class ZnZendFormatBytes extends AbstractHelper
      * @see http://en.wikipedia.org/wiki/Binary_prefix
      * @var array
      */
-    protected $prefixes = array('', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi');
+    protected $prefixes = ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'];
 
     /**
      * __invoke
@@ -37,7 +36,7 @@ class ZnZendFormatBytes extends AbstractHelper
      */
     public function __invoke($bytes, $returnMultiplier = false)
     {
-        if (!is_numeric($bytes)) {
+        if (! is_numeric($bytes)) {
             $bytes = 0;
         }
 
@@ -51,5 +50,5 @@ class ZnZendFormatBytes extends AbstractHelper
             ? $multiplier
             : sprintf('%.2f %s%s', $bytes / $multiplier, $this->prefixes[$power], 'B')
         );
-    } // end function __invoke
+    }
 }

@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Mvc\Controller\Plugin;
@@ -31,7 +30,7 @@ class ZnZendTimestamp extends AbstractPlugin
      */
     public function __invoke($convertToBase36 = true, $timestamp = null)
     {
-        if (null === $timestamp || !is_numeric($timestamp)) {
+        if (null === $timestamp || ! is_numeric($timestamp)) {
             $timestamp = microtime(true);
         }
 
@@ -45,7 +44,7 @@ class ZnZendTimestamp extends AbstractPlugin
             $timestamp
         );
 
-        if (!$convertToBase36) {
+        if (! $convertToBase36) {
             return $formattedTimestamp;
         }
 

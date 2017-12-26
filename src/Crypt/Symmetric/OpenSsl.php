@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Crypt\Symmetric;
@@ -28,25 +27,25 @@ class OpenSsl extends Mcrypt
      *
      * @var array
      */
-    protected $supportedAlgos = array(
-        'aes'      => array('name' => 'AES-256', 'keySize' => 32, 'blockSize' => 32),
-        'blowfish' => array('name' => 'BF', 'keySize' => 16, 'blockSize' => 8),
-        'des'      => array('name' => 'DES', 'keySize' => 7, 'blockSize' => 8),
-        'des3'     => array('name' => 'DES-EDE3', 'keySize' => 21, 'blockSize' => 8), // 3 different 56-bit keys
-        'cast'     => array('name' => 'CAST5', 'keySize' => 16, 'blockSize' => 8),
-    );
+    protected $supportedAlgos = [
+        'aes'      => ['name' => 'AES-256', 'keySize' => 32, 'blockSize' => 32],
+        'blowfish' => ['name' => 'BF', 'keySize' => 16, 'blockSize' => 8],
+        'des'      => ['name' => 'DES', 'keySize' => 7, 'blockSize' => 8],
+        'des3'     => ['name' => 'DES-EDE3', 'keySize' => 21, 'blockSize' => 8], // 3 different 56-bit keys
+        'cast'     => ['name' => 'CAST5', 'keySize' => 16, 'blockSize' => 8],
+    ];
 
     /**
      * Supported encryption modes
      *
      * @var array
      */
-    protected $supportedModes = array(
+    protected $supportedModes = [
         'cbc'  => 'CBC',
         'cfb'  => 'CFB',
         'ecb'  => 'ECB',
         'ofb'  => 'OFB',
-    );
+    ];
 
     /**
      * Constructor
@@ -55,17 +54,17 @@ class OpenSsl extends Mcrypt
      * @throws Exception\RuntimeException
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
-        if (!extension_loaded('openssl')) {
+        if (! extension_loaded('openssl')) {
             throw new Exception\RuntimeException(
                 'You cannot use ' . __CLASS__ . ' without the OpenSSL extension'
             );
         }
-        if (!empty($options)) {
+        if (! empty($options)) {
             if ($options instanceof Traversable) {
                 $options = ArrayUtils::iteratorToArray($options);
-            } elseif (!is_array($options)) {
+            } elseif (! is_array($options)) {
                 throw new Exception\InvalidArgumentException(
                     'The options parameter must be an array, a Zend\Config\Config object or a Traversable'
                 );

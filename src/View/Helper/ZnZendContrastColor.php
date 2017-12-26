@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\View\Helper;
@@ -22,10 +21,10 @@ class ZnZendContrastColor extends AbstractHelper
      *
      * @var array $colorCode => array('red' => $redValue, 'green' => $greenValue, 'blue' => $blueValue)
      */
-    protected $contrastColors = array(
-        '#000000' => array('red' => 0, 'green' => 0, 'blue' => 0), // black
-        '#ffffff' => array('red' => 255, 'green' => 255, 'blue' => 255), // white
-    );
+    protected $contrastColors = [
+        '#000000' => ['red' => 0, 'green' => 0, 'blue' => 0], // black
+        '#ffffff' => ['red' => 255, 'green' => 255, 'blue' => 255], // white
+    ];
 
     /**
      * Algorithms for computing difference between 2 colors
@@ -33,10 +32,10 @@ class ZnZendContrastColor extends AbstractHelper
      * @see http://www.w3.org/TR/AERT for algorithm under Checkpoint 2.2.1
      * @var array $name => array('method' => $methodName, 'threshold' => $thresholdValue)
      */
-    protected $algorithms = array(
-        'brightness' => array('method' => 'brightnessDifference', 'threshold' => 125),
-        'color' => array('method' => 'colorDifference', 'threshold' => 500),
-    );
+    protected $algorithms = [
+        'brightness' => ['method' => 'brightnessDifference', 'threshold' => 125],
+        'color' => ['method' => 'colorDifference', 'threshold' => 500],
+    ];
 
     /**
      * __invoke; Choose color that provides sufficient constrast when combined with specified color
@@ -48,7 +47,7 @@ class ZnZendContrastColor extends AbstractHelper
     public function __invoke($color, $algorithm = 'brightness')
     {
         // Get method and threshold for algorithm
-        if (!isset($this->algorithms[$algorithm])) {
+        if (! isset($this->algorithms[$algorithm])) {
             $algorithmKeys = array_keys($this->algorithms);
             $algorithm = reset($algorithmKeys);
         }
@@ -60,14 +59,14 @@ class ZnZendContrastColor extends AbstractHelper
         if (3 == strlen($color)) {
             $color = $color[0] . $color[0] . $color[1] . $color[1] . $color[2] . $color[2];
         }
-        $colorValues = array(
+        $colorValues = [
             'red'   => hexdec(substr($color, 0, 2)),
             'green' => hexdec(substr($color, 2, 2)),
             'blue'  => hexdec(substr($color, 4, 2)),
-        );
+        ];
 
         // Perform calculations and return the first contrast color that meets/exceeds the threshold
-        $differences = array();
+        $differences = [];
         foreach ($this->contrastColors as $contrastColor => $contrastValues) {
             $value = $this->$method($colorValues, $contrastValues);
             if ($value >= $threshold) {
@@ -106,7 +105,7 @@ class ZnZendContrastColor extends AbstractHelper
     protected function colorDifference(array $color1, array $color2)
     {
         $difference = 0;
-        foreach (array('red', 'green', 'blue') as $component) {
+        foreach (['red', 'green', 'blue'] as $component) {
             $difference += (
                 max($color1[$component], $color2[$component]) - min($color1[$component], $color2[$component])
             );

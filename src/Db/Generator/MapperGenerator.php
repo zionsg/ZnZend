@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Db\Generator;
@@ -57,7 +56,7 @@ class MapperGenerator
         $activeRowStateFunc = null,
         $deletedRowStateFunc = null
     ) {
-        if (!is_writable($filePath)) {
+        if (! is_writable($filePath)) {
             throw new Exception\InvalidArgumentException("{$filePath} is not writable");
         }
 
@@ -66,12 +65,12 @@ class MapperGenerator
         // indicates the row state.
         // Eg: `person_is_deleted` column is found, so $activeRowState = array('person_is_deleted' => 0)
         // and $deletedRowState = array('person_is_deleted' => 1)
-        if (!is_callable($activeRowStateFunc) && !is_callable($deletedRowStateFunc)) {
+        if (! is_callable($activeRowStateFunc) && ! is_callable($deletedRowStateFunc)) {
             $rowStateFunc = function ($stateValue) {
                 return function ($tableName, $columnNames) use ($stateValue) {
                     foreach ($columnNames as $columnName) {
                         if (preg_match('/.+_is_?deleted$/i', $columnName)) {
-                            return array($columnName => $stateValue);
+                            return [$columnName => $stateValue];
                         }
                     }
                     return false;
@@ -85,7 +84,7 @@ class MapperGenerator
         $databaseName = $dbAdapter->getCurrentSchema();
         $tables = $dbAdapter->query(
             'SELECT table_name FROM information_schema.tables WHERE table_schema = ?',
-            array($databaseName)
+            [$databaseName]
         );
         foreach ($tables as $table) {
             // If table name is `map_ab_cd`, entity name will be MapAbCd
@@ -96,10 +95,10 @@ class MapperGenerator
             $columns = $dbAdapter->query(
                 'SELECT column_name, column_key FROM information_schema.columns '
                 . 'WHERE table_schema = ? AND table_name = ?',
-                array($databaseName, $tableName)
+                [$databaseName, $tableName]
             );
-            $columnNames = array();
-            $primaryKeys = array();
+            $columnNames = [];
+            $primaryKeys = [];
             foreach ($columns as $column) {
                 $columnNames[] = $column->column_name;
                 if ('PRI' == $column->column_key) {
@@ -109,46 +108,52 @@ class MapperGenerator
 
             // Generate class
             $mapperClass = new ClassGenerator();
-            $properties = array(
-                PropertyGenerator::fromArray(array(
+            $properties = [
+                PropertyGenerator::fromArray([
                     'name'         => 'table',
                     'visibility'   => 'protected',
                     'defaultValue' => $tableName,
-                )),
-                PropertyGenerator::fromArray(array(
+                ]),
+                PropertyGenerator::fromArray([
                     'name'         => 'resultSetClass',
                     'visibility'   => 'protected',
                     'defaultValue' => "\\{$namespace}\\{$entityName}",
-                )),
-            );
+                ]),
+            ];
             if ($primaryKeys) {
-                $value = (1 == count($primaryKeys))
-                       ? $primaryKeys[0]
-                       : 'array(' . implode(',', array_map(function ($v) { return "'$v'"; }, $primaryKeys)) . ')';
-                $properties[] = PropertyGenerator::fromArray(array(
+                if (1 === count($primaryKeys)) {
+                    $value = $primaryKeys[0];
+                } else {
+                    $mapFn = function ($v) {
+                        return "'$v'";
+                    };
+                    $value = sprintf('[%s]', implode(',', array_map($mapFn, $primaryKeys)));
+                }
+
+                $properties[] = PropertyGenerator::fromArray([
                     'name'         => 'primaryKey',
                     'visibility'   => 'protected',
                     'defaultValue' => $value,
-                ));
+                ]);
             }
             if (is_callable($activeRowStateFunc)) {
                 $activeColumnValue = $activeRowStateFunc($tableName, $columnNames);
                 if ($activeColumnValue) {
-                    $properties[] = PropertyGenerator::fromArray(array(
+                    $properties[] = PropertyGenerator::fromArray([
                         'name'         => 'activeRowState',
                         'visibility'   => 'protected',
                         'defaultValue' => $activeColumnValue,
-                    ));
+                    ]);
                 }
             }
             if (is_callable($deletedRowStateFunc)) {
                 $deletedColumnValue = $deletedRowStateFunc($tableName, $columnNames);
                 if ($deletedColumnValue) {
-                    $properties[] = PropertyGenerator::fromArray(array(
+                    $properties[] = PropertyGenerator::fromArray([
                         'name'         => 'deletedRowState',
                         'visibility'   => 'protected',
                         'defaultValue' => $deletedColumnValue,
-                    ));
+                    ]);
                 }
             }
             $mapperClass->setName($entityName . 'Mapper')

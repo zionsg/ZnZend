@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Form\View\Helper;
@@ -27,7 +26,7 @@ class ZnZendFormValue extends AbstractHelper
      */
     public function __invoke(ElementInterface $element = null)
     {
-        if (!$element) {
+        if (! $element) {
             return $this;
         }
 
@@ -47,7 +46,7 @@ class ZnZendFormValue extends AbstractHelper
     public function render(ElementInterface $element)
     {
         $renderer = $this->getView();
-        if (!method_exists($renderer, 'plugin')) {
+        if (! method_exists($renderer, 'plugin')) {
             // Bail early if renderer is not pluggable
             return '';
         }
@@ -98,10 +97,12 @@ class ZnZendFormValue extends AbstractHelper
         }
 
         if ('date' == $type) {
-            return $value;        }
+            return $value;
+        }
 
         if ('datetime' == $type) {
-            return $value;        }
+            return $value;
+        }
 
         if ('datetime-local' == $type) {
             return $value;

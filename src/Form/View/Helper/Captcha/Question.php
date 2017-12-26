@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Form\View\Helper\Captcha;
@@ -38,7 +37,7 @@ class Question extends AbstractWord
     {
         $captcha = $element->getCaptcha();
 
-        if ($captcha === null || !$captcha instanceof CaptchaAdapter) {
+        if ($captcha === null || ! $captcha instanceof CaptchaAdapter) {
             throw new Exception\DomainException(sprintf(
                 '%s requires that the element has a "captcha" attribute of type Zend\Captcha\Question; none found',
                 __METHOD__
@@ -47,9 +46,9 @@ class Question extends AbstractWord
 
         $captcha->generate();
 
-        $imgAttributes = array(
+        $imgAttributes = [
             'src' => $captcha->getImage(),
-        );
+        ];
 
         if ($element->hasAttribute('id')) {
             $imgAttributes['id'] = $element->getAttribute('id') . '-image';

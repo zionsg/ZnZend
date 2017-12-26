@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Mvc\Controller\Plugin;
@@ -76,9 +75,9 @@ class ZnZendRestJson extends AbstractPlugin
     public function __invoke(
         $uri,
         $method = Request::METHOD_GET,
-        array $data = array(),
-        array $headers = array(),
-        array $clientOptions = array()
+        array $data = [],
+        array $headers = [],
+        array $clientOptions = []
     ) {
         $client = new Client();
         $client->setUri($uri)
@@ -142,7 +141,7 @@ class ZnZendRestJson extends AbstractPlugin
      *
      * @return string
      */
-    public function prettyPrint($options = array('indent' => "\t"))
+    public function prettyPrint($options = ['indent' => "\t"])
     {
         return Json::prettyPrint($this->result, $options);
     }

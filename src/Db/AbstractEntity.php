@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Db;
@@ -29,7 +28,7 @@ use ZnZend\Db\Exception;
  * Typically, type checking/casting is done once in setters and not repeated in getters.
  * Values passed to setters and from getters should be the actual value as stored in the database,
  * eg. getEmails() would return a comma-delimited list of emails. If an array is expected, a separate
- * function, eg. getEmailsAsArray() should be created to prevent confusion.
+ * function, eg. getEmailsAs[] should be created to prevent confusion.
  *
  * @Annotation\Name("Entity")
  * @Annotation\Type("ZnZend\Form\Form")
@@ -60,13 +59,13 @@ abstract class AbstractEntity implements EntityInterface
      *
      * This is used for getModifiedArrayCopy() and gets populated every time set() is used.
      * Setters of extending classes should populate this if not using set().
-     * This should be cleared after the initial populating of the entity, usually during exchangeArray().
+     * This should be cleared after the initial populating of the entity, usually during exchange[].
      *
      * @Annotation\Exclude()
      * @example array('id' => '', ...)
      * @var array
      */
-    protected $_modifiedColumns = array();
+    protected $_modifiedColumns = [];
 
     /**
      * Authenticated identity (current logged in user)
@@ -120,7 +119,7 @@ abstract class AbstractEntity implements EntityInterface
      * @example array(
      *              'getId'       => 'person_id', // maps directly to column (maps to property $person_id here)
      *              'getFullName' => "CONCAT(person_firstname, ' ', person_lastname)", // maps to SQL expression
-     *              'isSuspended' => '!enabled',  // simple negation of properties is allowed (in this case $enabled)
+     *              'isSuspended' => '! enabled',  // simple negation of properties is allowed (in this case $enabled)
      *              'isHidden'    => false,       // boolean values are allowed (in this case all records are visible)
      *              'getDeleted'  => 'person_isdeleted',
      *              'isDeleted'   => 'person_isdeleted',
@@ -128,13 +127,13 @@ abstract class AbstractEntity implements EntityInterface
      * @Annotation\Exclude()
      * @var array
      */
-    protected static $_mapGettersColumns = array(
+    protected static $_mapGettersColumns = [
         // The mappings below are for the getters defined in EntityInterface
         // and are provided for easy copying when coding extending classes
         'getId'     => 'id',
         'getName'   => 'name',
         'isDeleted' => false,
-    );
+    ];
 
     /**
      * Array mapping columns to getters - computed by mapColumnsGetters()
@@ -152,7 +151,7 @@ abstract class AbstractEntity implements EntityInterface
      *
      * @param array $data Optional array to populate entity
      */
-    public function __construct(array $data = array())
+    public function __construct(array $data = [])
     {
         $this->exchangeArray($data);
     }
@@ -192,18 +191,18 @@ abstract class AbstractEntity implements EntityInterface
 
         $map = $this->mapColumnsGetters();
         foreach ($data as $key => $value) {
-            if (!array_key_exists($key, $map)) {
+            if (! array_key_exists($key, $map)) {
                 continue;
             }
             $getter = $map[$key];
             $setter = substr_replace($getter, 'set', 0, 3);
-            if (is_callable(array($this, $setter))) {
+            if (is_callable([$this, $setter])) {
                 $this->$setter($value);
             }
         }
 
         // Clear modified flags
-        $this->_modifiedColumns = array();
+        $this->_modifiedColumns = [];
     }
 
     /**
@@ -225,11 +224,11 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getArrayCopy()
     {
-        $result = array();
+        $result = [];
         $map = $this->mapColumnsGetters();
         foreach ($map as $column => $getter) {
             // Skip if column is not a property (eg. an SQL expression) or is prefixed with an underscore
-            if (!property_exists($this, $column) || '_' == substr($column, 0, 1)) {
+            if (! property_exists($this, $column) || '_' == substr($column, 0, 1)) {
                 continue; // in case the column is an SQL expression
             }
             $value = $this->$getter();
@@ -263,14 +262,14 @@ abstract class AbstractEntity implements EntityInterface
         if ($modifiedData instanceof EntityInterface) {
             $modifiedData = $modifiedData->getArrayCopy();
         }
-        if (!is_array($modifiedData)) {
-            return array();
+        if (! is_array($modifiedData)) {
+            return [];
         }
 
         // A new array must be used as $modifiedData may contain additional keys, eg. from the form
-        $result = array();
+        $result = [];
         foreach ($this->getArrayCopy() as $key => $value) {
-            if (!isset($modifiedData[$key])) {
+            if (! isset($modifiedData[$key])) {
                 continue;
             }
             if ($value != $modifiedData[$key]) {
@@ -291,7 +290,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getResourceId()
     {
-        return strtolower(str_replace(array('\\', '/', '_'), '.', get_called_class()));
+        return strtolower(str_replace(['\\', '/', '_'], '.', get_called_class()));
     }
 
     /**
@@ -329,7 +328,7 @@ abstract class AbstractEntity implements EntityInterface
      */
     public function getPropertyResourceId($property)
     {
-        if (!property_exists($this, $property)) {
+        if (! property_exists($this, $property)) {
             return null;
         }
 
@@ -469,7 +468,7 @@ abstract class AbstractEntity implements EntityInterface
      *
      * Only columns mapping to actual getters such as getX() will be returned,
      * not those mapping to isX(), SQL expressions, negated properties or boolean values.
-     * This behaviour is depended upon when used in exchangeArray() to infer names of setters and
+     * This behaviour is depended upon when used in exchange[] to infer names of setters and
      * in getArrayCopy() to ensure only actual getters are used (eg. ensure isDeleted() does not override
      * getDeleted() with boolean value).
      *
@@ -478,10 +477,10 @@ abstract class AbstractEntity implements EntityInterface
     protected function mapColumnsGetters()
     {
         if (null === $this->_mapColumnsGetters) {
-            $map = array();
+            $map = [];
             foreach (static::$_mapGettersColumns as $getter => $column) {
                 // Only include if mapped function is of getX() format
-                if (   is_string($column)
+                if (is_string($column)
                     && 'get' === substr($getter, 0, 3)
                     && strtoupper(substr($getter, 3, 1)) === substr($getter, 3, 1)
                 ) {
@@ -521,7 +520,7 @@ abstract class AbstractEntity implements EntityInterface
             }
         }
 
-        if (!property_exists($this, $property)) {
+        if (! property_exists($this, $property)) {
             throw new Exception\InvalidArgumentException("Property \"{$property}\" does not exist.");
         }
 
@@ -529,10 +528,10 @@ abstract class AbstractEntity implements EntityInterface
         if ($value !== null && $type !== null) {
             if ($type == strtolower($type)) { // primitive type
                 settype($value, $type);
-            } elseif ('DateTime' == $type && !$value instanceof DateTime) { // special handling for DateTime
+            } elseif ('DateTime' == $type && ! $value instanceof DateTime) { // special handling for DateTime
                 $value = (string) $value;
                 $intValue = (int) $value; // for checking default value of "0000-00-00 00:00:00.00000" from database
-                $value = (!$intValue || false === strtotime($value)) ? null : new DateTime($value);
+                $value = (! $intValue || false === strtotime($value)) ? null : new DateTime($value);
             } else { // object
                 $value = new $type($value);
             }
@@ -577,7 +576,7 @@ abstract class AbstractEntity implements EntityInterface
             $property = substr($property, 1);
         }
         if (property_exists($this, $property)) {
-            return ($negate ? !$this->$property : $this->$property);
+            return ($negate ? ! $this->$property : $this->$property);
         }
 
         if (empty($trace)) {
@@ -626,7 +625,7 @@ abstract class AbstractEntity implements EntityInterface
         $bitflag = (int) $bitflag; // '1' and 1 will yield different results hence cast to int
         $highestBitSet = 1 << floor(log10($bitflag) / log10(2));
 
-        $setBits = array();
+        $setBits = [];
         for ($bit = 1; $bit <= $highestBitSet; $bit *= 2) {
             if (($bit & $bitflag) != 0) {
                 $setBits[] = $bit;

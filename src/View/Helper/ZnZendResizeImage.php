@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\View\Helper;
@@ -53,7 +52,7 @@ class ZnZendResizeImage extends AbstractHelper
             $webRoot = $_SERVER['DOCUMENT_ROOT'];
         }
 
-        if (!extension_loaded('gd')) {
+        if (! extension_loaded('gd')) {
             return $failure;
         }
 
@@ -74,12 +73,12 @@ class ZnZendResizeImage extends AbstractHelper
             ($center ? 'c' : ''),
             $pathParts['extension']
         );
-        if (!$overwrite && file_exists($webRoot . $resizedPath)) {
+        if (! $overwrite && file_exists($webRoot . $resizedPath)) {
             return $resizedPath;
         }
 
         // Check if original image exists
-        if (!file_exists($webRoot . $imagePath)) {
+        if (! file_exists($webRoot . $imagePath)) {
             return $failure;
         }
 
@@ -139,23 +138,28 @@ class ZnZendResizeImage extends AbstractHelper
         $destX = empty($center) ? 0 : (int) (($width - $newWidth) / 2);
         $destY = empty($center) ? 0 : (int) (($height - $newHeight) / 2);
         imagecopyresampled(
-            $resizedImage, $image,
-            $destX, $destY,
-            0, 0,
-            $newWidth, $newHeight,
-            $currWidth, $currHeight
+            $resizedImage,
+            $image,
+            $destX,
+            $destY,
+            0,
+            0,
+            $newWidth,
+            $newHeight,
+            $currWidth,
+            $currHeight
         );
 
         // Create subfolder
-        if (!file_exists($webRoot . $resizedFolder)) {
-            if (!mkdir($webRoot . $resizedFolder, 0755)) {
+        if (! file_exists($webRoot . $resizedFolder)) {
+            if (! mkdir($webRoot . $resizedFolder, 0755)) {
                 return $failure;
             }
         }
 
         // Create file
         $imageFunc = 'image' . $type;
-        if('jpeg' == $type) {
+        if ('jpeg' == $type) {
             $success = $imageFunc($resizedImage, $webRoot . $resizedPath, $quality);
         } else {
             $success = $imageFunc($resizedImage, $webRoot . $resizedPath);

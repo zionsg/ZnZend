@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Mvc\Controller\Plugin;
@@ -48,7 +47,7 @@ class ZnZendDataTables extends AbstractPlugin
      *
      * @var array
      */
-    protected $params = array();
+    protected $params = [];
 
     /**
      * Name of property for specifying search operator in params sent by DataTables (for 1.10 only)
@@ -72,14 +71,14 @@ class ZnZendDataTables extends AbstractPlugin
      *
      * @var array
      */
-    protected $map = array();
+    protected $map = [];
 
     /**
      * Mapping of columns to getters used in global search
      *
      * @var array
      */
-    protected $searchMap = array();
+    protected $searchMap = [];
 
     /**
      * Whether to return updated Paginator
@@ -174,7 +173,7 @@ class ZnZendDataTables extends AbstractPlugin
      *                                         // method $p->getFullName() => SQL expression
      *                                         'getFullName' => "CONCAT('person_firstname, ' ', person_lastname)",
      *                                     )
-     * @param  array    $searchGetters     Default = array(). List of getters whose columns (as mapped in
+     * @param  array    $searchGetters     Default = []. List of getters whose columns (as mapped in
      *                                     $mapGettersColumns) will be used in the global search. If not provided,
      *                                     the global search filter is applied on the entire $mapGettersColumns.
      * @param  bool     $returnPaginator   Default = false. If true, updated Paginator is returned under 'paginator'
@@ -227,11 +226,12 @@ class ZnZendDataTables extends AbstractPlugin
      *               (@link http://legacy.datatables.net/usage/server-side for 1.9)
      *               (@link http://datatables.net/manual/server-side for 1.10)
      */
-    public function __invoke(Paginator $paginator,
-                             array $dataTablesParams,
-                             array $mapGettersColumns,
-                             array $searchGetters = array(),
-                             $returnPaginator = false
+    public function __invoke(
+        Paginator $paginator,
+        array $dataTablesParams,
+        array $mapGettersColumns,
+        array $searchGetters = [],
+        $returnPaginator = false
     ) {
         // The adapter and Select must be cloned to prevent modification of the original
         $adapter = clone ($paginator->getAdapter());
@@ -259,7 +259,7 @@ class ZnZendDataTables extends AbstractPlugin
         $this->map       = $mapGettersColumns;
         $this->returnPaginator = $returnPaginator;
 
-        if (!$searchGetters) {
+        if (! $searchGetters) {
             $this->searchMap = $this->map;
         } else {
             foreach ($searchGetters as $getter) {
@@ -339,7 +339,7 @@ class ZnZendDataTables extends AbstractPlugin
             }
             $column = $this->map[$getter];
 
-            if (!is_string($column)) {
+            if (! is_string($column)) {
                 continue;
             }
 
@@ -366,18 +366,18 @@ class ZnZendDataTables extends AbstractPlugin
                           ->setCurrentPageNumber($page);
 
         // Construct data for each row and column for current page
-        $aaData = array();
+        $aaData = [];
         foreach ($filteredPaginator as $row) {
             if (false === $row) {
                 break;
             }
-            $rowRender = array();
+            $rowRender = [];
             for ($i = 0; $i < $this->params['iColumns']; $i++) {
                 // Getter may be null, empty, a method of $row or property of $row
                 $getter = $columnGetters[$i];
-                if ('null' == $getter || empty($getter)){
+                if ('null' == $getter || empty($getter)) {
                     $value = null;
-                } elseif (is_callable(array($row, $getter))) {
+                } elseif (is_callable([$row, $getter])) {
                     $value = $row->$getter();
                 } elseif (isset($row->$getter)) {
                     // Property
@@ -396,12 +396,12 @@ class ZnZendDataTables extends AbstractPlugin
         }
 
         // Params to return to DataTables plugin
-        $returnParams = array(
+        $returnParams = [
             'sEcho' => (int) $this->params['sEcho'],
             'iTotalRecords' => $this->paginator->getTotalItemCount(),
             'iTotalDisplayRecords' => $filteredPaginator->getTotalItemCount(),
             'aaData' => $aaData,
-        );
+        ];
         if ($this->returnPaginator) {
             $returnParams['paginator'] = $filteredPaginator;
         }
@@ -419,7 +419,7 @@ class ZnZendDataTables extends AbstractPlugin
     protected function handler()
     {
         // 'name' key in 'columns' used to pass in the names of the getters used for each column
-        $columnGetters = array();//explode(',', $this->params['columns']);
+        $columnGetters = [];//explode(',', $this->params['columns']);
         $columnCnt = count($this->params['columns']);
         for ($i = 0; $i < $columnCnt; $i++) {
             $columnGetters[$i] = $this->params['columns'][$i]['name'];
@@ -483,7 +483,7 @@ class ZnZendDataTables extends AbstractPlugin
             }
             $column = $this->map[$getter];
 
-            if (!is_string($column)) {
+            if (! is_string($column)) {
                 continue;
             }
 
@@ -512,18 +512,18 @@ class ZnZendDataTables extends AbstractPlugin
                           ->setCurrentPageNumber($page);
 
         // Construct data for each row and column for current page
-        $data = array();
+        $data = [];
         foreach ($filteredPaginator as $row) {
             if (false === $row) {
                 break;
             }
-            $rowRender = array();
+            $rowRender = [];
             for ($i = 0; $i < $columnCnt; $i++) {
                 // Getter may be null, empty, a method of $row or property of $row
                 $getter = $columnGetters[$i];
-                if ('null' == $getter || empty($getter)){
+                if ('null' == $getter || empty($getter)) {
                     $value = null;
-                } elseif (is_callable(array($row, $getter))) {
+                } elseif (is_callable([$row, $getter])) {
                     $value = $row->$getter();
                 } elseif (isset($row->$getter)) {
                     // Property
@@ -542,12 +542,12 @@ class ZnZendDataTables extends AbstractPlugin
         }
 
         // Params to return to DataTables plugin
-        $returnParams = array(
+        $returnParams = [
             'draw' => (int) $this->params['draw'],
             'recordsTotal' => $this->paginator->getTotalItemCount(),
             'recordsFiltered' => $filteredPaginator->getTotalItemCount(),
             'data' => $data,
-        );
+        ];
         if ($this->returnPaginator) {
             $returnParams['paginator'] = $filteredPaginator;
         }

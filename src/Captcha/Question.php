@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Captcha;
@@ -107,23 +106,23 @@ class Question extends AbstractWord
      */
     public function __construct($options = null)
     {
-        if (!extension_loaded('gd')) {
+        if (! extension_loaded('gd')) {
             throw new Exception\ExtensionNotLoadedException('Question CAPTCHA requires GD extension');
         }
 
-        if (!function_exists("imagepng")) {
+        if (! function_exists("imagepng")) {
             throw new Exception\ExtensionNotLoadedException('Question CAPTCHA requires PNG support');
         }
 
-        if (!function_exists("imageftbbox")) {
+        if (! function_exists("imageftbbox")) {
             throw new Exception\ExtensionNotLoadedException('Question CAPTCHA requires FreeType fonts support');
         }
 
-        if (!isset($options['font']) || !file_exists($options['font'])) {
+        if (! isset($options['font']) || ! file_exists($options['font'])) {
             throw new Exception\NoFontProvidedException('Question CAPTCHA requires font');
         }
 
-        if (!isset($options['service'])) {
+        if (! isset($options['service'])) {
             throw new Exception\NoServiceProvidedException('Question CAPTCHA requires service to generate questions');
         }
 
@@ -137,7 +136,7 @@ class Question extends AbstractWord
      */
     public function generate()
     {
-        if (!$this->keepSession) {
+        if (! $this->keepSession) {
             $this->session = null;
         }
 
@@ -465,8 +464,10 @@ class Question extends AbstractWord
         for ($i = 0; $i < $this->lineNoiseLevel; $i++) {
             imageline(
                 $image,
-                mt_rand(0, $width), mt_rand(0, $height),
-                mt_rand(0, $width), mt_rand(0, $height),
+                mt_rand(0, $width),
+                mt_rand(0, $height),
+                mt_rand(0, $width),
+                mt_rand(0, $height),
                 $textColor
             );
         }
@@ -493,15 +494,15 @@ class Question extends AbstractWord
 
             for ($x = 0; $x < $width; $x++) {
                 for ($y = 0; $y < $height; $y++) {
-                    $sx = $x + (sin($x*$freq1 + $ph1) + sin($y*$freq3 + $ph3)) * $szx;
-                    $sy = $y + (sin($x*$freq2 + $ph2) + sin($y*$freq4 + $ph4)) * $szy;
+                    $sx = $x + (sin($x * $freq1 + $ph1) + sin($y * $freq3 + $ph3)) * $szx;
+                    $sy = $y + (sin($x * $freq2 + $ph2) + sin($y * $freq4 + $ph4)) * $szy;
 
                     if ($sx < 0 || $sy < 0 || $sx >= $width - 1 || $sy >= $height - 1) {
                         continue;
                     } else {
-                        $color   = (imagecolorat($image, $sx, $sy) >> 16)         & 0xFF;
-                        $colorX  = (imagecolorat($image, $sx + 1, $sy) >> 16)     & 0xFF;
-                        $colorY  = (imagecolorat($image, $sx, $sy + 1) >> 16)     & 0xFF;
+                        $color   = (imagecolorat($image, $sx, $sy) >> 16) & 0xFF;
+                        $colorX  = (imagecolorat($image, $sx + 1, $sy) >> 16) & 0xFF;
+                        $colorY  = (imagecolorat($image, $sx, $sy + 1) >> 16) & 0xFF;
                         $colorXY = (imagecolorat($image, $sx + 1, $sy + 1) >> 16) & 0xFF;
                     }
 
@@ -518,14 +519,17 @@ class Question extends AbstractWord
                         $fracX1 = 1 - $fracX;
                         $fracY1 = 1 - $fracY;
 
-                        $newcolor = $color   * $fracX1 * $fracY1
-                                  + $colorX  * $fracX  * $fracY1
-                                  + $colorY  * $fracX1 * $fracY
-                                  + $colorXY * $fracX  * $fracY;
+                        $newcolor = $color * $fracX1 * $fracY1
+                                  + $colorX * $fracX * $fracY1
+                                  + $colorY * $fracX1 * $fracY
+                                  + $colorXY * $fracX * $fracY;
                     }
 
                     imagesetpixel(
-                        $transformedImage, $x, $y, imagecolorallocate($transformedImage, $newcolor, $newcolor, $newcolor)
+                        $transformedImage,
+                        $x,
+                        $y,
+                        imagecolorallocate($transformedImage, $newcolor, $newcolor, $newcolor)
                     );
                 }
             }
@@ -559,8 +563,8 @@ class Question extends AbstractWord
      */
     public function isValid($value, $context = null)
     {
-        if (!is_array($value)) {
-            if (!is_array($context)) {
+        if (! is_array($value)) {
+            if (! is_array($context)) {
                 $this->error(self::MISSING_VALUE);
                 return false;
             }
@@ -573,14 +577,14 @@ class Question extends AbstractWord
             $value = $value[$name];
         }
 
-        if (!isset($value['input'])) {
+        if (! isset($value['input'])) {
             $this->error(self::MISSING_VALUE);
             return false;
         }
         $input = strtolower($value['input']);
         $this->setValue($input);
 
-        if (!isset($value['id'])) {
+        if (! isset($value['id'])) {
             $this->error(self::MISSING_ID);
             return false;
         }

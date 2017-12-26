@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Listener;
@@ -28,7 +27,7 @@ class LogListener extends AbstractListenerAggregate
      *
      * @var array
      */
-    protected $logEvents = array('emerg', 'alert', 'crit', 'err', 'warn', 'notice', 'info', 'debug');
+    protected $logEvents = ['emerg', 'alert', 'crit', 'err', 'warn', 'notice', 'info', 'debug'];
 
     /**
      * Logger
@@ -64,11 +63,11 @@ class LogListener extends AbstractListenerAggregate
     public function attach(EventManagerInterface $events)
     {
         $sharedEvents      = $events->getSharedManager(); // must use shared manager else it will not work
-        $this->listeners[] = $sharedEvents->attach('*', $this->logEvents, array($this, 'log'));
+        $this->listeners[] = $sharedEvents->attach('*', $this->logEvents, [$this, 'log']);
         $this->listeners[] = $sharedEvents->attach(
             'Zend\Mvc\Application',
-            array(MvcEvent::EVENT_DISPATCH_ERROR, MvcEvent::EVENT_RENDER_ERROR),
-            array($this, 'logException')
+            [MvcEvent::EVENT_DISPATCH_ERROR, MvcEvent::EVENT_RENDER_ERROR],
+            [$this, 'logException']
         );
     }
 
@@ -83,7 +82,7 @@ class LogListener extends AbstractListenerAggregate
     public function log(EventInterface $e)
     {
         $logLevel = $e->getName();
-        if (null == $this->logger || !in_array($logLevel, $this->logEvents)) {
+        if (null == $this->logger || ! in_array($logLevel, $this->logEvents)) {
             return;
         }
 
@@ -103,12 +102,12 @@ class LogListener extends AbstractListenerAggregate
     {
         $result = $e->getResult();
         $exception = isset($result->exception) ? $result->exception : null; // property may not exist, eg. if status 302
-        if (!$exception) {
+        if (! $exception) {
             return;
         }
 
         $trace = $exception->getTraceAsString();
-        $messages = array();
+        $messages = [];
         $i = 1;
         do {
             $messages[] = $i++ . ': ' . $exception->getMessage();

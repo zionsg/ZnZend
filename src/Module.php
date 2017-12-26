@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend;
@@ -45,28 +44,29 @@ class Module implements
     public function init(ModuleManagerInterface $manager)
     {
         // For reference only - up to application to implement
+        /*
+        $manager->getEventManager()->getSharedManager()->attach(
+            [__NAMESPACE__, 'Web', 'Cms'], // apply event to these modules or use '*' to apply to all
+            MvcEvent::EVENT_DISPATCH,
+            function (MvcEvent $e) {
+                $namespace = explode('\\', $e->getRouteMatch()->getParam('controller'));
+                $module = $namespace[0];
 
-        // $manager->getEventManager()->getSharedManager()->attach(
-            // array(__NAMESPACE__, 'Web', 'Cms'), // apply event to these modules or use '*' to apply to all
-            // MvcEvent::EVENT_DISPATCH,
-            // function (MvcEvent $e) {
-                // $namespace = explode('\\', $e->getRouteMatch()->getParam('controller'));
-                // $module = $namespace[0];
+                // Pass variable to controller - use $this->myVar when in controller
+                $controller = $e->getTarget();
+                $controller->myVar = 'My Var';
 
-                // // Pass variable to controller - use $this->myVar when in controller
-                // $controller = $e->getTarget();
-                // $controller->myVar = 'My Var';
-
-                // // Module used in setTemplate hence this need not be duplicated for every module to load specific layout
-                // // Variable is passed to layout (top view model) - use $myVar in layout, $this->layout()->myVar in view
-                // $viewModel = $e->getViewModel();
-                // $viewModel->setTemplate(strtolower($module) . '/layout/layout');
-                // $viewModel->setVariables(array(
-                    // 'myVar' => 'My Var'
-                // ));
-            // },
-            // 100
-        // );
+                // Module used in setTemplate hence this need not be duplicated for every module to load specific layout
+                // Variable is passed to layout (top view model) - use $myVar in layout, $this->layout()->myVar in view
+                $viewModel = $e->getViewModel();
+                $viewModel->setTemplate(strtolower($module) . '/layout/layout');
+                $viewModel->setVariables([
+                    'myVar' => 'My Var'
+                ]);
+            },
+            100
+        );
+        */
     }
 
     /**
@@ -80,7 +80,7 @@ class Module implements
     public function onBootstrap(EventInterface $e)
     {
         // Methods called on $e below belong to MvcEvent and are not found in EventInterface
-        if (!$e instanceof MvcEvent) {
+        if (! $e instanceof MvcEvent) {
             return;
         }
 
@@ -88,8 +88,8 @@ class Module implements
 
         // Allow configuration of PHP settings via 'php_settings' key in config
         $config = $sm->get('Config');
-        $phpSettings = isset($config['php_settings']) ? $config['php_settings'] : array();
-        foreach($phpSettings as $key => $value) {
+        $phpSettings = isset($config['php_settings']) ? $config['php_settings'] : [];
+        foreach ($phpSettings as $key => $value) {
             ini_set($key, $value);
         }
 
@@ -103,29 +103,30 @@ class Module implements
         });
 
         // For reference only - up to application to implement
-
+        /*
         // Route listener
-        // $eventManager        = $e->getApplication()->getEventManager();
-        // $moduleRouteListener = new ModuleRouteListener();
-        // $moduleRouteListener->attach($eventManager);
+        $eventManager        = $e->getApplication()->getEventManager();
+        $moduleRouteListener = new ModuleRouteListener();
+        $moduleRouteListener->attach($eventManager);
 
         // Log listener
-        // $logger->registerErrorHandler() not used as notices will be logged also and be missed out in development env
-        // $logger->registerExceptionHandler() does not work - listener used instead to listen to dispatch error event
-        // $logger = new Logger();
-        // $logger->addWriter(new Mock());
-        // $logListener = new LogListener($logger);
-        // $eventManager->attachAggregate($logListener); // alternate way of attaching listener from above
+        $logger->registerErrorHandler() not used as notices will be logged also and be missed out in development env
+        $logger->registerExceptionHandler() does not work - listener used instead to listen to dispatch error event
+        $logger = new Logger();
+        $logger->addWriter(new Mock());
+        $logListener = new LogListener($logger);
+        $eventManager->attachAggregate($logListener); // alternate way of attaching listener from above
 
         // Set global/static db adapter for feature-enabled TableGateways such as ZnZend\Model\AbstractMapper
-        // if ($sm->has('Zend\Db\Adapter\Adapter')) {
-            // GlobalAdapterFeature::setStaticAdapter($sm->get('Zend\Db\Adapter\Adapter'));
-        // }
+        if ($sm->has('Zend\Db\Adapter\Adapter')) {
+            GlobalAdapterFeature::setStaticAdapter($sm->get('Zend\Db\Adapter\Adapter'));
+        }
 
         // Another way to assign variables to layout other than in init()
-        // $e->getViewModel()->setVariables(array(
-            // 'myVar' => 'My Var',
-        // ));
+        $e->getViewModel()->setVariables([
+            'myVar' => 'My Var',
+        ]);
+        */
     }
 
     /**

@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Mvc\Controller\Plugin;
@@ -21,7 +20,7 @@ class ZnZendDatabaseRowSize extends AbstractPlugin
      *
      * @var array array(<data type> => <size in bytes>, <data type> => <callback to calculate size in bytes>)
      */
-    protected $dataTypeBytes = array(
+    protected $dataTypeBytes = [
         'tinyint' => 1,
         'smallint' => 2,
         'mediumint' => 3,
@@ -41,7 +40,7 @@ class ZnZendDatabaseRowSize extends AbstractPlugin
         'blob' => 65535,
         'mediumblob' => 16777215,
         'longblob' => 4294967295,
-    );
+    ];
 
     /**
      * Constructor
@@ -58,7 +57,7 @@ class ZnZendDatabaseRowSize extends AbstractPlugin
             return ($integerBytes + $fractionalBytes);
         };
 
-        $this->dataTypeBytes = array_merge($this->dataTypeBytes, array(
+        $this->dataTypeBytes = array_merge($this->dataTypeBytes, [
             'float'   => function ($column) {
                 $precision = ($column->numeric_precision ?: 0);
                 return ($precision <= 24 ? 4 : 8);
@@ -68,7 +67,7 @@ class ZnZendDatabaseRowSize extends AbstractPlugin
             'bit' => function ($column) {
                 return ceil(($column->numeric_precision + 7) / 8);
             },
-        ));
+        ]);
     }
 
     /**
@@ -85,17 +84,17 @@ class ZnZendDatabaseRowSize extends AbstractPlugin
             . 'character_maximum_length, numeric_precision, numeric_scale '
             . 'FROM information_schema.columns '
             . 'WHERE table_schema = ?',
-            array($dbName)
+            [$dbName]
         );
 
-        $tableBytes = array();
+        $tableBytes = [];
         foreach ($columns as $column) {
             $columnBytes = ($column->character_maximum_length ?: 0);
-            if (!$columnBytes && isset($this->dataTypeBytes[$column->data_type])) {
+            if (! $columnBytes && isset($this->dataTypeBytes[$column->data_type])) {
                 $value = $this->dataTypeBytes[$column->data_type];
                 $columnBytes = is_callable($value) ? $value($column) : $value;
             }
-            if (!isset($tableBytes[$column->table_name])) {
+            if (! isset($tableBytes[$column->table_name])) {
                 $tableBytes[$column->table_name] = 0;
             }
             $tableBytes[$column->table_name] += $columnBytes;

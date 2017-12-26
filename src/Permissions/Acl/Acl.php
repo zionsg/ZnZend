@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Permissions\Acl;
@@ -40,7 +39,7 @@ class Acl extends ZendAcl
     {
         if (is_string($resource)) {
             $resource = new Resource\GenericResource($resource);
-        } elseif (!$resource instanceof Resource\ResourceInterface) {
+        } elseif (! $resource instanceof Resource\ResourceInterface) {
             throw new Exception\InvalidArgumentException(
                 'addResource() expects $resource to be of type Zend\Permissions\Acl\Resource\ResourceInterface'
             );

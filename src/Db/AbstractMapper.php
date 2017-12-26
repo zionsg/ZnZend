@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Db;
@@ -45,7 +44,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      *
      * @var array
      */
-    protected $records = array();
+    protected $records = [];
 
     /**
      * Fully qualified name of class used for result set objects - set by user
@@ -70,7 +69,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * @example array('usr_isdeleted' => 0)
      * @var     array
      */
-    protected $activeRowState = array();
+    protected $activeRowState = [];
 
     /**
      * Column-value pair used to determine deleted row state - set by user
@@ -78,7 +77,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * @example array('usr_isdeleted' => 1)
      * @var     array
      */
-    protected $deletedRowState = array();
+    protected $deletedRowState = [];
 
     /**
      * Current row state
@@ -127,14 +126,14 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     {
         $select = $this->sql->select();
 
-        if (!$this->hasRowState()) {
+        if (! $this->hasRowState()) {
             return $select;
         }
 
         // Any other value besides ACTIVE_ROWS and DELETED_ROWS will default to ALL_ROWS
-        if (self::ACTIVE_ROWS == $this->rowState && !empty($this->activeRowState)) {
+        if (self::ACTIVE_ROWS == $this->rowState && ! empty($this->activeRowState)) {
             $select->where($this->activeRowState);
-        } elseif (self::DELETED_ROWS == $this->rowState && !empty($this->deletedRowState)) {
+        } elseif (self::DELETED_ROWS == $this->rowState && ! empty($this->deletedRowState)) {
             $select->where($this->deletedRowState);
         }
 
@@ -184,20 +183,24 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      * @param  array $updateSet Optional column-value pairs to use for update instead of insert values from $set
      * @return int
      */
-    public function insertOnDuplicate($set, array $updateSet = array())
+    public function insertOnDuplicate($set, array $updateSet = [])
     {
         $set = $this->filterColumns($set);
 
         $dbAdapter = $this->adapter;
-        $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
-        $fp = function ($name) use ($dbAdapter) { return $dbAdapter->driver->formatParameterName($name); };
+        $qi = function ($name) use ($dbAdapter) {
+            return $dbAdapter->platform->quoteIdentifier($name);
+        };
+        $fp = function ($name) use ($dbAdapter) {
+            return $dbAdapter->driver->formatParameterName($name);
+        };
 
         $columns = array_keys($set);
         $quotedColumns = array_map($qi, $columns);
         $parameters = array_map($fp, array_values($columns));
 
         $primaryKey = $this->getPrimaryKey();
-        $updateValues = array();
+        $updateValues = [];
         foreach ($columns as $index => $column) {
             $quotedColumn = $quotedColumns[$index];
             if ($primaryKey == $column) {
@@ -234,9 +237,9 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
             $columns = $this->adapter->query(
                 'SELECT column_name FROM information_schema.columns '
                 . "WHERE table_schema = ? AND table_name = ? AND column_key = 'PRI'",
-                array($this->adapter->getCurrentSchema(), $this->table)
+                [$this->adapter->getCurrentSchema(), $this->table]
             );
-            $keys = array();
+            $keys = [];
             foreach ($columns as $column) {
                 $keys[] = $column->column_name;
             }
@@ -263,7 +266,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
             $data = $data->getArrayCopy();
         }
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             throw new Exception\InvalidArgumentException(
                 'Array or object implementing Zend\Stdlib\ArraySerializableInterface expected'
             );
@@ -277,9 +280,9 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         // array_intersect() not used as keys with empty strings or boolean false are removed
         $tableCols = array_flip($this->getColumns());  // need to flip
         foreach ($data as $key => $value) {
-            // isset() faster than in_array() and array_key_exists()
+            // isset() faster than in_[] and array_key_exists()
             $column = str_replace("{$this->table}.", '', $key);
-            if (!isset($tableCols[$column])) {
+            if (! isset($tableCols[$column])) {
                 unset($data[$key]);
             }
         }
@@ -298,7 +301,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public function getFeatureSet()
     {
-        if (!$this->featureSet instanceof Feature\FeatureSet) {
+        if (! $this->featureSet instanceof Feature\FeatureSet) {
             $this->featureSet = new Feature\FeatureSet();
         }
         return $this->featureSet;
@@ -317,9 +320,9 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
             $columns = $this->adapter->query(
                 'SELECT column_name FROM information_schema.columns '
                 . 'WHERE table_schema = ? AND table_name = ?',
-                array($this->adapter->getCurrentSchema(), $this->table)
+                [$this->adapter->getCurrentSchema(), $this->table]
             );
-            $this->columns = array();
+            $this->columns = [];
             foreach ($columns as $column) {
                 $this->columns[] = $column->column_name;
             }
@@ -361,7 +364,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     public function delete($where)
     {
         if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+            $where = [$this->getPrimaryKey() . ' = ?' => $where->getId()];
         }
         return parent::delete($where);
     }
@@ -388,15 +391,13 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
             $resultSetClass = $this->resultSetClass;
         }
 
-        if (   $resultSetClass == $this->resultSetClass
-            && $this->resultSetPrototype instanceof ResultSetInterface
-        ) {
+        if ($resultSetClass == $this->resultSetClass && $this->resultSetPrototype instanceof ResultSetInterface) {
             return $this->resultSetPrototype;
         }
 
         // Create prototype
         $resultSetInstance = new $resultSetClass();
-        if (!$resultSetInstance instanceof EntityInterface) {
+        if (! $resultSetInstance instanceof EntityInterface) {
             throw new Exception\InvalidArgumentException('Result set class does not implement EntityInterface');
         }
         $resultSetPrototype = new HydratingResultSet(
@@ -424,7 +425,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public function setRecords($records)
     {
-        if (!is_array($records)) {
+        if (! is_array($records)) {
             throw new Exception\InvalidArgumentException('Array expected');
         }
 
@@ -439,7 +440,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public static function getRowStates()
     {
-        $values = array(static::ACTIVE_ROWS, static::DELETED_ROWS, static::ALL_ROWS);
+        $values = [static::ACTIVE_ROWS, static::DELETED_ROWS, static::ALL_ROWS];
         return array_combine($values, $values);
     }
 
@@ -454,8 +455,8 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public function hasRowState()
     {
-        $hasActiveRowState  = is_array($this->activeRowState) && !empty($this->activeRowState);
-        $hasDeletedRowState = is_array($this->deletedRowState) && !empty($this->deletedRowState);
+        $hasActiveRowState  = is_array($this->activeRowState) && ! empty($this->activeRowState);
+        $hasDeletedRowState = is_array($this->deletedRowState) && ! empty($this->deletedRowState);
         return ($hasActiveRowState && $hasDeletedRowState);
     }
 
@@ -482,12 +483,12 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public function markActive($where)
     {
-        if (!$this->hasRowState()) {
+        if (! $this->hasRowState()) {
             return false;
         }
 
         if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+            $where = [$this->getPrimaryKey() . ' = ?' => $where->getId()];
         }
         return parent::update($this->activeRowState, $where);
     }
@@ -500,12 +501,12 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public function markDeleted($where)
     {
-        if (!$this->hasRowState()) {
+        if (! $this->hasRowState()) {
             return false;
         }
 
         if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+            $where = [$this->getPrimaryKey() . ' = ?' => $where->getId()];
         }
         return parent::update($this->deletedRowState, $where);
     }
@@ -523,7 +524,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         }
 
         $select = $this->getBaseSelect();
-        $select->where(array($this->getPrimaryKey() => $key));
+        $select->where([$this->getPrimaryKey() => $key]);
         return $this->getResultSet($select, false);
     }
 
@@ -547,7 +548,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
      */
     public function fetchIn($values, $column = null)
     {
-        if (!$values || !is_array($values)) {
+        if (! $values || ! is_array($values)) {
             return null;
         }
 
@@ -556,16 +557,20 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         }
 
         $dbAdapter = $this->adapter;
-        $qi = function ($name) use ($dbAdapter) { return $dbAdapter->platform->quoteIdentifier($name); };
-        $qv = function ($value) use ($dbAdapter) { return $dbAdapter->platform->quoteValue($value); };
+        $qi = function ($name) use ($dbAdapter) {
+            return $dbAdapter->platform->quoteIdentifier($name);
+        };
+        $qv = function ($value) use ($dbAdapter) {
+            return $dbAdapter->platform->quoteValue($value);
+        };
 
         $select = $this->getBaseSelect();
         $select->where->in($column, $values);
-        $select->order(array(new Expression(sprintf( // sort according to the order of the given values
+        $select->order([new Expression(sprintf( // sort according to the order of the given values
             'FIELD (%s, %s)',
             $qi($column),
             implode(',', array_map($qv, $values))
-        ))));
+        ))]);
 
         return $this->getResultSet($select);
     }
@@ -579,11 +584,11 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     public function create($set)
     {
         $affectedRows = $this->insert($set);
-        if (!$affectedRows) {
+        if (! $affectedRows) {
             return null;
         }
 
-        if (!$set instanceof EntityInterface) {
+        if (! $set instanceof EntityInterface) {
             $set = new $this->resultSetClass($set);
         }
 
@@ -614,7 +619,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
             $set = $set->getArrayCopy();
         }
         if ($where instanceof EntityInterface) {
-            $where = array($this->getPrimaryKey() . ' = ?' => $where->getId());
+            $where = [$this->getPrimaryKey() . ' = ?' => $where->getId()];
         }
 
         return parent::update($this->filterColumns($set), $where);

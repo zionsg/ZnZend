@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\View\Helper;
@@ -55,7 +54,7 @@ class ZnZendFormatDateRange extends AbstractHelper
         }
 
         return $output;
-    } // end function __invoke
+    }
 
     /**
      * Convert various datetime representations into UNIX timestamp

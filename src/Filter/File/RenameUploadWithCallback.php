@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Filter\File;
@@ -20,14 +19,14 @@ class RenameUploadWithCallback extends RenameUpload
     /**
      * @var array
      */
-    protected $options = array(
+    protected $options = [
         'target'               => null,
         'callback'             => null,
         'use_upload_name'      => false,
         'use_upload_extension' => false,
         'overwrite'            => false,
         'randomize'            => false,
-    );
+    ];
 
     /**
      * Set callback for renaming file
@@ -45,7 +44,7 @@ class RenameUploadWithCallback extends RenameUpload
         if (is_string($callback)) {
             $callback = new $callback();
         }
-        if (!is_callable($callback)) {
+        if (! is_callable($callback)) {
             throw new Exception\InvalidArgumentException('Invalid callback');
         }
 
@@ -76,14 +75,14 @@ class RenameUploadWithCallback extends RenameUpload
     protected function getFinalTarget($uploadData)
     {
         $callback = $this->getCallback();
-        if (!is_callable($callback)) {
+        if (! is_callable($callback)) {
             return parent::getFinalTarget($uploadData);
         }
 
         // This part is replicated from the parent class to resolve the target dir
         $source = $uploadData['tmp_name'];
         $target = $this->getTarget();
-        if (!isset($target) || $target == '*') {
+        if (! isset($target) || $target == '*') {
             $target = $source;
         }
 

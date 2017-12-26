@@ -2,8 +2,7 @@
 /**
  * ZnZend
  *
- * @author Zion Ng <zion@intzone.com>
- * @link   http://github.com/zionsg/ZnZend for canonical source repository
+ * @link https://github.com/zionsg/ZnZend for canonical source repository
  */
 
 namespace ZnZend\Db\Generator;
@@ -61,7 +60,7 @@ class EntityGenerator
      *
      * @var array
      */
-    protected static $mapTypes = array(
+    protected static $mapTypes = [
         'int' => 'int',
         'tinyint' => 'int',
         'smallint' => 'int',
@@ -73,7 +72,7 @@ class EntityGenerator
         'real' => 'float',
         'datetime' => 'DateTime',
         'timestamp' => 'DateTime',
-    );
+    ];
 
     /**
      * Generate entity classes for all tables in active database
@@ -107,16 +106,16 @@ class EntityGenerator
         $columnToGetterFunc = null,
         $columnToBooleanFunc = null
     ) {
-        if (!is_writable($filePath)) {
+        if (! is_writable($filePath)) {
             throw new Exception\InvalidArgumentException("{$filePath} is not writable");
         }
-        if (!is_callable($columnToSetterFunc)) {
+        if (! is_callable($columnToSetterFunc)) {
             $columnToSetterFunc = self::columnToSetterFunc();
         }
-        if (!is_callable($columnToGetterFunc)) {
+        if (! is_callable($columnToGetterFunc)) {
             $columnToGetterFunc = self::columnToGetterFunc();
         }
-        if (!is_callable($columnToBooleanFunc)) {
+        if (! is_callable($columnToBooleanFunc)) {
             $columnToBooleanFunc = self::columnToBooleanFunc();
         }
 
@@ -124,7 +123,7 @@ class EntityGenerator
         $databaseName = $dbAdapter->getCurrentSchema();
         $tables = $dbAdapter->query(
             'SELECT table_name FROM information_schema.tables WHERE table_schema = ?',
-            array($databaseName)
+            [$databaseName]
         );
         foreach ($tables as $table) {
             // If table name is `map_ab_cd`, entity name will be MapAbCd
@@ -137,14 +136,14 @@ class EntityGenerator
                 . 'character_maximum_length, numeric_precision, column_default '
                 . 'FROM information_schema.columns '
                 . 'WHERE table_schema = ? AND table_name = ?',
-                array($databaseName, $tableName)
+                [$databaseName, $tableName]
             );
 
             // Create getter and setters for each column and map them
-            $mapGettersColumns = array('getId' => null, 'getName' => null, 'isDeleted' => false);
-            $properties = array();
-            $methods = array();
-            $types = array();
+            $mapGettersColumns = ['getId' => null, 'getName' => null, 'isDeleted' => false];
+            $properties = [];
+            $methods = [];
+            $types = [];
             $priority = count($columns) + 1; // priority for elements - larger numbers mean higher priority
             foreach ($columns as $column) {
                 $priority--;
@@ -164,12 +163,12 @@ class EntityGenerator
                 }
                 $label = strtolower(implode(' ', $columnWords));
 
-                $tags = array(
+                $tags = [
                     new Tag('@Annotation\Exclude()'), // no form input needed for primary keys
                     new Tag('@Annotation\Flags({"priority": ' . ($priority * 10) . '})'), // priority
-                );
-                if (!$isPrimary) {
-                    $tags = array(
+                ];
+                if (! $isPrimary) {
+                    $tags = [
                         new Tag('@Annotation\Name("' . $columnName . '")'),
                         new Tag('@Annotation\Required(false)'),
                         new Tag(sprintf(
@@ -185,70 +184,68 @@ class EntityGenerator
                         )),
                         new Tag('@Annotation\Options({"label":"' . ucwords($label) . '"})'),
                         new Tag('@Annotation\Filter({"name":"StringTrim"})'),
-                    );
+                    ];
 
                     if ($isNumeric) { // numeric field
                         $tags[] = new Tag('@Annotation\Validator({"name":"Digits"})');
                         $defaultValue = ('int' == substr($sqlType, -3)) ? (int) $defaultValue : (float) $defaultValue;
                     }
 
-                    if (   'CURRENT_TIMESTAMP' == $defaultValue
-                        && ('datetime' == $sqlType || 'timestamp' == $sqlType)
-                    ) {
+                    if ('CURRENT_TIMESTAMP' == $defaultValue && ('datetime' == $sqlType || 'timestamp' == $sqlType)) {
                         $defaultValue = null; // cannot have string as default for datetime field
                     }
                 }
-                $properties[] = PropertyGenerator::fromArray(array(
+                $properties[] = PropertyGenerator::fromArray([
                     'name'         => $columnName,
                     'visibility'   => 'protected',
                     'defaultValue' => $defaultValue,
-                    'docblock'     => DocBlockGenerator::fromArray(array(
+                    'docblock'     => DocBlockGenerator::fromArray([
                         'shortDescription' => null,
                         'longDescription'  => null,
                         'tags'             => $tags,
-                    )),
-                ));
+                    ]),
+                ]);
 
                 // Setter
                 if ($setterName) {
-                    if (!in_array($setterName, array('setId', 'setName'))) { // skip methods defined in AbstractEntity
+                    if (! in_array($setterName, ['setId', 'setName'])) { // skip methods defined in AbstractEntity
                         $desc = 'Set ' . $label;
-                        $methods[] = MethodGenerator::fromArray(array(
+                        $methods[] = MethodGenerator::fromArray([
                             'name'       => $setterName,
-                            'parameters' => array(
-                                ParameterGenerator::fromArray(array('name' => 'value')),
-                            ),
-                            'body'       =>   ('string' == $phpType)
+                            'parameters' => [
+                                ParameterGenerator::fromArray(['name' => 'value']),
+                            ],
+                            'body'       => ('string' == $phpType)
                                             ? 'return $this->set($value);'
                                             : "return \$this->set(\$value, '{$phpType}');",
-                            'docblock'   => DocBlockGenerator::fromArray(array(
+                            'docblock'   => DocBlockGenerator::fromArray([
                                 'shortDescription' => $desc,
                                 'longDescription'  => null,
-                                'tags'             => array(
-                                    new ParamTag('value', array('null', $phpType)),
-                                    new ReturnTag(array($entityName)),
-                                ),
-                            )),
-                        ));
+                                'tags'             => [
+                                    new ParamTag('value', ['null', $phpType]),
+                                    new ReturnTag([$entityName]),
+                                ],
+                            ]),
+                        ]);
                     }
                 }
 
                 // Getter
                 if ($getterName) {
                     $mapGettersColumns[$getterName] = $columnName;
-                    if (!in_array($getterName, array('getId', 'getName'))) { // skip methods defined in AbstractEntity
+                    if (! in_array($getterName, ['getId', 'getName'])) { // skip methods defined in AbstractEntity
                         $desc = 'Get ' . $label;
-                        $methods[] = MethodGenerator::fromArray(array(
+                        $methods[] = MethodGenerator::fromArray([
                             'name'       => $getterName,
                             'body'       => 'return $this->get();',
-                            'docblock'   => DocBlockGenerator::fromArray(array(
+                            'docblock'   => DocBlockGenerator::fromArray([
                                 'shortDescription' => $desc,
                                 'longDescription'  => null,
-                                'tags'             => array(
-                                    new ReturnTag(array(self::getPhpType($sqlType))),
-                                ),
-                            )),
-                        ));
+                                'tags'             => [
+                                    new ReturnTag([self::getPhpType($sqlType)]),
+                                ],
+                            ]),
+                        ]);
                     }
                 }
 
@@ -257,17 +254,17 @@ class EntityGenerator
                     $mapGettersColumns[$booleanName] = $columnName;
                     if ($booleanName != 'isDeleted') { // skip methods defined in AbstractEntity
                         $desc = 'Check if ' . $label;
-                        $methods[] = MethodGenerator::fromArray(array(
+                        $methods[] = MethodGenerator::fromArray([
                             'name'       => $booleanName,
                             'body'       => 'return (bool) $this->get();',
-                            'docblock'   => DocBlockGenerator::fromArray(array(
+                            'docblock'   => DocBlockGenerator::fromArray([
                                 'shortDescription' => $desc,
                                 'longDescription'  => null,
-                                'tags'             => array(
-                                    new ReturnTag(array('bool')),
-                                ),
-                            )),
-                        ));
+                                'tags'             => [
+                                    new ReturnTag(['bool']),
+                                ],
+                            ]),
+                        ]);
                     }
                 }
             }
@@ -280,15 +277,15 @@ class EntityGenerator
                         ->addUse('Zend\Form\Annotation')
                         ->addUse($extendedClass, 'BaseEntityClass')
                         ->setExtendedClass('BaseEntityClass')
-                        ->setDocBlock(DocBlockGenerator::fromArray(array(
+                        ->setDocBlock(DocBlockGenerator::fromArray([
                               'shortDescription' => null,
                               'longDescription'  => null,
-                              'tags'             => array(
+                              'tags'             => [
                                   new Tag('@Annotation\Name("' . $entityName . '")'),
                                   new Tag('@Annotation\Type("ZnZend\Form\Form")'),
                                   new Tag('@Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")'),
-                              ),
-                          )));
+                              ],
+                          ]));
 
             if ($mapGettersColumns) {
                 // If no column is mapped to getName, eg. in a junction table which has no name column, use getId's
@@ -296,50 +293,50 @@ class EntityGenerator
                     $mapGettersColumns['getName'] = $mapGettersColumns['getId']; // hopefully getId's is not null also
                 }
 
-                array_unshift($properties, PropertyGenerator::fromArray(array(
+                array_unshift($properties, PropertyGenerator::fromArray([
                     'name'         => '_mapGettersColumns',
                     'visibility'   => 'protected',
                     'static'       => true,
                     'defaultValue' => $mapGettersColumns,
-                    'docblock'     => DocBlockGenerator::fromArray(array(
+                    'docblock'     => DocBlockGenerator::fromArray([
                         'shortDescription' => null,
                         'longDescription'  => null,
-                        'tags'             => array(
+                        'tags'             => [
                             new Tag('@Annotation\Exclude()'),
                             new Tag('@var', 'array'),
-                        ),
-                    ))
-                )));
+                        ],
+                    ])
+                ]));
             }
 
             array_unshift(
                 $properties,
-                PropertyGenerator::fromArray(array(
+                PropertyGenerator::fromArray([
                     'name'         => '_singularNoun',
                     'visibility'   => 'protected',
                     'defaultValue' => strtolower($entityName),
-                    'docblock'     => DocBlockGenerator::fromArray(array(
+                    'docblock'     => DocBlockGenerator::fromArray([
                         'shortDescription' => null,
                         'longDescription'  => null,
-                        'tags'             => array(
+                        'tags'             => [
                             new Tag('@Annotation\Exclude()'),
                             new Tag('@var', 'string'),
-                        ),
-                    ))
-                )),
-                PropertyGenerator::fromArray(array(
+                        ],
+                    ])
+                ]),
+                PropertyGenerator::fromArray([
                     'name'         => '_pluralNoun',
                     'visibility'   => 'protected',
                     'defaultValue' => strtolower($entityName) . 's',
-                    'docblock'     => DocBlockGenerator::fromArray(array(
+                    'docblock'     => DocBlockGenerator::fromArray([
                         'shortDescription' => null,
                         'longDescription'  => null,
-                        'tags'             => array(
+                        'tags'             => [
                             new Tag('@Annotation\Exclude()'),
                             new Tag('@var', 'string'),
-                        ),
-                    ))
-                ))
+                        ],
+                    ])
+                ])
             );
 
             if ($properties) {
