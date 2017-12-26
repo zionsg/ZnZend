@@ -44,6 +44,9 @@ For the Zend Framework 2 version, use the `v0.2.0` release.
 - Run `composer require zionsg/ZnZend` to get the latest release in the `master` branch.
   To get the `develop` branch, run `composer require zionsg/ZnZend:dev-develop`.
 - Ensure that the `ZnZend` module is enabled in `config/modules.config.php` in the ZF3 project.
+- To check coding style (CS) errors, run `composer cs`.
+- To run tests, run `composer test`.
+- See `scripts` key in `composer.json` for other scripts.
 
 ## Interfaces
 - `ZnZend\Authentication\IdentityInterface` - Interface for identity stored in authentication service
