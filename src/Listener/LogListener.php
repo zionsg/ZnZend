@@ -53,22 +53,29 @@ class LogListener extends AbstractListenerAggregate
      *
      * Once attached, the listener will listen to the events named after the RFC5424 severity levels,
      * eg. when the following code is run in a controller:
-     *     $this->getEventManager()->trigger('log', $this, array('param' => 'value'));
+     *     $this->getEventManager()->trigger('log', $this, ['param' => 'value']);
      *
      * Listens for exceptions as well as Zend\Log\Logger::registerExceptionHandler() does not seem to work.
      *
      * @param EventManagerInterface $events
+     * @param int                   $priority
      * @return void
      */
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $sharedEvents      = $events->getSharedManager(); // must use shared manager else it will not work
-        $this->listeners[] = $sharedEvents->attach('*', $this->logEvents, [$this, 'log']);
-        $this->listeners[] = $sharedEvents->attach(
-            'Zend\Mvc\Application',
-            [MvcEvent::EVENT_DISPATCH_ERROR, MvcEvent::EVENT_RENDER_ERROR],
-            [$this, 'logException']
-        );
+        $sharedEvents = $events->getSharedManager(); // must use shared manager else it will not work
+
+        foreach ($this->logEvents as $event) {
+            $this->listeners[] = $sharedEvents->attach('*', $event, [$this, 'log']);
+        }
+
+        foreach ([MvcEvent::EVENT_DISPATCH_ERROR, MvcEvent::EVENT_RENDER_ERROR] as $event) {
+            $this->listeners[] = $sharedEvents->attach(
+                'Zend\Mvc\Application',
+                $event,
+                [$this, 'logException']
+            );
+        }
     }
 
     /**
@@ -101,7 +108,7 @@ class LogListener extends AbstractListenerAggregate
     public function logException(EventInterface $e)
     {
         $result = $e->getResult();
-        $exception = isset($result->exception) ? $result->exception : null; // property may not exist, eg. if status 302
+        $exception = $result->exception ?? null; // property may not exist, eg. if status 302
         if (! $exception) {
             return;
         }
