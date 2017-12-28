@@ -52,9 +52,13 @@
             "@test"
         ],
         "cs": "phpcs config src test",
-        "cs-errors-only": "./vendor/bin/phpcs -q --warning-severity=0 --standard=PSR1,PSR2 --no-colors --no-cache --ignore-annotations config src test",
         "cs-fix": "phpcbf config src test",
+        "cs-errors-only": "\"./vendor/bin/phpcs\" -q --warning-severity=0 --standard=PSR1,PSR2 --no-colors --no-cache --ignore-annotations config src test",
         "serve": "php -S 0.0.0.0:8080 -t public/ public/index.php",
-        "test": "phpunit -c test/phpunit.xml test"
-    }
+        "test": "\"./vendor/bin/phpunit\" -c test/phpunit.xml test"
+    },
+    "_comments": [
+        "Path specified for cs-errors-only and test commands under scripts so that Travis CI will use our version instead of theirs when using .travis.yml",
+        "Escaped quotes under scripts are to enable commands to work in Windows"
+    ]
 }
