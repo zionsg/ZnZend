@@ -16,7 +16,6 @@ use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
-use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use ZnZend\Listener\LogListener;
 
@@ -88,7 +87,7 @@ class Module implements
 
         // Allow configuration of PHP settings via 'php_settings' key in config
         $config = $sm->get('Config');
-        $phpSettings = isset($config['php_settings']) ? $config['php_settings'] : [];
+        $phpSettings = $config['php_settings'] ?? [];
         foreach ($phpSettings as $key => $value) {
             ini_set($key, $value);
         }
@@ -104,18 +103,14 @@ class Module implements
 
         // For reference only - up to application to implement
         /*
-        // Route listener
-        $eventManager        = $e->getApplication()->getEventManager();
-        $moduleRouteListener = new ModuleRouteListener();
-        $moduleRouteListener->attach($eventManager);
-
         // Log listener
         $logger->registerErrorHandler() not used as notices will be logged also and be missed out in development env
         $logger->registerExceptionHandler() does not work - listener used instead to listen to dispatch error event
         $logger = new Logger();
         $logger->addWriter(new Mock());
         $logListener = new LogListener($logger);
-        $eventManager->attachAggregate($logListener); // alternate way of attaching listener from above
+        $eventManager = $e->getApplication()->getEventManager();
+        $logListener->attach($eventManager);
 
         // Set global/static db adapter for feature-enabled TableGateways such as ZnZend\Model\AbstractMapper
         if ($sm->has('Zend\Db\Adapter\Adapter')) {
