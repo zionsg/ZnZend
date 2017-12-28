@@ -450,6 +450,6 @@ class EntityGenerator
      */
     protected static function getPhpType($sqlType)
     {
-        return (isset(self::$mapTypes[$sqlType]) ? self::$mapTypes[$sqlType] : 'string');
+        return (self::$mapTypes[$sqlType] ?? 'string');
     }
 }
