@@ -1,12 +1,42 @@
 # Change Log
+
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 The format follows [Keep a CHANGELOG](http://keepachangelog.com/) as recommended by the
 [Zend Framework Maintainers Guide](https://github.com/zendframework/maintainers/blob/master/MAINTAINERS.md).
 BC breaks shall be listed at the top of their respective sections.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][unreleased]
-Migration from Zend Framework 2 to Zend Framework 3.
+## [Unreleased]
+v0.3.0 - Migration from Zend Framework 2 to Zend Framework 3.
+
+### Added
+- Nothing yet.
+
+### Changed
+- Use Composer for installation, including specifying of individual Zend Framework components.
+- Require PHP 7.0 and above.
+- Use [PSR-4](http://www.php-fig.org/psr/psr-4/) for autoloading and directory structure. Path in
+  `ZnZend\Module::getConfig()` updated accordingly.
+- Short array syntax used to define arrays.
+- Replace code such as `(isset($x) ? $x : $y)` with null coalescing operator `??`.
+- Replace [Sensio Labs PHP CS Fixer](https://github.com/fabpot/php-cs-fixer) with
+  [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) for checking compliance with coding standards.
+- Replace [PHPUnit](https://phpunit.de/) with [Zend\Test](https://docs.zendframework.com/zend-test/) for tests.
+- Replace all occurrences of `Zend\Stdlib\Hydrator\ArraySerializable` with `Zend\Hydrator\ArraySerializable`.
+- Add method argument `$priority` to `ZnZend\Listener\LogListener::attach()` due to method signature change in
+  `Zend\EventManager\ListenerAggregateInterface::attach()`.
+- Replace `$eventManager->attach($logListener);` with `$logListener->attach($eventManager);` in commented example
+  for the log listener in `ZnZend\Module::onBootstrap()`.
+
+### Removed
+- `ZnZend\Module` no longer implements `Zend\ModuleManager\Feature\AutoloaderProviderInterface`
+  nor `getAutoloaderConfig()`.
+- Removed commented example for `Zend\Mvc\ModuleRouteListener` in `ZnZend\Module::onBootstrap()`.
+
+### Fixed
+- Travis CI was failing due to support for PHP 5.3 and broken link for Sensio Lab's PHP CS Fixer. Now working.
+- Pass each event as a string via a loop to `ZnZend\Listener\LogListener::attach()` for the 2nd argument
+  as `Zend\EventManager\SharedEventManager::attach()` no longer accepts an array of events for the 2nd argument.
 
 ## [v0.2.0] - 2015-10-14
 ### Added
@@ -74,6 +104,6 @@ the developer deems it not appropriate to tag it as version 1.0.0 as the unit te
 use of it warrants versioning. A develop branch has been created at this point to accumulate changes before merging them
 into the master branch for a new release.
 
-[unreleased]: https://github.com/zionsg/ZnZend/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/zionsg/ZnZend/compare/v0.2.0...HEAD
 [v0.2.0]: https://github.com/zionsg/ZnZend/compare/v0.1.0...v0.2.0
 [v0.1.0]: https://github.com/zionsg/ZnZend/tree/v0.1.0
