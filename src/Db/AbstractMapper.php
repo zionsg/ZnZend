@@ -16,7 +16,7 @@ use Zend\Db\TableGateway\AbstractTableGateway;
 use Zend\Db\TableGateway\Feature;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\ArraySerializableInterface;
-use Zend\Stdlib\Hydrator\ArraySerializable as ArraySerializableHydrator;
+use Zend\Hydrator\ArraySerializable as ArraySerializableHydrator;
 use ZnZend\Db\EntityInterface;
 use ZnZend\Db\Exception;
 use ZnZend\Db\MapperInterface;

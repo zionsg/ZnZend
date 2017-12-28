@@ -283,7 +283,7 @@ class EntityGenerator
                               'tags'             => [
                                   new Tag('@Annotation\Name("' . $entityName . '")'),
                                   new Tag('@Annotation\Type("ZnZend\Form\Form")'),
-                                  new Tag('@Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")'),
+                                  new Tag('@Annotation\Hydrator("Zend\Hydrator\ArraySerializable")'),
                               ],
                           ]));
 

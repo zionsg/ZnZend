@@ -32,7 +32,7 @@ use ZnZend\Db\Exception;
  *
  * @Annotation\Name("Entity")
  * @Annotation\Type("ZnZend\Form\Form")
- * @Annotation\Hydrator("Zend\Stdlib\Hydrator\ArraySerializable")
+ * @Annotation\Hydrator("Zend\Hydrator\ArraySerializable")
  */
 abstract class AbstractEntity implements EntityInterface
 {
@@ -177,7 +177,7 @@ abstract class AbstractEntity implements EntityInterface
      * the corresponding setter is assumed to be setX().
      * Extending classes should override this if this is not desired.
      *
-     * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::hydrate()
+     * This method is used by \Zend\Hydrator\ArraySerializable::hydrate()
      * typically in forms to populate an object.
      *
      * @param  array $data
@@ -217,7 +217,7 @@ abstract class AbstractEntity implements EntityInterface
      * If the value is an object, $value->__toString() must be defined.
      * Extending classes should override this if any of the above is not desired.
      *
-     * This method is used by \Zend\Stdlib\Hydrator\ArraySerializable::extract()
+     * This method is used by \Zend\Hydrator\ArraySerializable::extract()
      * typically in forms to extract values from an object.
      *
      * @return array
