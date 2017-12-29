@@ -6,11 +6,16 @@ The format follows [Keep a CHANGELOG](http://keepachangelog.com/) as recommended
 BC breaks shall be listed at the top of their respective sections.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-v0.3.0 - Migration from Zend Framework 2 to Zend Framework 3.
+## [v0.3.0] - 2017-12-30
+Migration from Zend Framework 2 to Zend Framework 3. This release updates the module to work with Zend Framework 3 (ZF3)
+projects, with intzone.com being its first deployment. Not all the components have been tested yet - it is still
+work in progress.
+
+As of this point, the module will no longer maintain compatibility with Zend Framework 2 (ZF2).
+For ZF2 projects, please use the `v0.2.0` release.
 
 ### Added
-- Nothing yet.
+- Nothing.
 
 ### Changed
 - Use Composer for installation, including specifying of individual Zend Framework components.
@@ -34,6 +39,7 @@ v0.3.0 - Migration from Zend Framework 2 to Zend Framework 3.
 - Removed commented example for `Zend\Mvc\ModuleRouteListener` in `ZnZend\Module::onBootstrap()`.
 
 ### Fixed
+- Lots of CS fixes :P
 - Travis CI was failing due to support for PHP 5.3 and broken link for Sensio Lab's PHP CS Fixer. Now working.
 - Pass each event as a string via a loop to `ZnZend\Listener\LogListener::attach()` for the 2nd argument
   as `Zend\EventManager\SharedEventManager::attach()` no longer accepts an array of events for the 2nd argument.
@@ -104,6 +110,7 @@ the developer deems it not appropriate to tag it as version 1.0.0 as the unit te
 use of it warrants versioning. A develop branch has been created at this point to accumulate changes before merging them
 into the master branch for a new release.
 
-[Unreleased]: https://github.com/zionsg/ZnZend/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/zionsg/ZnZend/compare/v0.3.0...HEAD
+[v0.3.0]: https://github.com/zionsg/ZnZend/compare/v0.2.0...v0.3.0
 [v0.2.0]: https://github.com/zionsg/ZnZend/compare/v0.1.0...v0.2.0
 [v0.1.0]: https://github.com/zionsg/ZnZend/tree/v0.1.0
