@@ -1,31 +1,65 @@
 {
     "name": "zionsg/znzend",
-    "description": "Zend Framework 2 module containing helpers and base classes for projects at intzone.com",
+    "description": "Zend Framework 2/3 module containing helpers and base classes for projects at intzone.com",
     "type": "library",
     "keywords": [
+        "zf3",
         "zf2",
         "zend",
         "module"
     ],
     "homepage": "https://github.com/zionsg/ZnZend",
-    "authors": [
-        {
-            "name": "Zion Ng",
-            "email": "zion@intzone.com",
-            "homepage": "http://zion.sg/"
-        }
-    ],
+    "prefer-stable": true,
     "require": {
-        "php": ">=5.3.3",
-        "zendframework/zendframework": "2.*",
-        "doctrine/common": ">=2.1"      
+        "php": "^7.0",
+        "zendframework/zend-authentication": "^2.5",
+        "zendframework/zend-captcha": "^2.7",
+        "zendframework/zend-code": "^3.1",
+        "zendframework/zend-crypt": "^3.2",
+        "zendframework/zend-db": "^2.9",
+        "zendframework/zend-eventmanager": "^3.2",
+        "zendframework/zend-filter": "^2.7",
+        "zendframework/zend-form": "^2.11",
+        "zendframework/zend-http": "^2.7",
+        "zendframework/zend-i18n": "^2.7",
+        "zendframework/zend-log": "^2.9",
+        "zendframework/zend-mvc": "^3.1",
+        "zendframework/zend-mvc-plugin-identity": "^1.0",
+        "zendframework/zend-paginator": "^2.8",
+        "zendframework/zend-permissions-acl": "^2.6",
+        "zendframework/zend-session": "^2.8",
+        "zendframework/zend-stdlib": "^3.1",
+        "zendframework/zend-router": "^3.0",
+        "zendframework/zend-view": "^2.9",
+        "doctrine/common": "^2.7"
+    },
+    "require-dev": {
+        "zendframework/zend-test": "^3.1",
+        "squizlabs/php_codesniffer": "^3.2"
     },
     "autoload": {
-        "psr-0": {
-            "ZnZend": "src/"
-        },
-        "classmap": [
-            "./Module.php"
-        ]
-    }
+        "psr-4": {
+            "ZnZend\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZnZendTest\\": "test/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs",
+            "@test"
+        ],
+        "cs": "phpcs config src test",
+        "cs-fix": "phpcbf config src test",
+        "cs-errors-only": "\"./vendor/bin/phpcs\" -q --warning-severity=0 --standard=PSR1,PSR2 --no-colors --no-cache --ignore-annotations config src test",
+        "serve": "php -S 0.0.0.0:8080 -t public/ public/index.php",
+        "test": "\"./vendor/bin/phpunit\" -c test/phpunit.xml test"
+    },
+    "_comments": [
+        "Path specified for cs-errors-only and test commands under scripts so that Travis CI will use our version instead of theirs when using .travis.yml",
+        "Escaped quotes under scripts are to enable commands to work in Windows"
+    ]
 }

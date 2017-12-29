@@ -1,16 +1,12 @@
 language: php
 
 php:
-  - 5.3
-  - 5.4
-
-before_install:
- - wget http://cs.sensiolabs.org/get/php-cs-fixer.phar
+  - 7.0
 
 before_script:
- - composer self-update
- - composer install
- 
+  - composer self-update
+  - composer install
+
 script:
- - (cd test; phpunit -c phpunit.xml.dist)
- - output=$(php php-cs-fixer.phar fix --verbose --dry-run --diff --level=psr2 .); if [[ $output ]]; then while read -r line; do echo -e "\e[00;31m$line\e[00m"; done <<< "$output"; false; fi;
+  - (composer test)
+  - output=$(composer cs-errors-only); if [[ $output ]]; then while read -r line; do echo -e "\e[00;31m$line\e[00m"; done <<< "$output"; false; fi;
