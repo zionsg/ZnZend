@@ -25,7 +25,7 @@ For the Zend Framework 2 version, use the `v0.2.0` release.
 ## Requirements
 - [PHP](http://php.net/) >= 7.0
 - [Composer](https://getcomposer.org/)
-- [Zend Framework 3](https://framework.zend.com/) >= 3.0
+- [Zend Framework 3](https://framework.zend.com/)
 
 ## Installation
 - As this module is not available on Packagist, the GitHub repository needs to be added to `composer.json` in the
@@ -47,6 +47,7 @@ For the Zend Framework 2 version, use the `v0.2.0` release.
 - To check coding style (CS) errors, run `composer cs`.
 - To run tests, run `composer test`.
 - See `scripts` key in `composer.json` for other scripts.
+- Examples can be found in `docs/examples`.
 
 ## Interfaces
 - `ZnZend\Authentication\IdentityInterface` - Interface for identity stored in authentication service
