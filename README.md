@@ -5,14 +5,14 @@ Master:
 Develop:
 [![Build Status](https://secure.travis-ci.org/zionsg/ZnZend.png?branch=develop)](https://travis-ci.org/zionsg/ZnZend)
 
-Zend Framework 2 module containing helpers and base classes for my projects at intzone.com.
+Zend Framework 2/3 module containing helpers and base classes for my projects at intzone.com.
 
 ## Release Information
-*ZnZend 0.3.0dev*
+*ZnZend v0.3.0*
 
-DD MMM YYYY
+30 December 2017
 
-## Updates in 0.3.0
+## Updates in v0.3.0
 Please see [CHANGELOG.md](CHANGELOG.md).
 
 ## Introduction

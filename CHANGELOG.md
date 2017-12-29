@@ -45,6 +45,7 @@ For ZF2 projects, please use the `v0.2.0` release.
   as `Zend\EventManager\SharedEventManager::attach()` no longer accepts an array of events for the 2nd argument.
 
 ## [v0.2.0] - 2015-10-14
+
 ### Added
 - This CHANGELOG file.
 - [BC Break Commit](https://github.com/zionsg/ZnZend/commit/9b7c6746742852d1c4eac725ce769b4b09a6e8d9) adds a new method
