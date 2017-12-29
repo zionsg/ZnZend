@@ -6,6 +6,20 @@ The format follows [Keep a CHANGELOG](http://keepachangelog.com/) as recommended
 BC breaks shall be listed at the top of their respective sections.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Nothing.
+
+### Changed
+- Nothing.
+
+### Removed
+- Nothing.
+
+### Fixed
+- Nothing.
+
 ## [v0.3.0] - 2017-12-30
 Migration from Zend Framework 2 to Zend Framework 3. This release updates the module to work with Zend Framework 3 (ZF3)
 projects, with intzone.com being its first deployment. Not all the components have been tested yet - it is still
