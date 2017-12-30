@@ -304,6 +304,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         if (! $this->featureSet instanceof Feature\FeatureSet) {
             $this->featureSet = new Feature\FeatureSet();
         }
+
         return $this->featureSet;
     }
 
@@ -345,6 +346,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
             // $set->setCreator($set->getAuthIdentity())->setCreated(date('c')); // eg. of how getAuthIdentity() is used
             $set = $set->getArrayCopy();
         }
+
         return parent::insert($this->filterColumns($set));
     }
 
@@ -366,6 +368,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         if ($where instanceof EntityInterface) {
             $where = [$this->getPrimaryKey() . ' = ?' => $where->getId()];
         }
+
         return parent::delete($where);
     }
 
@@ -441,6 +444,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     public static function getRowStates()
     {
         $values = [static::ACTIVE_ROWS, static::DELETED_ROWS, static::ALL_ROWS];
+
         return array_combine($values, $values);
     }
 
@@ -457,6 +461,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     {
         $hasActiveRowState  = is_array($this->activeRowState) && ! empty($this->activeRowState);
         $hasDeletedRowState = is_array($this->deletedRowState) && ! empty($this->deletedRowState);
+
         return ($hasActiveRowState && $hasDeletedRowState);
     }
 
@@ -472,6 +477,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     public function setRowState($rowState)
     {
         $this->rowState = $rowState;
+
         return $this;
     }
 
@@ -490,6 +496,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         if ($where instanceof EntityInterface) {
             $where = [$this->getPrimaryKey() . ' = ?' => $where->getId()];
         }
+
         return parent::update($this->activeRowState, $where);
     }
 
@@ -508,6 +515,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         if ($where instanceof EntityInterface) {
             $where = [$this->getPrimaryKey() . ' = ?' => $where->getId()];
         }
+
         return parent::update($this->deletedRowState, $where);
     }
 
@@ -525,6 +533,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
 
         $select = $this->getBaseSelect();
         $select->where([$this->getPrimaryKey() => $key]);
+
         return $this->getResultSet($select, false);
     }
 
@@ -536,6 +545,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
     public function fetchAll()
     {
         $select = $this->getBaseSelect();
+
         return $this->getResultSet($select);
     }
 
@@ -593,6 +603,7 @@ abstract class AbstractMapper extends AbstractTableGateway implements MapperInte
         }
 
         $set->setId($this->getLastInsertValue()); // this is important!
+
         return $set;
     }
 

@@ -173,6 +173,7 @@ class Question extends AbstractWord
         $session           = $this->getSession();
         $session->question = $question;
         $this->question    = $question;
+
         return $this;
     }
 
@@ -187,6 +188,7 @@ class Question extends AbstractWord
             $session        = $this->getSession();
             $this->question = $session->question;
         }
+
         return $this->question;
     }
 
@@ -201,6 +203,7 @@ class Question extends AbstractWord
         $session         = $this->getSession();
         $session->answer = $answer;
         $this->answer    = $answer;
+
         return $this;
     }
 
@@ -215,6 +218,7 @@ class Question extends AbstractWord
             $session      = $this->getSession();
             $this->answer = $session->answer;
         }
+
         return $this->answer;
     }
 
@@ -227,6 +231,7 @@ class Question extends AbstractWord
     protected function setImage($image)
     {
         $this->image = $image;
+
         return $this;
     }
 
@@ -240,6 +245,7 @@ class Question extends AbstractWord
         if (empty($this->image)) {
             $this->image = $this->generateImage();
         }
+
         return $this->image;
     }
 
@@ -252,6 +258,7 @@ class Question extends AbstractWord
     public function setService(QuestionServiceInterface $service)
     {
         $this->service = $service;
+
         return $this;
     }
 
@@ -274,6 +281,7 @@ class Question extends AbstractWord
     public function setFont($font)
     {
         $this->font = $font;
+
         return $this;
     }
 
@@ -296,6 +304,7 @@ class Question extends AbstractWord
     public function setFontSize($fontSize)
     {
         $this->fontSize = $fontSize;
+
         return $this;
     }
 
@@ -318,6 +327,7 @@ class Question extends AbstractWord
     public function setPadding($padding)
     {
         $this->padding = $padding;
+
         return $this;
     }
 
@@ -338,6 +348,7 @@ class Question extends AbstractWord
     public function setDotNoisePercent($dotNoisePercent)
     {
         $this->dotNoisePercent = $dotNoisePercent;
+
         return $this;
     }
 
@@ -356,6 +367,7 @@ class Question extends AbstractWord
     public function setLineNoiseLevel($lineNoiseLevel)
     {
         $this->lineNoiseLevel = $lineNoiseLevel;
+
         return $this;
     }
 
@@ -374,6 +386,7 @@ class Question extends AbstractWord
     public function setTransformImage($transformImage)
     {
         $this->transformImage = $transformImage;
+
         return $this;
     }
 

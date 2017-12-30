@@ -63,6 +63,7 @@ class Identity implements IdentityInterface
     public function setIdentityId($id)
     {
         $this->identityId = $id;
+
         return $this;
     }
 
@@ -85,6 +86,7 @@ class Identity implements IdentityInterface
     public function setUsername($username)
     {
         $this->username = $username;
+
         return $this;
     }
 
@@ -107,6 +109,7 @@ class Identity implements IdentityInterface
     public function setDisplayName($displayName)
     {
         $this->displayName = $displayName;
+
         return $this;
     }
 
@@ -129,6 +132,7 @@ class Identity implements IdentityInterface
     public function addRole(RoleInterface $role)
     {
         $this->roles[] = $role;
+
         return $this;
     }
 

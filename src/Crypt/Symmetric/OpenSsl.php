@@ -169,6 +169,7 @@ class OpenSsl extends Mcrypt
             false,
             $iv
         );
+
         // unpadding
         return $this->padding->strip($result);
     }
@@ -209,6 +210,7 @@ class OpenSsl extends Mcrypt
         if ('DES-EDE3' == $algo && 'ECB' == $mode) {
             return $algo;
         }
+
         return $algo . '-' . $mode;
     }
 }

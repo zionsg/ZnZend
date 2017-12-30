@@ -318,6 +318,7 @@ abstract class AbstractEntity implements EntityInterface
         if (empty($map[$property])) {
             return null;
         }
+
         return $map[$property];
     }
 
@@ -347,6 +348,7 @@ abstract class AbstractEntity implements EntityInterface
     public function setAuthIdentity($identity)
     {
         $this->_authIdentity = (string) $identity; // objects must implement __toString()
+
         return $this;
     }
 
@@ -369,6 +371,7 @@ abstract class AbstractEntity implements EntityInterface
     public function setSingularNoun($value)
     {
         $this->_singularNoun = strtolower($value);
+
         return $this;
     }
 
@@ -392,6 +395,7 @@ abstract class AbstractEntity implements EntityInterface
     public function setPluralNoun($value)
     {
         $this->_pluralNoun = strtolower($value);
+
         return $this;
     }
 
@@ -492,6 +496,7 @@ abstract class AbstractEntity implements EntityInterface
             }
             $this->_mapColumnsGetters = $map;
         }
+
         return $this->_mapColumnsGetters;
     }
 
@@ -543,6 +548,7 @@ abstract class AbstractEntity implements EntityInterface
         // Set value and indicate that property has been modified
         $this->$property = $value;
         $this->_modifiedColumns[$property] = ''; // empty value is just a placeholder
+
         return $this;
     }
 
@@ -613,6 +619,7 @@ abstract class AbstractEntity implements EntityInterface
         foreach ($setBits as $bit) {
             $bitflag |= (int) $bit; // '1' and 1 will yield different results hence cast to int
         }
+
         return $bitflag;
     }
 

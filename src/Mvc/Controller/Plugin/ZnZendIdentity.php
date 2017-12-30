@@ -72,6 +72,7 @@ class ZnZendIdentity extends ZendIdentityPlugin
                  ->setUsername($name)
                  ->setDisplayName($name)
                  ->addRole(new GenericRole());
+
         return $identity;
     }
 

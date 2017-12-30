@@ -54,6 +54,7 @@ class ZnZendDatabaseRowSize extends AbstractPlugin
             $fractionalDigits = $column->numeric_scale;
             $integerBytes     = (floor($integerDigits / 9) * 4) + ceil(($integerDigits % 9) / 2);
             $fractionalBytes  = (floor($fractionalDigits / 9) * 4) + ceil(($fractionalDigits % 9) / 2);
+
             return ($integerBytes + $fractionalBytes);
         };
 

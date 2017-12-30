@@ -97,6 +97,7 @@ class MathQuestionService implements QuestionServiceInterface
         }
 
         $ans = $num . $ans;
+
         return $ans;
     }
 

@@ -49,6 +49,7 @@ class RenameUploadWithCallback extends RenameUpload
         }
 
         $this->options['callback'] = $callback;
+
         return $this;
     }
 

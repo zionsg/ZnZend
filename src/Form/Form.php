@@ -123,6 +123,7 @@ class Form extends ZendForm implements ResourceInterface
     public function setParams(array $params = [])
     {
         $this->params = $params;
+
         return $this;
     }
 
@@ -140,6 +141,7 @@ class Form extends ZendForm implements ResourceInterface
             $this->params,
             $params
         );
+
         return $this;
     }
 
@@ -195,6 +197,7 @@ class Form extends ZendForm implements ResourceInterface
     public function setErrorMessages(array $messages)
     {
         $this->clearErrorMessages();
+
         return $this->addErrorMessages($messages);
     }
 
@@ -221,6 +224,7 @@ class Form extends ZendForm implements ResourceInterface
     public function addErrorMessage($message)
     {
         $this->errorMessages[] = (string) $message;
+
         return $this;
     }
 
@@ -242,6 +246,7 @@ class Form extends ZendForm implements ResourceInterface
     public function clearErrorMessages()
     {
         $this->errorMessages = [];
+
         return $this;
     }
 
@@ -302,6 +307,7 @@ class Form extends ZendForm implements ResourceInterface
     public function setParentResourceId($parentResourceId)
     {
         $this->parentResourceId = strtolower($parentResourceId);
+
         return $this;
     }
 }
