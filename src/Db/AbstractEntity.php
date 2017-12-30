@@ -211,8 +211,9 @@ abstract class AbstractEntity implements EntityInterface
      * This uses $_mapGettersColumns and calls all the getters to populate the array.
      * By default, properties prefixed with an underscore will be omitted.
      *
-     * All values are cast to string for use in forms and database queries.
-     * If the value is DateTime, $value->format('c') is used to return the ISO 8601 timestamp.
+     * All values are cast to string for use in forms and database queries except for null as this may cause problems
+     * with primary key columns in database inserts.
+     * If the value is DateTime, $value->format('Y-m-d\TH:i:s'). No timezone so as to be compatible with MySQL DateTime.
      * If the value is an array, it will be imploded into a comma-delimited list.
      * If the value is an object, $value->__toString() must be defined.
      * Extending classes should override this if any of the above is not desired.
@@ -231,13 +232,15 @@ abstract class AbstractEntity implements EntityInterface
             if (! property_exists($this, $column) || '_' == substr($column, 0, 1)) {
                 continue; // in case the column is an SQL expression
             }
+
             $value = $this->$getter();
             if ($value instanceof DateTime) {
-                $value = $value->format('c');
+                $value = $value->format('Y-m-d\TH:i:s');
             } elseif (is_array($value)) {
                 $value = implode(',', $value);
             }
-            $result[$column] = (string) $value;
+
+            $result[$column] = (null === $value) ? null : (string) $value;
         }
 
         return $result;
