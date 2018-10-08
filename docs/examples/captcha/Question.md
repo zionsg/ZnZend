@@ -60,4 +60,4 @@ echo $this->form()->closeTag();
 
 _BECOMES_
 
-![Screenshot of result](https://raw.github.com/zionsg/ZnZend/master/examples/captcha/Question_screenshot.png)
+![Screenshot of result](Question_screenshot.png)
