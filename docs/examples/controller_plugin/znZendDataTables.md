@@ -160,4 +160,4 @@ class IndexController extends AbstractActionController
 
 _BECOMES_
 
-![Screenshot of result](https://raw.github.com/zionsg/ZnZend/master/examples/controller_plugin/znZendDataTables_screenshot.png)
+![Screenshot of result](znZendDataTables_screenshot.png)
